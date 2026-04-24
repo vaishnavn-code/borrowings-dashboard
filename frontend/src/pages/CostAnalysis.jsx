@@ -151,7 +151,7 @@ const COLUMNS = [
   },
 ];
 
-export default function Loans({ data }) {
+export default function CostAnalysis({ data }) {
 
   const rows = data?.loan_portfolio?.table || [];
   const kpi = data?.exposure?.kpi || {}

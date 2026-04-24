@@ -4,10 +4,10 @@ import { jsPDF } from 'jspdf';
 import domtoimage from 'dom-to-image';
 import html2canvas from 'html2canvas';
 import Overview from "../../pages/Overview";
-import Exposure from "../../pages/Exposure";
-import Loans from "../../pages/Loans";
+import Exposure from "../../pages/Portfolio";
+import Loans from "../../pages/CostAnalysis";
 import Rates from "../../pages/Rates";
-import Borrowers from "../../pages/Borrowers";
+import Borrowers from "../../pages/Maturity";
 import Transactions from "../../pages/Transactions";
 function LiveClock() {
   const [time, setTime] = useState("");

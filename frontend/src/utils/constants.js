@@ -1,12 +1,13 @@
 /** Navigation pages — remove or add entries here to change the sidebar. */
 export const NAV_PAGES = [
-  { id: 'overview',     label: 'Overview',         section: 'Navigation' },
-  { id: 'exposure',     label: 'Exposure Analysis',          section: 'Navigation' },
-  // { id: 'loans', label: 'Loan Portfolio',      section: 'Data Views' },
-  { id: 'rates',        label: 'Interest & Rates',  section: 'Data Views' },
-  { id: 'borrowers',    label: 'Borrower Views',         section: 'Data Views' },
-  { id: 'transactions', label: 'Transactions',      section: '' },
+  { id: 'overview', label: 'Overview', section: 'Navigation' },
+  { id: 'portfolioMix', label: 'Portfolio Mix', section: 'Navigation' },
 
+  { id: 'costAnalysis', label: 'Cost Analysis', section: 'Data Views' },
+  { id: 'rateTrends', label: 'Rate Trends', section: 'Data Views' },
+  { id: 'maturityAnalysis', label: 'Maturity Analysis', section: 'Data Views' },
+  { id: 'counterparties', label: 'Counterparties', section: 'Data Views' },
+  { id: 'transactions', label: 'Transactions', section: 'Data Views' },
 ]
 
 /** Recharts color palette */

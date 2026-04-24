@@ -392,7 +392,7 @@ export default function Overview({ data }) {
         /> */}
 
         <KpiCard
-          label="Total Sanction"
+          label="Closing Balance"
           value={formatDisplay(kpi.Total_Sanction?.Title)}
           sub={kpi.Total_Sanction?.Subtitle}
           footer={kpi.Total_Sanction?.Footer}
@@ -421,7 +421,7 @@ export default function Overview({ data }) {
         /> */}
 
         <KpiCard
-          label="Total Outstanding Amount"
+          label="Monthly Accrual"
           value={formatDisplay(kpi.Outstanding_Amount?.Title)}
           sub={kpi.Outstanding_Amount?.Subtitle}
           footer={kpi.Outstanding_Amount?.Footer}
@@ -429,7 +429,7 @@ export default function Overview({ data }) {
           accent="c2"
           iconName="graph"
           badge={{
-            label: "Outstanding",
+            label: "Accrual",
             bgColor: "#E8F5E9",
             textColor: "#43A047",
             dotColor: "#43A047", //  key line for badge dot
@@ -437,7 +437,7 @@ export default function Overview({ data }) {
         />
 
         <KpiCard
-          label="Total Exposure Amount"
+          label="Avg EIR Rate"
           value={formatDisplay(kpi.Total_Exposure?.Title)}
           sub={kpi.Total_Exposure?.Subtitle}
           footer={kpi.Total_Exposure?.Footer}
@@ -445,7 +445,7 @@ export default function Overview({ data }) {
           accent="c3"
           iconName="trending"
           badge={{
-            label: "Exposure",
+            label: "EIR Rate",
             bgColor: "#FFF3E0",
             textColor: "#FB8C00",
           }}
@@ -465,7 +465,7 @@ export default function Overview({ data }) {
         /> */}
 
         <KpiCard
-          label="Avg. Interest Rate"
+          label="Total Closing"
           value={formatDisplay(kpi.Avg_IntRate?.Title)}
           sub={kpi.Avg_IntRate?.Subtitle}
           footer={kpi.Avg_IntRate?.Footer}
@@ -473,7 +473,7 @@ export default function Overview({ data }) {
           accent="c4"
           iconName="personFolder"
           badge={{
-            label: "Rate",
+            label: "Balnce",
             bgColor: "#FFF3E0",
             textColor: "#7B1FA2",
           }}

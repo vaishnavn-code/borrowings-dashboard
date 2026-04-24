@@ -79,7 +79,7 @@ const COLUMNS = [
   },
 ];
 
-export default function Borrowers({ data }) {
+export default function CounterParty({ data }) {
   const [page, setPage] = useState(1);
 const PER_PAGE = 25;
   const [topN, setTopN] = useState({ outstanding: 15, sanction: 15 });

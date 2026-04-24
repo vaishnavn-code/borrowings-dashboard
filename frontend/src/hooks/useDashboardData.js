@@ -3,8 +3,8 @@ import { dashboardApi } from '../api/client'
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'https://sap-cloud-analytics-aah0gbcrf3ckgefc.centralindia-01.azurewebsites.net/',
-  // baseURL: 'http://127.0.0.1:8001',
+//   baseURL: 'https://sap-cloud-analytics-aah0gbcrf3ckgefc.centralindia-01.azurewebsites.net/',
+  baseURL: 'http://127.0.0.1:8001',
   // Use a safer default for heavier backend computations.
   timeout: 90000,
   headers: { 'Content-Type': 'application/json' },

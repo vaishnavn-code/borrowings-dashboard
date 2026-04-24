@@ -111,7 +111,7 @@ const COLUMNS = [
   },
 ];
 
-export default function Exposure({ data }) {
+export default function Portfolio({ data }) {
   console.log("Exposure data:", data);
   const kpis = data?.exposure?.kpi || {};
   const exposureTable = data?.exposure?.table || [];
