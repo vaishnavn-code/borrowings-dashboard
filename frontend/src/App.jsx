@@ -15,6 +15,16 @@ import React from "react";
 
 const DASHBOARD_SUBTITLE = "COF Dashboard · v14 · All Amounts in INR Crores";
 
+const PAGE_TITLES = {
+  overview: "Cost of Funds — Overview",
+  portfolioMix: "Cost of Funds — Portfolio Mix",
+  costAnalysis: "Cost of Funds — Cost Analysis",
+  rateTrends: "Cost of Funds — Rate Trends",
+  maturityAnalysis: "Cost of Funds — Maturity Analysis",
+  counterparties: "Cost of Funds — Counterparties",
+  transactions: "Cost of Funds — Transactions",
+};
+
 export default function App() {
   const [isExportingFull, setIsExportingFull] = useState(false);
   const [exportStatus, setExportStatus] = useState("");
@@ -119,7 +129,7 @@ export default function App() {
 
       <div className="main-area">
         <Header
-          title="Cost of Funds — Overview"
+          title={PAGE_TITLES[page]}
           subtitle={DASHBOARD_SUBTITLE}
           darkMode={darkMode}
           onToggleDark={toggleDark}

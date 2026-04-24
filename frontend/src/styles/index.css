@@ -951,9 +951,9 @@ body {
   color: var(--text);
 }
 .header-subtitle {
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   font-weight: 600;
-  color: var(--text);
+  color: #6a9cbf;
 }
 
 .header-actions {
