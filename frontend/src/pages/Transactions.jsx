@@ -386,7 +386,25 @@ export default function Transactions({ data }) {
 
   return (
     <div>
-      <div className="section-label">Transaction Analytics</div>
+      <div className="section-label">
+        Transaction Register — Mar 2026 · ₹ Crores
+      </div>
+      <div className="txn-month-bar">
+        <label>&#128197;</label>
+
+        <div className="txn-month-pills">
+          {["Jan 2026", "Feb 2026", "Mar 2026", "Apr 2026"].map((month) => (
+            <button
+              key={month}
+              className={`txn-month-pill ${
+                month === "Apr 2026" ? "active" : ""
+              }`}
+            >
+              {month}
+            </button>
+          ))}
+        </div>
+      </div>
 
       <div className="four-col">
         <KpiCard
@@ -448,179 +466,6 @@ export default function Transactions({ data }) {
             textColor: "#FB8C00",
           }}
         />
-      </div>
-
-      <div className="two-col">
-        <div className="chart-card">
-          <div className="chart-title">Disbursements by Year</div>
-          <div className="chart-subtitle">
-            LOAN COUNT (BARS) vs SANCTION ₹ BN (LINE)
-          </div>
-          <VerticalBarWithLineTransactions data={yearlyData} height={350} />
-        </div>
-
-        <div className="chart-card">
-          <div className="chart-title">Loan Size Distribution</div>
-          <div className="chart-subtitle">SANCTION AMOUNT BUCKETS</div>
-          <VerticalBar
-            data={loanSizeData}
-            dataKey="value"
-            nameKey="label"
-            height={400}
-            formatter={(v) => `₹${Number(v).toLocaleString("en-IN")} Cr`}
-          />
-        </div>
-      </div>
-
-      <div className="two-col">
-        <div className="chart-card">
-          <div className="chart-title">Quarterly Sanction Volume</div>
-          <div className="chart-subtitle">SANCTION ₹ BN — ALL QUARTERS</div>
-          <VerticalBar
-            data={quarterlyData}
-            dataKey="value"
-            nameKey="quarter"
-            height={400}
-            formatter={(v) => `₹${Number(v).toLocaleString("en-IN")} Cr`}
-          />
-        </div>
-
-        <div className="chart-card">
-          <div className="chart-title">Rate Band Split</div>
-          <div className="chart-subtitle">LOANS BY INTEREST RATE BUCKET</div>
-          <DonutChart data={rateDonut} colors={RATE_COLORS} />
-          <div
-            style={{
-              marginTop: 16,
-              borderTop: "1px solid var(--border)",
-              paddingTop: 12,
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              columnGap: 30,
-              rowGap: 8,
-              fontSize: 12,
-            }}
-          >
-            {rateWithPercent.map((item, idx) => (
-              <div
-                key={item.name}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  width: "100%",
-                }}
-              >
-                <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span
-                    style={{
-                      width: 9,
-                      height: 9,
-                      borderRadius: "50%",
-                      background: RATE_COLORS[idx % RATE_COLORS.length],
-                      flexShrink: 0,
-                    }}
-                  />
-                  <span>{item.name}</span>
-                </span>
-                <strong style={{ marginLeft: "auto", textAlign: "right" }}>
-                  {Number(item.value || 0).toLocaleString("en-IN")}
-                  <span style={{ marginLeft: 8 }}>({item.percent}%)</span>
-                </strong>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-      <div className="two-col">
-        <div className="chart-card">
-          <div className="chart-title">Top Groups by Sanction</div>
-          <div className="chart-subtitle" style={{ marginBottom: "10px" }}>
-            ₹ BILLIONS
-          </div>
-          <TopNSelector
-            options={TOP_N_OPTIONS}
-            value={topN}
-            onChange={setTopN}
-          />
-          <VerticalBar
-            data={topGroupsSanction}
-            dataKey="value"
-            nameKey="label"
-            formatter={(v) => `₹${Number(v).toLocaleString("en-IN")} Cr`}
-            slantLabels={true}
-            height={400}
-          />
-        </div>
-
-        <div className="chart-card">
-          <div className="chart-title">Top Groups by Principal Collected</div>
-          <div className="chart-subtitle" style={{ marginBottom: "10px" }}>
-            ₹ BILLIONS
-          </div>
-          <TopNSelector
-            options={TOP_N_OPTIONS}
-            value={topN}
-            onChange={setTopN}
-          />
-          <VerticalBar
-            data={topGroupsPrincipal}
-            dataKey="value"
-            nameKey="label"
-            slantLabels={true}
-            height={400}
-            formatter={(v) => `₹${Number(v).toLocaleString("en-IN")} Cr`}
-          />
-        </div>
-      </div>
-
-      <div className="two-col">
-        <div className="chart-card">
-          <div className="chart-title">Product Type Mix</div>
-          <div className="chart-subtitle">TL vs DEB — BY COUNT</div>
-          <DonutChart data={productDonut} />
-          <div
-            style={{
-              marginTop: 16,
-              borderTop: "1px solid var(--border)",
-              paddingTop: 12,
-              display: "flex",
-              justifyContent: "space-between",
-              gap: "40px",
-              fontSize: 12,
-            }}
-          >
-            {productWithPercent.map((p, i) => (
-              <div
-                key={p.name}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                }}
-              >
-                {/* COLOR DOT */}
-                <span
-                  style={{
-                    width: 8,
-                    height: 8,
-                    borderRadius: "50%",
-                    background: i === 0 ? "#1e88e5" : "#26a69a",
-                  }}
-                />
-
-                {/* LABEL */}
-                <span>{p.name}</span>
-
-                {/* VALUE + % */}
-                <span style={{ fontWeight: 600 }}>
-                  {Number(p.value || 0).toLocaleString("en-IN")}
-                  <span style={{ marginLeft: 8 }}>({p.percent}%)</span>
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
 
       <div className="card">

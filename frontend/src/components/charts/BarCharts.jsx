@@ -186,7 +186,8 @@ export function HorizontalBar({
         data={data}
         layout="vertical"
         barCategoryGap="25%"
-        margin={{ top: 20, right: 8, left: 0, bottom: 20 }}>
+        margin={{ top: 20, right: 8, left: 0, bottom: 20 }}
+      >
         <defs>
           <linearGradient id="hbarBlueGrad" x1="0" y1="0" x2="1" y2="0">
             <stop offset="0%" stopColor="rgba(220, 238, 253, 1)" />{" "}
@@ -412,18 +413,21 @@ export function VerticalBarWithLineOverview({ data, height = 320, viewMode }) {
         barGap={2}
       >
         <defs>
-          <linearGradient id="loanGrad" x1="0" y1="0" x2="0" y2="1">
+          {/* Opening Balance */}
+          <linearGradient id="openingGrad" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="rgba(21,101,192,0.90)" />
             <stop offset="100%" stopColor="rgba(144,202,249,0.24)" />
           </linearGradient>
 
-          <linearGradient id="sanctionGrad" x1="0" y1="0" x2="0" y2="1">
+          {/* Closing Balance */}
+          <linearGradient id="closingGrad" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="rgba(144,202,249,0.72)" />
             <stop offset="100%" stopColor="rgba(144,202,249,0.10)" />
           </linearGradient>
 
-          <linearGradient id="outstandingAreaGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="rgba(0,172,193,0.35)" />
+          {/* Closing Balance Area Shade */}
+          <linearGradient id="closingAreaGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="rgba(0,172,193,0.30)" />
             <stop offset="100%" stopColor="rgba(0,172,193,0.05)" />
           </linearGradient>
         </defs>
@@ -433,6 +437,8 @@ export function VerticalBarWithLineOverview({ data, height = 320, viewMode }) {
           horizontal={true}
           vertical={false}
         />
+
+        {/* X Axis */}
         <XAxis
           dataKey="name"
           axisLine={false}
@@ -440,64 +446,76 @@ export function VerticalBarWithLineOverview({ data, height = 320, viewMode }) {
           tick={{ fontSize: 10, fill: "#6a9cbf", fontFamily: "Inter" }}
           tickFormatter={(value) => formatDate(value, viewMode)}
         />
+
+        {/* LEFT AXIS → Opening + Closing Balance */}
         <YAxis
           yAxisId="left"
           tick={{ fontSize: 10, fill: "#6a9cbf" }}
           axisLine={false}
           tickLine={false}
-          tickFormatter={(v) => Math.round(v / 10000000)}
+          tickFormatter={(v) => Math.round(v)}
           label={{
-            value: "Sanction / Outstanding (₹ Cr)",
+            value: "Opening / Closing Balance (₹ Cr)",
             angle: -90,
             dx: -9,
             dy: 35,
             position: "insideLeft",
-            style: { fontSize: 9, fill: "#6a9cbf" },
+            style: {
+              fontSize: 9,
+              fill: "#6a9cbf",
+            },
           }}
         />
 
-        {/* RIGHT → LOANS */}
+        {/* RIGHT AXIS → Avg EIR */}
         <YAxis
           yAxisId="right"
           orientation="right"
           tick={{ fontSize: 10, fill: "#6a9cbf" }}
           axisLine={false}
           tickLine={false}
+          tickFormatter={(v) => `${Number(v).toFixed(1)}%`}
           label={{
-            value: "No. of Loans",
+            value: "Avg EIR Rate (%)",
             angle: 90,
             position: "insideRight",
-            style: { fontSize: 9, fill: "#6a9cbf" },
+            style: {
+              fontSize: 9,
+              fill: "#6a9cbf",
+            },
           }}
         />
 
+        {/* TOOLTIP */}
         <Tooltip
           cursor={{ fill: "transparent" }}
           content={buildUnifiedTooltip({
             valueFormatter: (value, _name, entry) => {
-              if (entry.dataKey === "loan") {
-                return fmt.int(value); // loan count
+              if (entry.dataKey === "eir") {
+                return `${Number(value).toFixed(2)} %`;
               }
-              return fmt.cr(value); // ₹ in Crores
+
+              return `₹${Number(value).toLocaleString("en-IN")} Cr`;
             },
           })}
         />
 
+        {/* OPENING BALANCE BAR */}
         <Bar
-          yAxisId="right"
-          dataKey="loan"
-          name="No. of Loans"
-          fill="url(#loanGrad)"
+          yAxisId="left"
+          dataKey="opening"
+          name="Opening Balance (₹ Cr)"
+          fill="url(#openingGrad)"
           radius={[5, 5, 0, 0]}
           maxBarSize={32}
         />
 
-        {/* ₹ → LEFT */}
+        {/* CLOSING BALANCE BAR */}
         <Bar
           yAxisId="left"
-          dataKey="sanction"
-          name="Sanction (₹ Cr)"
-          fill="url(#sanctionGrad)"
+          dataKey="closing"
+          name="Closing Balance (₹ Cr)"
+          fill="url(#closingGrad)"
           radius={[5, 5, 0, 0]}
           maxBarSize={32}
         />
@@ -505,20 +523,20 @@ export function VerticalBarWithLineOverview({ data, height = 320, viewMode }) {
         <Area
           yAxisId="left"
           type="monotone"
-          dataKey="outstanding"
-          fill="url(#outstandingAreaGrad)"
+          dataKey="closing"
+          fill="url(#closingAreaGrad)"
           stroke="none"
           tooltipType="none"
         />
 
+        {/* AVG EIR LINE */}
         <Line
-          yAxisId="left"
+          yAxisId="right"
           type="monotone"
-          dataKey="outstanding"
-          name="Outstanding (₹ Cr)"
+          dataKey="eir"
+          name="Avg EIR Rate (%)"
           stroke="#00acc1"
           strokeWidth={2.5}
-          tension={0.38}
           dot={{
             r: 4,
             stroke: "#fff",

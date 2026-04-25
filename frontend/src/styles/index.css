@@ -116,12 +116,6 @@ body {
 }
 
 /* ── Grid helpers ───────────────────────────────────────────────────────── */
-.two-col {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 16px;
-}
 .four-col {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -1887,7 +1881,13 @@ header {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
-  margin-bottom: 16px;
+  align-items: stretch;   /* IMPORTANT */
+}
+.chart-card.equal-height-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 660px; /* adjust if needed */
 }
 .three-col {
   display: grid;
@@ -2603,6 +2603,69 @@ header {
   color: #1a3c5f;
   font-weight: 700;
   text-align: left;
+}
+
+.txn-month-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+  padding: 10px 16px;
+  background: var(--blue-pale);
+  border: 1px solid var(--blue-pale2);
+  border-radius: 12px;
+}
+.txn-month-bar label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--blue-dark);
+  white-space: nowrap;
+}
+.txn-month-pills {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Month selector pills styling */
+.txn-month-pill {
+      font-family: var(--font);
+    font-size: .67rem;
+    font-weight: 700;
+    padding: 4px 11px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all .15s;
+    white-space: nowrap;
+}
+.txn-month-pill:hover,
+.txn-month-pill:focus {
+  border-color: var(--blue);
+  background: var(--blue-pale);
+  color: var(--blue-dark);
+}
+.txn-month-pill.active {
+  background: var(--blue-dark);
+    color: #fff;
+    border-color: var(--blue-dark);
+}
+
+/* Period info styling */
+.txn-period-info {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #1e88e5;
+  margin-left: 18px;
+  background: #e3f2fd;
+  border-radius: 8px;
+  padding: 5px 16px;
+  box-shadow: 0 1px 4px rgba(30, 136, 229, 0.07);
+  white-space: nowrap;
 }
 
 @media (max-width: 900px) {

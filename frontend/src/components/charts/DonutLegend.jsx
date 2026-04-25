@@ -4,106 +4,81 @@ export default function DonutLegend({
   data = [],
   colors = [],
   showPercent = true,
-  showValue = false,
+  showValue = true,
   valueFormatter,
 }) {
-  const total = data.reduce((sum, i) => sum + (i.value || 0), 0);
+  const midpoint = Math.ceil(data.length / 2);
 
-  const getPercent = (val) =>
-    total ? ((val / total) * 100).toFixed(1) + "%" : "0%";
+  const leftItems = data.slice(0, midpoint);
+  const rightItems = data.slice(midpoint);
 
-  const getValue = (val) =>
-    valueFormatter ? valueFormatter(val || 0) : String(val || 0);
-
-  const renderStats = (item) => {
-    if (showValue && showPercent) {
-      return (
-        <strong style={{ marginLeft: "6px" }}>
-          {getValue(item.value)}
-          <span style={{ marginLeft: "10px" }}>
-            ({getPercent(item.value)})
-          </span>
-        </strong>
-      );
-    }
-
-    if (showValue) {
-      return <strong style={{ marginLeft: "6px" }}>{getValue(item.value)}</strong>;
-    }
-
-    if (showPercent) {
-      return <strong style={{ marginLeft: "6px" }}>{getPercent(item.value)}</strong>;
-    }
-
-    return null;
-  };
-
-  return (
-    <div style={{ marginTop: "12px", fontSize: "12px" }}>
-      {/* TOP ROW */}
+  const renderItem = (item, idx) => (
+    <div
+      key={item.name}
+      style={{
+        display: "flex",
+        alignItems: "flex-start",
+        gap: "10px",
+        marginBottom: "14px",
+        fontSize: "13px",
+        lineHeight: "1.6",
+        color: "var(--text)",
+      }}
+    >
+      {/* Color Dot */}
       <div
         style={{
-          display: "flex",
-          justifyContent: "space-between",
-          marginBottom: "8px",
+          width: "10px",
+          height: "10px",
+          borderRadius: "50%",
+          background: colors[idx % colors.length],
+          flexShrink: 0,
+          marginTop: "5px",
         }}
-      >
-        {/* LEFT */}
-        {data[0] && (
-          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-            <span
-              style={{
-                width: "10px",
-                height: "10px",
-                borderRadius: "50%",
-                backgroundColor: colors[0],
-              }}
-            />
-            {data[0].name}
-            {renderStats(data[0])}
-          </div>
+      />
+
+      {/* Text */}
+      <span style={{ lineHeight: 1.5 }}>
+        {item.name}:{" "}
+
+        {showValue && (
+          <strong style={{ marginLeft: "4px" }}>
+            {valueFormatter
+              ? valueFormatter(item.value)
+              : `₹${Number(item.value || 0).toLocaleString("en-IN")} Cr`}
+          </strong>
         )}
 
-        {/* RIGHT */}
-        {data[1] && (
-          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-            <span
-              style={{
-                width: "10px",
-                height: "10px",
-                borderRadius: "50%",
-                backgroundColor: colors[1],
-              }}
-            />
-            {data[1].name}
-            {renderStats(data[1])}
-          </div>
+        {showPercent && (
+          <strong style={{ marginLeft: "8px" }}>
+            ({Number(item.percent || 0).toFixed(1)}%)
+          </strong>
         )}
+      </span>
+    </div>
+  );
+
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr",
+        gap: "40px",
+        marginTop: "28px",
+        alignItems: "start",
+      }}
+    >
+      {/* LEFT COLUMN */}
+      <div>
+        {leftItems.map((item, idx) => renderItem(item, idx))}
       </div>
 
-      {/* BOTTOM ROW */}
-      {data.slice(2).map((item, index) => (
-        <div
-          key={item.name}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "6px",
-            marginBottom: "4px",
-          }}
-        >
-          <span
-            style={{
-              width: "10px",
-              height: "10px",
-              borderRadius: "50%",
-              backgroundColor: colors[index + 2],
-            }}
-          />
-          {item.name}
-          {renderStats(item)}
-        </div>
-      ))}
+      {/* RIGHT COLUMN */}
+      <div>
+        {rightItems.map((item, idx) =>
+          renderItem(item, idx + midpoint)
+        )}
+      </div>
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import KpiCard from "../components/ui/KpiCard";
 import ActivityChart from "../components/charts/ActivityChart";
 import DonutChart from "../components/charts/DonutChart";
+import { mapOverviewData } from "../mappers/overviewMapper";
 import {
   VerticalBar,
   GroupedBar,
@@ -13,6 +14,10 @@ import React from "react";
 import MonthlySummaryTable from "../components/ui/MonthlySummaryTable";
 
 export default function Overview({ data }) {
+  const mappedData = useMemo(() => mapOverviewData(data), [data]);
+
+  console.log("monthlyTrend", mappedData.monthlyTrend);
+  console.log("portfolioRateTypeData", mappedData.portfolioRateTypeData);
   const {
     insights,
     loading: aiLoading,
@@ -31,7 +36,7 @@ export default function Overview({ data }) {
     "UTILIZATION",
     "CURRENCY RISK",
   ];
-  const kpi = data?.overview?.kpi || {};
+  const kpi = mappedData.kpis;
   const insightItems = useMemo(() => {
     if (Array.isArray(insights?.insights)) return insights.insights;
     if (Array.isArray(insights)) return insights;
@@ -80,15 +85,16 @@ export default function Overview({ data }) {
   const ragEnabled = Boolean(insights?.meta?.rag?.enabled);
 
   const productDonut = useMemo(() => {
-    const productChart = data?.overview?.charts?.["Product Type"];
+    const total = mappedData.productMix.reduce(
+      (sum, item) => sum + Number(item.value || 0),
+      0,
+    );
 
-    if (!productChart) return [];
-
-    return Object.entries(productChart.values).map(([key, value]) => ({
-      name: key.replace(" - Disbursements", ""),
-      value: parseFloat(value || 0),
+    return mappedData.productMix.map((item) => ({
+      ...item,
+      percent: total ? ((Number(item.value || 0) / total) * 100).toFixed(1) : 0,
     }));
-  }, [data]);
+  }, [mappedData]);
 
   const tenorChartData = useMemo(() => {
     const tenorChart = data?.overview?.charts?.["Tenor Distribution"];
@@ -133,23 +139,7 @@ export default function Overview({ data }) {
     ];
   }, [data]);
 
-  const portfolioRateTypeData = useMemo(() => {
-    const productChart = data?.overview?.charts?.["Product Type"];
-    const values = productChart?.values || {};
-
-    const entries = Object.entries(values);
-    if (entries.length > 0) {
-      return entries.map(([label, value]) => ({
-        label: label.replace(" - Disbursements", ""),
-        count: Number(value) || 0,
-      }));
-    }
-
-    return [
-      { label: "TL", count: 0 },
-      { label: "DEB", count: 0 },
-    ];
-  }, [data]);
+  const portfolioRateTypeData = mappedData.portfolioRateTypeData;
 
   const fixedFloatingData = useMemo(
     () => [
@@ -159,20 +149,7 @@ export default function Overview({ data }) {
     [],
   );
 
-  const topGroupsOutstanding = useMemo(() => {
-    const groupChart =
-      data?.overview?.charts?.["Group by Outstanding & Sanction"];
-
-    if (!groupChart) return [];
-
-    return groupChart.values
-      .map((item) => ({
-        label: item.bp_group,
-        count: +(item.outstanding / 1e7).toFixed(2), // convert to Cr
-      }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, topN);
-  }, [data, topN]);
+  const topGroupsOutstanding = mappedData.borrowingBookByProduct;
 
   const topGroupsDual = useMemo(() => {
     const groupChart =
@@ -190,95 +167,7 @@ export default function Overview({ data }) {
       .slice(0, 10); // ✅ top 10
   }, [data]);
 
-  const disbursementData = useMemo(() => {
-    const chart = data?.overview?.charts?.["Disbursements Activity"];
-
-    if (!chart) return [];
-
-    const raw = Object.entries(chart.values).map(([date, val]) => ({
-      date,
-      label: date,
-      loan: +val.loan_count,
-      sanction: +val.sanction_amount,
-      outstanding: +val.outstanding,
-      quarter: val.Quater || val.Quarter,
-      year: String(val.Year || ""),
-    }));
-
-    const mode = viewMode === "auto" ? "quarterly" : viewMode;
-
-    const filtered =
-      mode === "yearly" || selectedYear === "All"
-        ? raw
-        : raw.filter((r) => r.year === selectedYear);
-
-    if (mode === "monthly") {
-      // Aggregate by YYYY-MM key so all entries within a month are summed
-      const monthMap = {};
-      filtered.forEach((r) => {
-        const monthKey = r.date.slice(0, 7); // "YYYY-MM"
-        if (!monthMap[monthKey]) {
-          monthMap[monthKey] = {
-            name: monthKey,
-            loan: 0,
-            sanction: 0,
-            outstanding: 0,
-          };
-        }
-        monthMap[monthKey].loan += r.loan;
-        monthMap[monthKey].sanction += r.sanction;
-        monthMap[monthKey].outstanding += r.outstanding;
-      });
-
-      return Object.values(monthMap)
-        .sort((a, b) => new Date(b.name) - new Date(a.name))
-        .slice(0, 12)
-        .reverse();
-    }
-
-    const groupBy = (key) => {
-      const map = {};
-      filtered.forEach((r) => {
-        const k = r[key];
-
-        if (!k) return;
-
-        if (!map[k]) {
-          map[k] = {
-            name: `${k} - ${String(r.year).slice(-2)}`,
-            loan: 0,
-            sanction: 0,
-            outstanding: 0,
-          };
-        }
-
-        map[k].loan += r.loan;
-        map[k].sanction += r.sanction;
-        map[k].outstanding += r.outstanding;
-      });
-
-      return Object.values(map);
-    };
-
-    if (mode === "quarterly") {
-      // quarter key is like "2026 Q1", sort by year then quarter number
-      const parseQuarter = (name) => {
-        const [yr, q] = name.split(" ");
-        return parseInt(yr) * 10 + parseInt(q?.replace("Q", "") || 0);
-      };
-
-      return groupBy("quarter")
-        .sort((a, b) => parseQuarter(b.name) - parseQuarter(a.name))
-        .slice(0, 12)
-        .reverse();
-    }
-
-    if (mode === "yearly") {
-      return groupBy("year").sort((a, b) => Number(a.name) - Number(b.name));
-    }
-
-    return [];
-  }, [data, selectedYear, viewMode]);
+  const disbursementData = mappedData.monthlyTrend;
 
   const formatDisplay = (v) => {
     if (!v) return "-";
@@ -309,167 +198,9 @@ export default function Overview({ data }) {
 
   const disbursementSubtitle = `BARS = OPENING & CLOSING BALANCE (₹ CR) | LINE = AVG EIR RATE (%)`;
 
-  const monthlySummaryRows = useMemo(
-    () => [
-      {
-        period: "Apr 2025",
-        openingCr: 30586.78,
-        closingCr: 29126.9,
-        additionCr: 955.88,
-        redemptionCr: 2415.75,
-        accrualCr: 734.38,
-        eirIntCr: 200.31,
-        avgEir: 8.0674,
-        avgExit: 7.8973,
-        count: 90,
-      },
-      {
-        period: "May 2025",
-        openingCr: 24530.76,
-        closingCr: 24293.55,
-        additionCr: 1703.89,
-        redemptionCr: 1941.09,
-        accrualCr: 592.24,
-        eirIntCr: 157.24,
-        avgEir: 7.9642,
-        avgExit: 7.7905,
-        count: 73,
-      },
-      {
-        period: "Jun 2025",
-        openingCr: 37825.99,
-        closingCr: 37932.39,
-        additionCr: 2582.1,
-        redemptionCr: 2475.7,
-        accrualCr: 1116.42,
-        eirIntCr: 243.7,
-        avgEir: 7.799,
-        avgExit: 7.6739,
-        count: 99,
-      },
-      {
-        period: "Jul 2025",
-        openingCr: 25166.6,
-        closingCr: 25956.19,
-        additionCr: 2380.4,
-        redemptionCr: 1590.8,
-        accrualCr: 641.54,
-        eirIntCr: 165.9,
-        avgEir: 7.8817,
-        avgExit: 7.6995,
-        count: 77,
-      },
-      {
-        period: "Aug 2025",
-        openingCr: 35816.79,
-        closingCr: 36267.66,
-        additionCr: 2522.79,
-        redemptionCr: 2071.92,
-        accrualCr: 1068.87,
-        eirIntCr: 234.28,
-        avgEir: 7.8611,
-        avgExit: 7.7221,
-        count: 84,
-      },
-      {
-        period: "Sep 2025",
-        openingCr: 29411.1,
-        closingCr: 29521.07,
-        additionCr: 2361.83,
-        redemptionCr: 2251.85,
-        accrualCr: 621.22,
-        eirIntCr: 192.35,
-        avgEir: 7.8798,
-        avgExit: 7.6803,
-        count: 95,
-      },
-      {
-        period: "Oct 2025",
-        openingCr: 28959.05,
-        closingCr: 29209,
-        additionCr: 2337.53,
-        redemptionCr: 2087.58,
-        accrualCr: 932.88,
-        eirIntCr: 185.34,
-        avgEir: 7.8518,
-        avgExit: 7.7757,
-        count: 71,
-      },
-      {
-        period: "Nov 2025",
-        openingCr: 21111.82,
-        closingCr: 22024.44,
-        additionCr: 2555.71,
-        redemptionCr: 1643.08,
-        accrualCr: 537.31,
-        eirIntCr: 137.3,
-        avgEir: 7.8134,
-        avgExit: 7.6247,
-        count: 70,
-      },
-      {
-        period: "Dec 2025",
-        openingCr: 23667.38,
-        closingCr: 24467.6,
-        additionCr: 2412.35,
-        redemptionCr: 1612.13,
-        accrualCr: 723.58,
-        eirIntCr: 156.33,
-        avgEir: 7.9795,
-        avgExit: 7.8538,
-        count: 77,
-      },
-      {
-        period: "Jan 2026",
-        openingCr: 14926.41,
-        closingCr: 15027.5,
-        additionCr: 1305.18,
-        redemptionCr: 1204.09,
-        accrualCr: 345.13,
-        eirIntCr: 97.04,
-        avgEir: 8.0411,
-        avgExit: 7.8805,
-        count: 58,
-      },
-      {
-        period: "Feb 2026",
-        openingCr: 20913.85,
-        closingCr: 21884.31,
-        additionCr: 2188.98,
-        redemptionCr: 1218.52,
-        accrualCr: 655.75,
-        eirIntCr: 135.64,
-        avgEir: 7.8326,
-        avgExit: 7.7618,
-        count: 74,
-      },
-      {
-        period: "Mar 2026",
-        openingCr: 16680.3,
-        closingCr: 16343.47,
-        additionCr: 1094.25,
-        redemptionCr: 1431.09,
-        accrualCr: 348.42,
-        eirIntCr: 108.54,
-        avgEir: 8.0293,
-        avgExit: 7.8718,
-        count: 56,
-      },
-      {
-        period: "Apr 2026",
-        openingCr: 21713.27,
-        closingCr: 21955.73,
-        additionCr: 1448.12,
-        redemptionCr: 1205.66,
-        accrualCr: 661.63,
-        eirIntCr: 141.72,
-        avgEir: 7.8818,
-        avgExit: 7.7828,
-        count: 60,
-      },
-    ],
-    [],
-  );
+  const monthlySummaryRows = mappedData.monthlySummaryTable;
+
+  console.log("portfolioRateTypeData", portfolioRateTypeData);
 
   return (
     <div>
@@ -477,9 +208,9 @@ export default function Overview({ data }) {
       <div className="four-col">
         <KpiCard
           label="Closing Balance"
-          value={formatDisplay(kpi.Total_Sanction?.Title)}
-          sub={kpi.Total_Sanction?.Subtitle}
-          footer={kpi.Total_Sanction?.Footer}
+          value={formatDisplay(kpi.closingBalance?.Title)}
+          sub={kpi.closingBalance?.Subtitle}
+          footer={kpi.closingBalance?.Footer}
           sparkPct={100}
           accent="c1"
           iconName="dollar"
@@ -493,9 +224,9 @@ export default function Overview({ data }) {
 
         <KpiCard
           label="Monthly Accrual"
-          value={formatDisplay(kpi.Outstanding_Amount?.Title)}
-          sub={kpi.Outstanding_Amount?.Subtitle}
-          footer={kpi.Outstanding_Amount?.Footer}
+          value={formatDisplay(kpi.monthlyAccrual?.Title)}
+          sub={kpi.monthlyAccrual?.Subtitle}
+          footer={kpi.monthlyAccrual?.Footer}
           sparkPct={60}
           accent="c2"
           iconName="graph"
@@ -509,9 +240,9 @@ export default function Overview({ data }) {
 
         <KpiCard
           label="Avg EIR Rate"
-          value={formatDisplay(kpi.Total_Exposure?.Title)}
-          sub={kpi.Total_Exposure?.Subtitle}
-          footer={kpi.Total_Exposure?.Footer}
+          value={formatDisplay(kpi.avgEirRate?.Title)}
+          sub={kpi.avgEirRate?.Subtitle}
+          footer={kpi.avgEirRate?.Footer}
           sparkPct={80}
           accent="c3"
           iconName="trending"
@@ -797,7 +528,7 @@ export default function Overview({ data }) {
       {/* <ActivityChart timeseries={timeseries} /> */}
       <div className="section-label">Portfolio Distribution</div>
       <div className="two-col">
-        <div className="chart-card">
+        <div className="chart-card equal-height-card">
           <div className="chart-title" style={{ marginBottom: "6px" }}>
             Borrowing Book by Product Type
           </div>
@@ -894,13 +625,13 @@ export default function Overview({ data }) {
             data={topGroupsOutstanding}
             dataKey="count"
             nameKey="label"
-            height={360}
+            height={520}
             barSize={20}
             slantLabels={true}
             formatter={(v) => `₹${v.toLocaleString("en-IN")} Cr`}
           />
         </div>
-        <div className="chart-card">
+        <div className="chart-card equal-height-card">
           <div className="chart-title">Product Type Mix — Apr 2026</div>
           <div className="chart-subtitle">CLOSING BALANCE ₹ CR</div>
           <DonutChart
@@ -1041,19 +772,19 @@ export default function Overview({ data }) {
             <tbody>
               <tr>
                 <td>Total Book</td>
-                <td>₹ 21,956 (Cr)</td>
+                <td>{mappedData.summaryMetrics.totalBook} (Cr)</td>
               </tr>
               <tr>
                 <td>Wtd Avg EIR</td>
-                <td>7.88% p.a.</td>
+                <td>{mappedData.summaryMetrics.wtdAvgEir} %</td>
               </tr>
               <tr>
                 <td>Total Accrual</td>
-                <td>661.63</td>
+                <td>{mappedData.summaryMetrics.totalAccrual} (Cr)</td>
               </tr>
               <tr>
                 <td>Active Lines</td>
-                <td>60</td>
+                <td>{mappedData.summaryMetrics.activeLines}</td>
               </tr>
             </tbody>
           </table>
@@ -1080,19 +811,19 @@ export default function Overview({ data }) {
             <tbody>
               <tr>
                 <td>Fixed Rate</td>
-                <td>₹ 19,502 (88.8%)</td>
+                <td>{mappedData.rateMixSnapshot.fixedRate} (88.8%)</td>
               </tr>
               <tr>
                 <td>Floating Rate</td>
-                <td>₹ 2,453 (11.2%)</td>
+                <td>{mappedData.rateMixSnapshot.floatingRate} (11.2%)</td>
               </tr>
               <tr>
                 <td>Avg Exit Rate</td>
-                <td>7.78% p.a.</td>
+                <td>{mappedData.rateMixSnapshot.avgExitRate} %</td>
               </tr>
               <tr>
                 <td>Avg Coupon/Yield</td>
-                <td>7.78% p.a.</td>
+                <td>{mappedData.rateMixSnapshot.avgCouponYield} %</td>
               </tr>
             </tbody>
           </table>
