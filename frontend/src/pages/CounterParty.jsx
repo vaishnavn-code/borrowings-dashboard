@@ -1,206 +1,177 @@
 import React, { useState, useMemo } from "react";
-import { HorizontalBar, VerticalBar } from "../components/charts/BarCharts";
+import { HorizontalBar } from "../components/charts/BarCharts";
 import DataTable from "../components/ui/DataTable";
-import { TopNSelector } from "../components/ui/helpers";
 import { fmt } from "../utils/formatters";
-import { TOP_N_OPTIONS } from "../utils/constants";
 import KpiCard from "../components/ui/KpiCard";
 import DonutChart from "../components/charts/DonutChart";
 import DonutLegend from "../components/charts/DonutLegend";
 
 const COLUMNS = [
-  { key: "customer", label: "Customer" },
-
   {
-    key: "group",
-    label: "Group",
-    render: (v) => <span className="spill grey">{v}</span>,
-  },
-
-  {
-    key: "sanction_amt",
-    label: "Sanction (₹ Cr)",
-    render: (v) => fmt.cr(v),
-  },
-
-  {
-    key: "outstanding",
-    label: "Outstanding (₹ Cr)",
-    render: (v) => (
-      <span style={{ fontWeight: 700, color: "#2E6090" }}>{fmt.cr(v)}</span>
-    ),
-  },
-
-  {
-    key: "exposure",
-    label: "Exposure (₹ Cr)",
-    render: (v) => fmt.cr(v),
-  },
-
-  {
-    key: "princ_recv",
-    label: "Princ Recv (₹ Cr)",
-    render: (v) => fmt.cr(v),
-  },
-
-  {
-    key: "int_recv",
-    label: "Int Recv (₹ Cr)",
-    render: (v) => fmt.cr(v),
-  },
-
-  {
-    key: "avg_rate",
-    label: "Avg Rate",
+    key: "counterparty",
+    label: "Counterparty",
     render: (v) => (
       <span
         style={{
-          background: "rgba(123,31,162,0.08)",
-          color: "#7b1fa2",
-          padding: "3px 8px",
-          borderRadius: "10px",
+          color: "#2E6090",
           fontWeight: 600,
-          fontSize: "11px",
-          display: "inline-flex",
-          alignItems: "center",
-          gap: "6px",
         }}
       >
-        <span
-          style={{
-            width: "6px",
-            height: "6px",
-            borderRadius: "50%",
-            background: "#7b1fa2",
-          }}
-        />
-        {v}%
+        {v}
       </span>
     ),
   },
-];
 
+  {
+    key: "closingAmt",
+    label: "Closing Amount (₹ Cr)",
+    render: (v) => fmt.cr(v),
+  },
+
+  {
+    key: "share",
+    label: "Share",
+  },
+
+  {
+    key: "accrualAmt",
+    label: "Accrual Amount (₹ Cr)",
+    render: (v) => fmt.cr(v),
+  },
+
+  {
+    key: "rateType",
+    label: "Rate Type",
+    render: (v) => {
+      const isFixed = String(v).toLowerCase() === "fixed";
+
+      return (
+        <span
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "6px",
+            padding: "4px 10px",
+            borderRadius: "999px",
+            fontSize: "12px",
+            fontWeight: 600,
+            background: isFixed ? "#E8F1FF" : "#FFF4E5",
+            color: isFixed ? "#1565C0" : "#F57C00",
+            width: "fit-content",
+          }}
+        >
+          <span
+            style={{
+              width: "6px",
+              height: "6px",
+              borderRadius: "50%",
+              background: isFixed ? "#1565C0" : "#F57C00",
+              display: "inline-block",
+            }}
+          />
+          {v}
+        </span>
+      );
+    },
+  },
+
+  {
+    key: "txns",
+    label: "Transactions",
+    render: (v) => fmt.int(v),
+  },
+];
 export default function CounterParty({ data }) {
   const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
+  const [rateType, setRateType] = useState("");
+
   const PER_PAGE = 25;
-  const [topN, setTopN] = useState({ outstanding: 15, sanction: 15 });
 
-  const borrowersTable = data?.borrowers?.table || [];
+  const cpData = data?.["Counter Parties"] || {};
 
-  // 🔹 Derived metrics
-  const uniqueCustomers = borrowersTable.length;
+  const kpi = cpData?.kpi || {};
+  const charts = cpData?.Charts || {};
+  const tableData = cpData?.table || [];
 
-  const uniqueGroups = new Set(borrowersTable.map((b) => b.group)).size;
+  const uniqueCustomers = kpi?.Unique_CPs?.Title || 0;
+  const topCustomer = kpi?.Top_Counterparty?.Subtitle || "-";
+  const topCustomerValue = kpi?.Top_Counterparty?.Title || 0;
+  const topCustomerShare = kpi?.Top_Counterparty?.Footer || "";
+  const totalPortfolio = kpi?.Total_portfolio?.Title || 0;
 
-  const topCustomer = borrowersTable.reduce(
-    (max, b) => (b.outstanding > max ? b.outstanding : max),
-    0,
-  );
+  const topConcentration = kpi?.Top_concentration?.Title || "-";
 
-  const avgRate =
-    borrowersTable.reduce((sum, b) => sum + (b.avg_rate || 0), 0) /
-    (borrowersTable.length || 1);
+  const topConcentrationSub = kpi?.Top_concentration?.Subtitle || "";
 
-  // 🔹 Charts
-  const osData = borrowersTable
-    .slice()
-    .sort((a, b) => b.outstanding - a.outstanding)
-    .slice(0, topN.outstanding)
-    .map((c) => ({
-      name: c.customer,
-      value: c.outstanding,
-    }));
-
-  const sancData = borrowersTable
-    .slice()
-    .sort((a, b) => b.sanction_amt - a.sanction_amt)
-    .slice(0, topN.sanction)
-    .map((c) => ({
-      name: c.customer,
-      value: c.sanction_amt,
-    }));
-
-  const paginatedRows = useMemo(() => {
-    const start = (page - 1) * PER_PAGE;
-    return borrowersTable.slice(start, start + PER_PAGE);
-  }, [borrowersTable, page]);
-
-  const totalPages = Math.ceil(borrowersTable.length / PER_PAGE);
-
-  const exposureTable = data?.exposure?.table || [];
-
-  const kpis = data?.exposure?.kpi || {};
-  const kpi = data?.overview?.kpi || {};
-
-  const totalTxnSub =
-    kpis?.Total_Transactions?.subtitle?.join?.(" ") ||
-    kpis?.Total_Transactions?.subtitle ||
-    "";
-
-  const txn = data?.transactions || {};
-  const customer = data?.overview?.kpi || {};
-  const txnTable = txn.table || [];
-  const charts = txn.charts || {};
-
-  const avgSanctionSub = kpis?.Average_Sanction?.subtitle || "";
-
-  const principalSub = kpis?.Principal_Recieved?.subtitle || "";
-
-  const currentFYSub = kpis?.Current_FY_Disb?.subtitle || "";
+  const topConcentrationFooter = kpi?.Top_concentration?.Footer || "";
 
   const formatDisplay = (v) => {
-    if (v === null || v === undefined || v === "") return "-";
+    if (!v) return "-";
 
-    const str = String(v);
-
-    // Extract numeric part
-    const num = parseFloat(str.replace(/₹|,|Cr|%|Bn|Mn/gi, ""));
-
-    if (isNaN(num)) return v;
-
-    // % case
-    if (str.includes("%")) {
-      return `${num.toFixed(2)} %`;
-    }
-
-    // Already in Cr
-    if (str.toLowerCase().includes("cr")) {
-      return `₹${num.toLocaleString("en-IN")} Cr`;
-    }
-
-    // Already in Bn
-    if (str.toLowerCase().includes("bn")) {
-      return `₹${(num * 100).toLocaleString("en-IN")} Cr`;
-    }
-
-    // RAW INR → convert to Cr
-    return `₹${(num / 1e7).toLocaleString("en-IN", {
+    return `₹${(Number(v) / 1e7).toLocaleString("en-IN", {
       maximumFractionDigits: 2,
     })} Cr`;
   };
 
   const hBarData = useMemo(() => {
-    if (!exposureTable.length) return [];
+    const rawChart = charts?.["Counterparties by Closing Balance"] || {};
 
-    return exposureTable
-      .map((item) => ({
-        name: item.bp_group,
-        value: Number(item.outstanding_amt || 0),
+    return Object.entries(rawChart)
+      .map(([name, value]) => ({
+        name,
+        value: Number(value || 0),
       }))
       .sort((a, b) => b.value - a.value)
-      .slice(0, topN.hbar);
-  }, [exposureTable, topN.hbar]);
+      .slice(0, 13);
+  }, [charts]);
 
-  const productDonut = useMemo(() => {
-    const productChart = data?.overview?.charts?.["Product Type"];
+  const concentrationDonut = useMemo(() => {
+    const concentrationChart = charts?.Concentration || {};
 
-    if (!productChart) return [];
+    return Object.entries(concentrationChart)
+      .map(([name, percent]) => ({
+        name,
+        value: parseFloat(String(percent).replace("%", "")) || 0,
+      }))
+      .filter((item) => item.value > 0)
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 10);
+  }, [charts]);
 
-    return Object.entries(productChart.values).map(([key, value]) => ({
-      name: key.replace(" - Disbursements", ""),
-      value: parseFloat(value || 0),
+  const mappedTableRows = useMemo(() => {
+    return tableData.map((item, index) => ({
+      id: index + 1,
+      counterparty: item.Counterparty || "-",
+      closingAmt: item.Closing_amt || 0,
+      share: item.Share || "0%",
+      accrualAmt: item.Accrual_amt || 0,
+      rateType: item.Rate_type || "-",
+      txns: item.Txns || 0,
     }));
-  }, [data]);
+  }, [tableData]);
+
+  const filteredRows = useMemo(() => {
+    return mappedTableRows.filter((row) => {
+      const matchSearch =
+        !search ||
+        row.counterparty
+          ?.toLowerCase()
+          .includes(search.toLowerCase());
+
+      const matchRateType =
+        !rateType || row.rateType === rateType;
+
+      return matchSearch && matchRateType;
+    });
+  }, [mappedTableRows, search, rateType]);
+
+  const paginatedRows = useMemo(() => {
+    const start = (page - 1) * PER_PAGE;
+    return filteredRows.slice(start, start + PER_PAGE);
+  }, [filteredRows, page]);
+
+  const totalPages = Math.ceil(filteredRows.length / PER_PAGE);
 
   return (
     <div>
@@ -208,116 +179,174 @@ export default function CounterParty({ data }) {
 
       <div className="four-col">
         <KpiCard
-          label="Closing Balance"
-          value={formatDisplay(kpi.Total_Sanction?.Title)}
-          sub={kpi.Total_Sanction?.Subtitle}
-          footer={kpi.Total_Sanction?.Footer}
+          label="Unique Counterparties"
+          value={uniqueCustomers}
           sparkPct={100}
           accent="c1"
           iconName="dollar"
           badge={{
-            label: "CLosing Amt",
+            label: "Counterparties",
             bgColor: "#E8F1FF",
             textColor: "#1D4ED8",
-            dotColor: "#1D4ED8", //  key line for badge dot
           }}
         />
 
         <KpiCard
-          label="Monthly Accrual"
-          value={formatDisplay(kpi.Outstanding_Amount?.Title)}
-          sub={kpi.Outstanding_Amount?.Subtitle}
-          footer={kpi.Outstanding_Amount?.Footer}
-          sparkPct={60}
+          label="Top Counterparty"
+          value={formatDisplay(topCustomerValue)}
+          sub={topCustomer}
+          footer={topCustomerShare}
+          sparkPct={80}
           accent="c2"
           iconName="graph"
           badge={{
-            label: "Accrual",
+            label: "Largest Exposure",
             bgColor: "#E8F5E9",
             textColor: "#43A047",
-            dotColor: "#43A047", //  key line for badge dot
           }}
         />
 
         <KpiCard
-          label="Avg EIR Rate"
-          value={formatDisplay(kpi.Total_Exposure?.Title)}
-          sub={kpi.Total_Exposure?.Subtitle}
-          footer={kpi.Total_Exposure?.Footer}
-          sparkPct={80}
+          label="Top Concentration"
+          value={topConcentration || "-"}
+          sub={topConcentrationSub}
+          footer={topConcentrationFooter}
+          sparkPct={60}
           accent="c3"
           iconName="trending"
           badge={{
-            label: "EIR Rate",
+            label: "Concentration",
             bgColor: "#FFF3E0",
             textColor: "#FB8C00",
           }}
         />
 
         <KpiCard
-          label="Total Closing"
-          value={formatDisplay(kpi.Avg_IntRate?.Title)}
-          sub={kpi.Avg_IntRate?.Subtitle}
-          footer={kpi.Avg_IntRate?.Footer}
-          sparkPct={40}
+          label="Total Portfolio"
+          value={formatDisplay(totalPortfolio)}
+          sparkPct={90}
           accent="c4"
           iconName="personFolder"
           badge={{
-            label: "Balnce",
-            bgColor: "#FFF3E0",
+            label: "Portfolio",
+            bgColor: "#F3E5F5",
             textColor: "#7B1FA2",
           }}
         />
       </div>
 
-      {/* CHARTS */}
       <div className="two-col">
         <div className="chart-card">
+          <div className="chart-title">
+            Counterparty by Closing Balance
+          </div>
+
+          <div className="chart-subtitle">
+            Top counterparties by portfolio exposure
+          </div>
+
           <HorizontalBar
             data={hBarData}
             dataKey="value"
             nameKey="name"
-            height={320}
+            height={420}
             barSize={18}
-            formatter={(v) => `₹${(v / 1e7).toLocaleString("en-IN")} Cr`}
+            formatter={(v) =>
+              `₹${(Number(v || 0) / 1e7).toLocaleString("en-IN")} Cr`
+            }
           />
         </div>
 
         <div className="chart-card">
+          <div className="chart-title">
+            Counterparty Concentration
+          </div>
+
+          <div className="chart-subtitle">
+            Top counterparties by portfolio share (%)
+          </div>
+
           <DonutChart
-            data={productDonut}
-            colors={["#1565c0", "#00acc1"]}
+            data={concentrationDonut}
+            colors={[
+              "#1565c0",
+              "#00acc1",
+              "#42a5f5",
+              "#26c6da",
+              "#5c6bc0",
+              "#29b6f6",
+            ]}
             height={320}
-            formatter={(v) => `₹${(v || 0).toFixed(2)} Cr`}
+            formatter={(v) => `${Number(v || 0).toFixed(2)}%`}
           />
+
           <DonutLegend
-            data={productDonut}
-            colors={["#1565c0", "#00acc1"]}
-            showPercent={true}
+            data={concentrationDonut}
+            colors={[
+              "#1565c0",
+              "#00acc1",
+              "#42a5f5",
+              "#26c6da",
+              "#5c6bc0",
+              "#29b6f6",
+            ]}
+            showPercent={false}
             showValue={true}
-            valueFormatter={(v) => `₹${Math.round(v || 0)} Cr`}
+            valueFormatter={(v) =>
+              `${Number(v || 0).toFixed(2)}%`
+            }
           />
         </div>
       </div>
 
-      {/* TABLE */}
-      <div className="card">
+      <div className="card" style={{ marginTop: "20px" }}>
         <div className="card-title">
-          Customer Exposure Register
-          <span className="card-badge">{uniqueCustomers} CUSTOMERS</span>
+          Counterparty Register
+          <span className="card-badge">
+            {filteredRows.length} RECORDS
+          </span>
         </div>
 
-        <div className="cio-note">
-          <strong>{uniqueCustomers} customers</strong> across{" "}
-          <strong>{uniqueGroups} groups</strong>. Top customer outstanding:{" "}
-          <strong>₹{(topCustomer / 1e9).toFixed(2)} Bn</strong>. Avg interest
-          rate: <strong>{avgRate.toFixed(1)}%</strong>.
+        <div className="txn-toolbar">
+          <input
+            className="txn-search"
+            placeholder="Search counterparty..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
+          />
+
+          <select
+            className="txn-select"
+            value={rateType}
+            onChange={(e) => {
+              setRateType(e.target.value);
+              setPage(1);
+            }}
+          >
+            <option value="">All Rate Types</option>
+            <option value="Fixed">Fixed</option>
+            <option value="Floating">Floating</option>
+          </select>
+
+          <button
+            className="txn-clear"
+            onClick={() => {
+              setSearch("");
+              setRateType("");
+              setPage(1);
+            }}
+          >
+            Clear
+          </button>
         </div>
 
         <DataTable
           columns={COLUMNS}
           rows={paginatedRows}
-          total={borrowersTable.length}
+          total={filteredRows.length}
           page={page}
           totalPages={totalPages}
           onPage={(p) => setPage(Number(p))}
