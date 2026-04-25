@@ -10,6 +10,7 @@ import {
 import { useInsights } from "../hooks/useDashboardData";
 import DonutLegend from "../components/charts/DonutLegend";
 import React from "react";
+import MonthlySummaryTable from "../components/ui/MonthlySummaryTable";
 
 export default function Overview({ data }) {
   const {
@@ -18,36 +19,10 @@ export default function Overview({ data }) {
     error: aiError,
     generate,
   } = useInsights();
-
-  // const { kpis: k, computed: c, product_types, timeseries, rate_dist, tenor_dist } = {
-  //   kpis: {
-  //     total_sanction: data.render_state.totals.total_sanction,
-  //     total_exposure: data.render_state.totals.total_exposure,
-  //     total_prin_rec: data.render_state.totals.total_prin_rec,
-  //     total_os_amt: data.render_state.totals.total_os_amt,
-  //     sanction_amt: data.render_state.totals.total_sanction,
-  //     outstanding_amt: data.render_state.totals.total_os_amt,
-  //     loan_amt: data.render_state.totals.loan_amt,
-  //     principal_received: data.render_state.totals.total_prin_rec,
-  //     interest_received: 0, // placeholder
-  //   },
-  //   computed: {
-  //     total_records: data.row_count,
-  //     unique_proposals: 0, // placeholder
-  //     unique_groups: data.render_state.totals.lv_grp_cnt,
-  //     unique_customers: data.render_state.totals.lv_cust_cnt,
-  //     min_rate: 0, // placeholder
-  //     max_rate: 0, // placeholder
-  //     avg_rate: 0, // placeholder
-  //   },
-  //   product_types: [], // placeholder
-  //   timeseries: { yearly: [], quarterly: [] }, // placeholder
-  //   rate_dist: [], // placeholder
-  //   tenor_dist: [], // placeholder
-  // }
   const [topN, setTopN] = useState(15);
   const [viewMode, setViewMode] = useState("monthly");
   const [selectedYear, setSelectedYear] = useState("All");
+  const [bbToggle, setBBToggle] = useState("book");
 
   const hardcodedInsightTags = [
     "CONCENTRATION RISK",
@@ -157,6 +132,32 @@ export default function Overview({ data }) {
       },
     ];
   }, [data]);
+
+  const portfolioRateTypeData = useMemo(() => {
+    const productChart = data?.overview?.charts?.["Product Type"];
+    const values = productChart?.values || {};
+
+    const entries = Object.entries(values);
+    if (entries.length > 0) {
+      return entries.map(([label, value]) => ({
+        label: label.replace(" - Disbursements", ""),
+        count: Number(value) || 0,
+      }));
+    }
+
+    return [
+      { label: "TL", count: 0 },
+      { label: "DEB", count: 0 },
+    ];
+  }, [data]);
+
+  const fixedFloatingData = useMemo(
+    () => [
+      { label: "Fixed", count: 19502 },
+      { label: "Floating", count: 2453 },
+    ],
+    [],
+  );
 
   const topGroupsOutstanding = useMemo(() => {
     const groupChart =
@@ -302,95 +303,178 @@ export default function Overview({ data }) {
     return v;
   };
 
-  const disbursementTitle =
-    viewMode.charAt(0).toUpperCase() +
-    viewMode.slice(1) +
-    " Disbursement Activity";
-  const disbursementSubtitle =
-    viewMode === "yearly"
-      ? "YEARLY GROUPING • ALL YEARS"
-      : `${viewMode.toUpperCase()} GROUPING • ${selectedYear === "All" ? "ALL YEARS" : `YEAR ${selectedYear}`}`;
+  const formatViewMode = (mode) => mode.charAt(0).toUpperCase() + mode.slice(1);
 
-  // const rateSparkPct =
-  //   c.max_rate > c.min_rate
-  //     ? ((c.avg_rate - c.min_rate) / (c.max_rate - c.min_rate)) * 100
-  //     : 50;
+  const disbursementTitle = `${formatViewMode(viewMode)} Closing Balance & Accrual Trend`;
 
-  // const productDonut = useMemo(() =>
-  //   product_types.map((p) => ({ name: p.label.replace(' - Disbursements', ''), value: p.outstanding_bn })),
-  // [product_types])
+  const disbursementSubtitle = `BARS = OPENING & CLOSING BALANCE (₹ CR) | LINE = AVG EIR RATE (%)`;
 
-  // const productDonut = useMemo(() => {
-  //   const products = data?.render_state?.products || [];
-
-  //   console.log("ACTUAL PRODUCTS:", products);
-
-  //   if (!products.length) return [];
-
-  //   return products.map((p) => {
-  //     const label = (p.zprd_desc || "").toUpperCase();
-
-  //     let name = "OTHER";
-  //     if (label.includes("TL")) name = "TL";
-  //     else if (label.includes("DEB")) name = "DEB";
-
-  //     const raw = parseFloat(p.zos_amt);
-
-  //     return {
-  //       name,
-  //       value: parseFloat((raw / 1e7).toFixed(2)), // CR
-  //     };
-  //   });
-  // }, [data]);
-
-  // const collectionDonut = useMemo(() => [
-  //   { name: 'Principal Received', value: parseFloat((k.principal_received / 1e9).toFixed(2)) },
-  //   { name: 'Interest Received',  value: parseFloat((k.interest_received / 1e9).toFixed(2)) },
-  //   { name: 'Remaining O/S',      value: parseFloat(((k.outstanding_amt - k.principal_received) / 1e9).toFixed(2)) },
-  // ], [k])
-
-  // const collectionDonut = useMemo(
-  //   () => [
-  //     {
-  //       name: "Principal Received",
-  //       value: parseFloat((k.principal_received / 1e7).toFixed(2)),
-  //     },
-  //     {
-  //       name: "Interest Received",
-  //       value: parseFloat((k.interest_received / 1e7).toFixed(2)),
-  //     },
-  //     {
-  //       name: "Remaining O/S",
-  //       value: parseFloat(
-  //         ((k.outstanding_amt - k.principal_received) / 1e7).toFixed(2),
-  //       ),
-  //     },
-  //   ],
-  //   [],
-  // );
-
-  // const tenorChartData = tenor_dist.map((t) => ({
-  //   label: t.label,
-  //   count: t.count,
-  // }));
-  // const rateChartData = rate_dist.map((r) => ({
-  //   label: r.label,
-  //   count: r.count,
-  // }));
+  const monthlySummaryRows = useMemo(
+    () => [
+      {
+        period: "Apr 2025",
+        openingCr: 30586.78,
+        closingCr: 29126.9,
+        additionCr: 955.88,
+        redemptionCr: 2415.75,
+        accrualCr: 734.38,
+        eirIntCr: 200.31,
+        avgEir: 8.0674,
+        avgExit: 7.8973,
+        count: 90,
+      },
+      {
+        period: "May 2025",
+        openingCr: 24530.76,
+        closingCr: 24293.55,
+        additionCr: 1703.89,
+        redemptionCr: 1941.09,
+        accrualCr: 592.24,
+        eirIntCr: 157.24,
+        avgEir: 7.9642,
+        avgExit: 7.7905,
+        count: 73,
+      },
+      {
+        period: "Jun 2025",
+        openingCr: 37825.99,
+        closingCr: 37932.39,
+        additionCr: 2582.1,
+        redemptionCr: 2475.7,
+        accrualCr: 1116.42,
+        eirIntCr: 243.7,
+        avgEir: 7.799,
+        avgExit: 7.6739,
+        count: 99,
+      },
+      {
+        period: "Jul 2025",
+        openingCr: 25166.6,
+        closingCr: 25956.19,
+        additionCr: 2380.4,
+        redemptionCr: 1590.8,
+        accrualCr: 641.54,
+        eirIntCr: 165.9,
+        avgEir: 7.8817,
+        avgExit: 7.6995,
+        count: 77,
+      },
+      {
+        period: "Aug 2025",
+        openingCr: 35816.79,
+        closingCr: 36267.66,
+        additionCr: 2522.79,
+        redemptionCr: 2071.92,
+        accrualCr: 1068.87,
+        eirIntCr: 234.28,
+        avgEir: 7.8611,
+        avgExit: 7.7221,
+        count: 84,
+      },
+      {
+        period: "Sep 2025",
+        openingCr: 29411.1,
+        closingCr: 29521.07,
+        additionCr: 2361.83,
+        redemptionCr: 2251.85,
+        accrualCr: 621.22,
+        eirIntCr: 192.35,
+        avgEir: 7.8798,
+        avgExit: 7.6803,
+        count: 95,
+      },
+      {
+        period: "Oct 2025",
+        openingCr: 28959.05,
+        closingCr: 29209,
+        additionCr: 2337.53,
+        redemptionCr: 2087.58,
+        accrualCr: 932.88,
+        eirIntCr: 185.34,
+        avgEir: 7.8518,
+        avgExit: 7.7757,
+        count: 71,
+      },
+      {
+        period: "Nov 2025",
+        openingCr: 21111.82,
+        closingCr: 22024.44,
+        additionCr: 2555.71,
+        redemptionCr: 1643.08,
+        accrualCr: 537.31,
+        eirIntCr: 137.3,
+        avgEir: 7.8134,
+        avgExit: 7.6247,
+        count: 70,
+      },
+      {
+        period: "Dec 2025",
+        openingCr: 23667.38,
+        closingCr: 24467.6,
+        additionCr: 2412.35,
+        redemptionCr: 1612.13,
+        accrualCr: 723.58,
+        eirIntCr: 156.33,
+        avgEir: 7.9795,
+        avgExit: 7.8538,
+        count: 77,
+      },
+      {
+        period: "Jan 2026",
+        openingCr: 14926.41,
+        closingCr: 15027.5,
+        additionCr: 1305.18,
+        redemptionCr: 1204.09,
+        accrualCr: 345.13,
+        eirIntCr: 97.04,
+        avgEir: 8.0411,
+        avgExit: 7.8805,
+        count: 58,
+      },
+      {
+        period: "Feb 2026",
+        openingCr: 20913.85,
+        closingCr: 21884.31,
+        additionCr: 2188.98,
+        redemptionCr: 1218.52,
+        accrualCr: 655.75,
+        eirIntCr: 135.64,
+        avgEir: 7.8326,
+        avgExit: 7.7618,
+        count: 74,
+      },
+      {
+        period: "Mar 2026",
+        openingCr: 16680.3,
+        closingCr: 16343.47,
+        additionCr: 1094.25,
+        redemptionCr: 1431.09,
+        accrualCr: 348.42,
+        eirIntCr: 108.54,
+        avgEir: 8.0293,
+        avgExit: 7.8718,
+        count: 56,
+      },
+      {
+        period: "Apr 2026",
+        openingCr: 21713.27,
+        closingCr: 21955.73,
+        additionCr: 1448.12,
+        redemptionCr: 1205.66,
+        accrualCr: 661.63,
+        eirIntCr: 141.72,
+        avgEir: 7.8818,
+        avgExit: 7.7828,
+        count: 60,
+      },
+    ],
+    [],
+  );
 
   return (
     <div>
       <div className="section-label">Portfolio KPIs — All Figures in INR</div>
       <div className="four-col">
-        {/* <KpiCard
-          label="Total Sanction"
-          value={fmt.cr(k.total_sanction)}
-          sub={`${fmt.int(c.total_records)} records · ${fmt.int(c.unique_proposals)} proposals`}
-          footer={`${c.unique_groups} Borrower Groups · ${c.unique_customers} Customers`}
-          sparkPct={100}
-          accent="c1"
-        /> */}
-
         <KpiCard
           label="Closing Balance"
           value={formatDisplay(kpi.Total_Sanction?.Title)}
@@ -400,25 +484,12 @@ export default function Overview({ data }) {
           accent="c1"
           iconName="dollar"
           badge={{
-            label: "Sanctioned",
+            label: "CLosing Amt",
             bgColor: "#E8F1FF",
             textColor: "#1D4ED8",
-            dotColor: "#1D4ED8", // 👈 key line for badge dot
+            dotColor: "#1D4ED8", //  key line for badge dot
           }}
         />
-
-        {/* <KpiCard
-          label="Total Exposure"
-          value={fmt.cr(k.total_exposure)}
-          sub={`Disbursed: ${fmt.cr(k.loan_amt)}`}
-          footer={`Principal Received: ${fmt.cr(k.principal_received)}`}
-          sparkPct={
-            k.total_sanction > 0
-              ? (k.total_exposure / k.total_sanction) * 100
-              : 0
-          }
-          accent="c2"
-        /> */}
 
         <KpiCard
           label="Monthly Accrual"
@@ -451,19 +522,6 @@ export default function Overview({ data }) {
           }}
         />
 
-        {/* <KpiCard
-          label="Principal Received"
-          value={fmt.cr(k.total_prin_rec)}
-          sub={`Total Records: ${fmt.int(c.total_records)}`}
-          footer={`Unique Customers: ${fmt.int(c.unique_customers)}`}
-          sparkPct={
-            k.total_sanction > 0
-              ? (k.total_prin_rec / k.total_sanction) * 100
-              : 0
-          }
-          accent="c3"
-        /> */}
-
         <KpiCard
           label="Total Closing"
           value={formatDisplay(kpi.Avg_IntRate?.Title)}
@@ -478,17 +536,6 @@ export default function Overview({ data }) {
             textColor: "#7B1FA2",
           }}
         />
-
-        {/* <KpiCard
-          label="Outstanding Amount"
-          value={fmt.cr(k.total_os_amt)}
-          sub={`Borrower Groups: ${fmt.int(c.unique_groups)}`}
-          footer={`Total Exposure: ${fmt.cr(k.total_exposure)}`}
-          sparkPct={
-            k.total_sanction > 0 ? (k.total_os_amt / k.total_sanction) * 100 : 0
-          }
-          accent="c4"
-        /> */}
       </div>
       <div className="section-label">Gen AI Insights</div>
       <div className="card ai-panel">
@@ -497,7 +544,9 @@ export default function Overview({ data }) {
             <div className="ai-panel-icon">✦</div>
             <div className="ai-panel-title-block">
               <div className="ai-panel-title">Exposure Insights</div>
-              <div className="ai-panel-subtitle">Powered by Treasury Intelligence</div>
+              <div className="ai-panel-subtitle">
+                Powered by Treasury Intelligence
+              </div>
             </div>
           </div>
           <button
@@ -612,101 +661,25 @@ export default function Overview({ data }) {
       </div>
       <div className="section-label">Disbursement Activity Trend</div>
       <div className="chart-card">
-        {/* TITLE */}
-        <div className="chart-title">{disbursementTitle}</div>
-        <div className="chart-subtitle">{disbursementSubtitle}</div>
-
-        {/* TOGGLE BUTTONS */}
+        {/* TITLE ROW */}
         <div
           style={{
             display: "flex",
-            justifyContent: "space-between", // left + right split
+            justifyContent: "space-between",
             alignItems: "center",
             flexWrap: "wrap",
-            gap: "10px",
-            marginTop: "8px",
-            marginBottom: "12px",
+            gap: "12px",
           }}
         >
-          {/* LEFT SIDE → LEGEND */}
+          {/* LEFT → TITLE */}
+          <div className="chart-title">{disbursementTitle}</div>
+
+          {/* RIGHT → TEXT + BADGE */}
           <div
             style={{
               display: "flex",
               alignItems: "center",
-              gap: "20px",
-              flexWrap: "wrap",
-            }}
-          >
-            {/* Loans */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "7px",
-                fontSize: "11px",
-                color: "var(--text-muted)",
-              }}
-            >
-              <div
-                style={{
-                  width: "12px",
-                  height: "12px",
-                  borderRadius: "3px",
-                  background: "rgba(21,101,192,0.7)",
-                }}
-              />
-              No. of Loans
-            </div>
-
-            {/* Sanction */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "7px",
-                fontSize: "11px",
-                color: "var(--text-muted)",
-              }}
-            >
-              <div
-                style={{
-                  width: "12px",
-                  height: "12px",
-                  borderRadius: "3px",
-                  background: "rgba(144,202,249,0.75)",
-                }}
-              />
-              Sanction (₹ Bn)
-            </div>
-
-            {/* Outstanding */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "7px",
-                fontSize: "11px",
-                color: "var(--text-muted)",
-              }}
-            >
-              <div
-                style={{
-                  width: "28px",
-                  height: "3px",
-                  borderRadius: "2px",
-                  background: "#00acc1",
-                }}
-              />
-              Outstanding (₹ Bn)
-            </div>
-          </div>
-
-          {/* RIGHT SIDE → TEXT + BUTTONS + BADGE */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
+              gap: "12px",
               flexWrap: "wrap",
             }}
           >
@@ -715,42 +688,11 @@ export default function Overview({ data }) {
                 fontSize: "10px",
                 color: "var(--text-muted)",
                 fontWeight: 500,
+                whiteSpace: "nowrap",
               }}
             >
-              Bars = Loans & Sanction &nbsp;|&nbsp; Line = Outstanding
+              Bars = Opening & Closing Balance | Line = EIR Rate
             </span>
-
-            <div
-              style={{
-                display: "flex",
-                gap: "2px",
-                background: "var(--bg)",
-                border: "1px solid var(--border)",
-                borderRadius: "8px",
-                padding: "3px",
-              }}
-            >
-              {["monthly", "quarterly", "yearly"].map((mode) => (
-                <button
-                  key={mode}
-                  onClick={() => setViewMode(mode)}
-                  style={{
-                    padding: "4px 8px",
-                    fontSize: "10px",
-                    borderRadius: "6px",
-                    background: viewMode === mode ? "#fff" : "transparent",
-                    color:
-                      viewMode === mode ? "var(--blue)" : "var(--text-muted)",
-                    border:
-                      viewMode === mode ? "1px solid var(--border)" : "none",
-                    fontWeight: 600,
-                    cursor: "pointer",
-                  }}
-                >
-                  {mode.toUpperCase()}
-                </button>
-              ))}
-            </div>
 
             <span
               style={{
@@ -764,10 +706,88 @@ export default function Overview({ data }) {
                 letterSpacing: "0.06em",
               }}
             >
-              {viewMode.toUpperCase()}
+              13 Months
             </span>
           </div>
         </div>
+
+        <div className="chart-subtitle">{disbursementSubtitle}</div>
+
+        {/* LEGEND ROW */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "20px",
+            flexWrap: "wrap",
+            marginTop: "15px",
+            marginBottom: "12px",
+          }}
+        >
+          {/* Opening Balance */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "7px",
+              fontSize: "11px",
+              color: "var(--text-muted)",
+            }}
+          >
+            <div
+              style={{
+                width: "12px",
+                height: "12px",
+                borderRadius: "3px",
+                background: "rgba(21,101,192,0.7)",
+              }}
+            />
+            Opening Balance (₹ Cr)
+          </div>
+
+          {/* Closing Balance */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "7px",
+              fontSize: "11px",
+              color: "var(--text-muted)",
+            }}
+          >
+            <div
+              style={{
+                width: "12px",
+                height: "12px",
+                borderRadius: "3px",
+                background: "rgba(144,202,249,0.75)",
+              }}
+            />
+            Closing Balance (₹ Cr)
+          </div>
+
+          {/* Avg EIR Rate */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "7px",
+              fontSize: "11px",
+              color: "var(--text-muted)",
+            }}
+          >
+            <div
+              style={{
+                width: "28px",
+                height: "3px",
+                borderRadius: "2px",
+                background: "#00acc1",
+              }}
+            />
+            Avg EIR Rate (%)
+          </div>
+        </div>
+
         <VerticalBarWithLineOverview
           data={disbursementData}
           height={320}
@@ -779,48 +799,95 @@ export default function Overview({ data }) {
       <div className="two-col">
         <div className="chart-card">
           <div className="chart-title" style={{ marginBottom: "6px" }}>
-            Top {topN} Groups by Outstanding
+            Borrowing Book by Product Type
           </div>
           <div className="chart-subtitle" style={{ marginBottom: "6px" }}>
-            HIGHEST EXPOSURE GROUPS
+            TOGGLE: CLOSING BALANCE · ACCRUAL · EIR RATE — Apr 2026
           </div>
           <div
             style={{
               display: "flex",
               alignItems: "center",
-              gap: "6px",
+              gap: "8px",
+              flexWrap: "wrap",
+              marginLeft: "auto",
               marginTop: "8px",
               marginBottom: "30px",
             }}
           >
-            <span
+            {/* Period Dropdown */}
+            <div
               style={{
-                fontSize: "10px",
-                fontWeight: 700,
-                color: "var(--text-muted)",
-                marginRight: "4px",
+                display: "flex",
+                alignItems: "center",
+                gap: "5px",
               }}
             >
-              TOP
-            </span>
-
-            {[5, 10, 15, 20].map((n) => (
-              <button
-                key={n}
-                onClick={() => setTopN(n)}
+              <label
                 style={{
-                  padding: "4px 8px",
+                  fontSize: "10px",
+                  fontWeight: 700,
+                  color: "var(--text-muted)",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                📅 Period:
+              </label>
+
+              <select
+                id="bbMonthSel"
+                style={{
+                  fontFamily: "var(--font)",
                   fontSize: "11px",
-                  borderRadius: "12px",
-                  border: "1px solid var(--border)",
-                  background: topN === n ? "var(--blue)" : "transparent",
-                  color: topN === n ? "#fff" : "var(--text)",
+                  fontWeight: 600,
+                  padding: "4px 9px",
+                  border: "1.5px solid var(--blue-light)",
+                  borderRadius: "7px",
+                  background: "var(--white)",
+                  color: "var(--blue-dark)",
+                  outline: "none",
                   cursor: "pointer",
                 }}
               >
-                {n}
+                {/* Example Options */}
+                <option>Jan 2025</option>
+                <option>Feb 2025</option>
+                <option>Mar 2025</option>
+              </select>
+            </div>
+
+            {/* Toggle Buttons */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
+              }}
+            >
+              <button
+                className={`bbook-toggle ${bbToggle === "book" ? "active" : ""}`}
+                id="bbToggleBook"
+                onClick={() => setBBToggle("book")}
+              >
+                BOOK
               </button>
-            ))}
+
+              <button
+                className={`bbook-toggle ${bbToggle === "accrual" ? "active" : ""}`}
+                id="bbToggleAccrual"
+                onClick={() => setBBToggle("accrual")}
+              >
+                ACCRUAL
+              </button>
+
+              <button
+                className={`bbook-toggle ${bbToggle === "eir" ? "active" : ""}`}
+                id="bbToggleEir"
+                onClick={() => setBBToggle("eir")}
+              >
+                EIR %
+              </button>
+            </div>
           </div>
 
           <VerticalBar
@@ -834,8 +901,8 @@ export default function Overview({ data }) {
           />
         </div>
         <div className="chart-card">
-          <div className="chart-title">Product Type Split</div>
-          <div className="chart-subtitle">TL vs DEB — BY OUTSTANDING</div>
+          <div className="chart-title">Product Type Mix — Apr 2026</div>
+          <div className="chart-subtitle">CLOSING BALANCE ₹ CR</div>
           <DonutChart
             data={productDonut}
             colors={["#1565c0", "#00acc1"]}
@@ -851,75 +918,193 @@ export default function Overview({ data }) {
           />
         </div>
       </div>
+
+      <div className="section-label">Portfolio &amp; Rate Type Split</div>
       <div className="two-col">
         <div className="chart-card">
-          <div className="chart-title">Tenor Distribution</div>
-          <div className="chart-subtitle">LOAN COUNT BY MATURITY BAND</div>
-          <VerticalBar
-            data={tenorChartData}
-            dataKey="count"
-            nameKey="label"
-            height={320}
-          />
-        </div>
-        <div className="chart-card">
-          <div className="chart-title">Interest Rate Distribution</div>
-          <div className="chart-subtitle">LOAN COUNT BY RATE BUCKET</div>
-          <VerticalBar
-            data={rateChartData}
-            dataKey="count"
-            nameKey="label"
-            height={320}
-          />
-        </div>
-      </div>
-      <div className="two-col">
-        <div className="chart-card">
-          <div className="chart-title">Outstanding vs Sanction</div>
-          <div className="chart-subtitle" style={{ marginBottom: "20px" }}>
-            TOP 10 GROUPS COMPARISON
+          <div className="chart-title">Portfolio &amp; Rate Type Split</div>
+          <div className="chart-subtitle" style={{ marginBottom: "10px" }}>
+            APR 2026 — ₹ CR
           </div>
 
-          <GroupedBar
-            data={topGroupsDual}
-            series={[
-              {
-                key: "sanction",
-                label: "Sanction",
-                gradient: "blueGrad",
-              },
-              {
-                key: "outstanding",
-                label: "Outstanding",
-                gradient: "greenGrad",
-              },
-            ]}
-            height={380}
-            formatter={(v) => `₹${(v / 1e7).toLocaleString("en-IN")} Cr`}
+          <VerticalBar
+            data={portfolioRateTypeData}
+            dataKey="count"
+            nameKey="label"
+            height={300}
+            barSize={44}
+            slantLabels={false}
+            formatter={(v) => `${Number(v || 0).toLocaleString("en-IN")}`}
           />
         </div>
+
         <div className="chart-card">
-          <div className="chart-title">Collection Breakdown</div>
-          <div className="chart-subtitle">PRINCIPAL & INTEREST RECEIVED</div>
-          <DonutChart
-            data={collectionDonut}
-            colors={["#1565c0", "#00acc1", "#90caf9"]}
-            height={320}
-            formatter={(v) =>
-              `₹${Math.round((v || 0) / 1e7).toLocaleString("en-IN")} Cr`
-            }
-          />
-          <DonutLegend
-            data={collectionDonut}
-            colors={["#1565c0", "#00acc1", "#90caf9"]}
-            showPercent={true}
-            showValue={true}
-            valueFormatter={(v) =>
-              `₹${Math.round((v || 0) / 1e7).toLocaleString("en-IN")} Cr`
-            }
+          <div className="chart-title">Fixed vs Floating Balance</div>
+          <div className="chart-subtitle" style={{ marginBottom: "10px" }}>
+            APR 2026 — ₹ CR
+          </div>
+
+          <VerticalBar
+            data={fixedFloatingData}
+            dataKey="count"
+            nameKey="label"
+            height={300}
+            barSize={44}
+            slantLabels={false}
+            formatter={(v) => `₹${Number(v || 0).toLocaleString("en-IN")} Cr`}
           />
         </div>
       </div>
+
+      {/* SECTION LABEL */}
+      <div className="section-label">Summary Metrics — Select Period</div>
+
+      {/* PERIOD SELECT BOX */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          marginBottom: "16px",
+          padding: "11px 18px",
+          background: "var(--blue-pale)",
+          border: "1px solid var(--blue-pale2)",
+          borderRadius: "12px",
+          flexWrap: "wrap",
+        }}
+      >
+        <label
+          style={{
+            fontSize: "0.72rem",
+            fontWeight: 700,
+            color: "var(--blue-dark)",
+            whiteSpace: "nowrap",
+          }}
+        >
+          📅 Period:
+        </label>
+
+        <select
+          id="sumMetricsSel"
+          onChange={() => {}}
+          style={{
+            fontFamily: "var(--font)",
+            fontSize: "0.8rem",
+            fontWeight: 600,
+            padding: "6px 12px",
+            border: "1.5px solid var(--blue-light)",
+            borderRadius: "8px",
+            background: "var(--white)",
+            color: "var(--blue-dark)",
+            outline: "none",
+            cursor: "pointer",
+            minWidth: "160px",
+          }}
+        >
+          <option>Apr 2026</option>
+          <option>Mar 2026</option>
+          <option>Feb 2026</option>
+        </select>
+
+        <span
+          id="sumMetricsPeriodInfo"
+          style={{
+            fontSize: "0.7rem",
+            color: "var(--text-muted)",
+            marginLeft: "auto",
+          }}
+        >
+          Showing data for Apr 2026
+        </span>
+      </div>
+
+      {/* TWO CARDS SIDE BY SIDE */}
+      <div className="two-col summary-metrics-grid">
+        {/* CARD 1 */}
+        <div className="chart-card summary-metrics-card">
+          <div className="chart-title summary-metrics-title">
+            Summary Metrics
+            <span className="card-badge">Apr 2026</span>
+          </div>
+
+          <table
+            className="summary-table"
+            id="sumMetricsTable"
+            style={{ width: "100%" }}
+          >
+            <thead>
+              <tr>
+                <th>Metric</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Total Book</td>
+                <td>₹ 21,956 (Cr)</td>
+              </tr>
+              <tr>
+                <td>Wtd Avg EIR</td>
+                <td>7.88% p.a.</td>
+              </tr>
+              <tr>
+                <td>Total Accrual</td>
+                <td>661.63</td>
+              </tr>
+              <tr>
+                <td>Active Lines</td>
+                <td>60</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* CARD 2 */}
+        <div className="chart-card summary-metrics-card">
+          <div className="chart-title summary-metrics-title">
+            Rate & Mix Snapshot
+            <span className="card-badge">Apr 2026</span>
+          </div>
+
+          <table
+            className="summary-table"
+            id="sumMetricsTable2"
+            style={{ width: "100%" }}
+          >
+            <thead>
+              <tr>
+                <th>Metric</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Fixed Rate</td>
+                <td>₹ 19,502 (88.8%)</td>
+              </tr>
+              <tr>
+                <td>Floating Rate</td>
+                <td>₹ 2,453 (11.2%)</td>
+              </tr>
+              <tr>
+                <td>Avg Exit Rate</td>
+                <td>7.78% p.a.</td>
+              </tr>
+              <tr>
+                <td>Avg Coupon/Yield</td>
+                <td>7.78% p.a.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div className="section-label">
+        Monthly Summary Table — All Amounts ₹ Crores
+      </div>
+      <MonthlySummaryTable
+        rows={monthlySummaryRows}
+        periodLabel="Apr 2025 → Apr 2026"
+      />
     </div>
   );
 }
