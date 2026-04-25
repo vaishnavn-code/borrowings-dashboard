@@ -116,12 +116,6 @@ body {
 }
 
 /* ── Grid helpers ───────────────────────────────────────────────────────── */
-.two-col {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 16px;
-}
 .four-col {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -149,15 +143,6 @@ body {
   box-shadow: var(--shadow);
   backdrop-filter: blur(12px);
   margin-bottom: 16px;
-}
-.card-title {
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 .card-badge {
   font-size: 0.55rem;
@@ -608,19 +593,21 @@ body {
 }
 
 .ai-panel-title {
-  font-size: 0.98rem;
-  font-weight: 800;
-  color: #183153;
-  line-height: 1.2;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 2px;
 }
 
 .ai-panel-subtitle {
-  margin-top: 2px;
-  font-size: 0.72rem;
+  font-size: 0.6rem;
   font-weight: 800;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.18em;
+  color: #7c4dff;
   text-transform: uppercase;
-  color: #7ca2c7;
+}
+[data-theme="dark"] .ai-panel-subtitle {
+  color: #b39ddb;
 }
 
 .ai-panel-body {
@@ -639,7 +626,11 @@ body {
 }
 
 .ai-loading {
-  background: linear-gradient(180deg, rgba(248, 251, 255, 0.98), rgba(236, 244, 252, 0.96));
+  background: linear-gradient(
+    180deg,
+    rgba(248, 251, 255, 0.98),
+    rgba(236, 244, 252, 0.96)
+  );
   gap: 14px;
 }
 
@@ -673,7 +664,11 @@ body {
 }
 
 .ai-error {
-  background: linear-gradient(180deg, rgba(255, 248, 248, 0.98), rgba(255, 239, 239, 0.96));
+  background: linear-gradient(
+    180deg,
+    rgba(255, 248, 248, 0.98),
+    rgba(255, 239, 239, 0.96)
+  );
   color: #b42318;
   font-size: 0.88rem;
   font-weight: 700;
@@ -703,7 +698,11 @@ body {
 }
 
 .ai-summary-hero {
-  background: linear-gradient(180deg, rgba(244, 248, 255, 0.96), rgba(233, 241, 252, 0.96));
+  background: linear-gradient(
+    180deg,
+    rgba(244, 248, 255, 0.96),
+    rgba(233, 241, 252, 0.96)
+  );
   border: 1px solid rgba(204, 224, 245, 0.95);
   border-radius: 22px;
   padding: 20px 26px;
@@ -749,7 +748,11 @@ body {
 }
 
 .ai-insight-card {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(249, 251, 255, 0.96));
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.98),
+    rgba(249, 251, 255, 0.96)
+  );
   border: 1px solid rgba(204, 224, 245, 0.95);
   border-radius: 22px;
   overflow: hidden;
@@ -858,26 +861,33 @@ body {
 
 .insights-btn {
   font-family: var(--font);
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 700;
-  padding: 12px 20px;
-  border: none;
+  padding: 10px 22px;
   border-radius: 12px;
+  border: none;
   cursor: pointer;
-  background: linear-gradient(135deg, #6b21a8, #7e22ce);
+  background: linear-gradient(135deg, #5e35b1, #7c4dff);
   color: #fff;
-  transition: opacity 0.2s;
+  box-shadow: 0 4px 14px rgba(94, 53, 177, 0.35);
+  transition: all 0.25s;
   display: flex;
   align-items: center;
-  gap: 7px;
-  box-shadow: 0 10px 24px rgba(107, 33, 168, 0.22);
+  gap: 8px;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
 }
 .insights-btn:hover {
-  opacity: 0.88;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(94, 53, 177, 0.45);
 }
 .insights-btn:disabled {
   opacity: 0.5;
   cursor: default;
+}
+
+.insights-btn:active {
+  transform: translateY(0);
 }
 
 @media (max-width: 760px) {
@@ -1752,11 +1762,28 @@ header {
   color: var(--text-sub);
   font-weight: 700;
 }
+.bbook-toggle {
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bbook-toggle.active {
+  background: var(--blue-dark);
+  color: #fff;
+  border-color: var(--blue-dark);
+  box-shadow: 0 3px 10px rgba(21, 101, 192, 0.25);
+}
 .card {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 16px;
-  padding: 22px;
   box-shadow: var(--shadow);
   backdrop-filter: var(--blur);
   transition:
@@ -1854,7 +1881,13 @@ header {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
-  margin-bottom: 16px;
+  align-items: stretch;   /* IMPORTANT */
+}
+.chart-card.equal-height-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 660px; /* adjust if needed */
 }
 .three-col {
   display: grid;
@@ -2416,4 +2449,227 @@ header {
   text-transform: uppercase;
   display: inline-flex;
   align-items: center;
+}
+
+/* Summary Metrics block on Overview */
+.summary-metrics-card {
+  padding: 18px 22px;
+  border: 1px solid #c7dbed;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow:
+    0 6px 14px rgba(23, 86, 148, 0.06),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.22);
+}
+
+.summary-metrics-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.summary-metrics-title .card-badge {
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid #b7d2e8;
+  background: #dcecf9;
+  color: var(--blue);
+  white-space: nowrap;
+}
+
+.summary-metrics-card .summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.87rem;
+}
+
+.summary-metrics-card .summary-table thead th {
+  background: #d2e3f1;
+  color: #6b99be;
+  font-size: 0.57rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid #c6d9ea;
+}
+
+.summary-metrics-card .summary-table tbody td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #d5e4f1;
+  color: #193b5d;
+  white-space: nowrap;
+}
+
+.summary-metrics-card .summary-table tbody tr:last-child td {
+  border-bottom: 1px solid #cddff0;
+}
+
+.summary-metrics-card .summary-table tbody td:first-child {
+  font-weight: 600;
+}
+
+.summary-metrics-card .summary-table tbody td:last-child {
+  color: #1e88e5;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 13-Month Summary table card */
+.summary-monthly-card {
+  padding: 14px 16px 18px;
+  border: 1px solid #c5d9ea;
+  background: rgba(255, 255, 255, 0.84);
+  box-shadow:
+    0 7px 16px rgba(22, 82, 138, 0.06),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.24);
+}
+
+.summary-monthly-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.summary-monthly-title {
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: #1a3f63;
+}
+
+.summary-monthly-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #2b81d1;
+  background: #d7e9f8;
+  border: 1px solid #bad6ec;
+  border-radius: 999px;
+  padding: 5px 11px;
+  white-space: nowrap;
+}
+
+.summary-monthly-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #c8dcee;
+  border-radius: 11px;
+}
+
+.summary-monthly-table {
+  width: 100%;
+  min-width: 1060px;
+  border-collapse: collapse;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.summary-monthly-table thead th {
+  background: #d2e3f1;
+  color: #5f90b7;
+  font-size: 0.63rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid #bfd4e8;
+  white-space: nowrap;
+}
+
+.summary-monthly-table thead th:not(:first-child),
+.summary-monthly-table tbody td:not(:first-child) {
+  text-align: right;
+}
+
+.summary-monthly-table tbody td {
+  color: #2c5f92;
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 10px 12px;
+  border-bottom: 1px solid #d3e2ef;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.summary-monthly-table tbody td:first-child {
+  color: #1a3c5f;
+  font-weight: 700;
+  text-align: left;
+}
+
+.txn-month-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+  padding: 10px 16px;
+  background: var(--blue-pale);
+  border: 1px solid var(--blue-pale2);
+  border-radius: 12px;
+}
+.txn-month-bar label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--blue-dark);
+  white-space: nowrap;
+}
+.txn-month-pills {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Month selector pills styling */
+.txn-month-pill {
+      font-family: var(--font);
+    font-size: .67rem;
+    font-weight: 700;
+    padding: 4px 11px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all .15s;
+    white-space: nowrap;
+}
+.txn-month-pill:hover,
+.txn-month-pill:focus {
+  border-color: var(--blue);
+  background: var(--blue-pale);
+  color: var(--blue-dark);
+}
+.txn-month-pill.active {
+  background: var(--blue-dark);
+    color: #fff;
+    border-color: var(--blue-dark);
+}
+
+/* Period info styling */
+.txn-period-info {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #1e88e5;
+  margin-left: 18px;
+  background: #e3f2fd;
+  border-radius: 8px;
+  padding: 5px 16px;
+  box-shadow: 0 1px 4px rgba(30, 136, 229, 0.07);
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .summary-monthly-title {
+    font-size: 1.25rem;
+  }
 }
