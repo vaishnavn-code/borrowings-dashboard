@@ -1223,16 +1223,13 @@ export function RateTrendMixedChart({ data = [], height = 360 }) {
           cursor={{ fill: "transparent" }}
           content={buildUnifiedTooltip({
             valueFormatter: (value, _name, entry) => {
-              if (
-                entry.dataKey === "avgEir" ||
-                entry.dataKey === "exitRate"
-              ) {
+              if (entry.dataKey === "avgEir" || entry.dataKey === "exitRate") {
                 return `${Number(value).toFixed(2)} %`;
               }
 
-              return `₹${Math.round(
-                Number(value) / 10000000
-              ).toLocaleString("en-IN")} Cr`;
+              return `₹${Math.round(Number(value) / 10000000).toLocaleString(
+                "en-IN",
+              )} Cr`;
             },
           })}
         />
@@ -1348,8 +1345,7 @@ export function EirMonthlyMovementChart({ data = [], height = 320 }) {
         <Tooltip
           cursor={{ fill: "transparent" }}
           content={buildUnifiedTooltip({
-            valueFormatter: (value) =>
-              `${Number(value).toFixed(2)} %`,
+            valueFormatter: (value) => `${Number(value).toFixed(2)} %`,
           })}
         />
 
@@ -1372,6 +1368,381 @@ export function EirMonthlyMovementChart({ data = [], height = 320 }) {
           isAnimationActive={false}
         />
       </LineChart>
+    </ResponsiveContainer>
+  );
+}
+
+/* =========================================================
+   Closing Balance by Maturity Bucket — Monthly Trend
+   STACKED BAR + AVG EIR LINE
+========================================================= */
+
+export function MaturityClosingTrendChart({ data = [], height = 360 }) {
+  return (
+    <ResponsiveContainer width="100%" height={height}>
+      <ComposedChart
+        data={data}
+        margin={{
+          top: 20,
+          right: 30,
+          left: 10,
+          bottom: 10,
+        }}
+        barCategoryGap="24%"
+      >
+        <CartesianGrid
+          stroke="rgba(0,0,0,0.08)"
+          horizontal={true}
+          vertical={true}
+        />
+
+        <XAxis
+          dataKey="name"
+          axisLine={false}
+          tickLine={false}
+          tick={{
+            fontSize: 10,
+            fill: "#6a9cbf",
+            fontFamily: "Inter",
+          }}
+        />
+
+        {/* LEFT AXIS → Closing Balance */}
+        <YAxis
+          yAxisId="left"
+          axisLine={false}
+          tickLine={false}
+          tick={{
+            fontSize: 10,
+            fill: "#6a9cbf",
+          }}
+          tickFormatter={(v) =>
+            Math.round(v / 10000000).toLocaleString("en-IN")
+          }
+          label={{
+            value: "Closing ₹ Cr",
+            angle: -90,
+            position: "insideLeft",
+            style: {
+              fontSize: 9,
+              fill: "#6a9cbf",
+            },
+          }}
+        />
+
+        {/* RIGHT AXIS → Avg EIR */}
+        <YAxis
+          yAxisId="right"
+          orientation="right"
+          axisLine={false}
+          tickLine={false}
+          domain={[0, 9]}
+          tick={{
+            fontSize: 10,
+            fill: "#F57C00",
+          }}
+          tickFormatter={(v) => `${Number(v).toFixed(2)}%`}
+        />
+
+        <Tooltip
+          cursor={{ fill: "transparent" }}
+          content={buildUnifiedTooltip({
+            valueFormatter: (value, _name, entry) => {
+              if (entry?.dataKey === "avgEir") {
+                return `${Number(value).toFixed(2)} %`;
+              }
+
+              return `₹${Math.round(Number(value) / 10000000).toLocaleString(
+                "en-IN",
+              )} Cr`;
+            },
+          })}
+        />
+
+        {/* STACKED BARS */}
+
+        <Bar
+          yAxisId="left"
+          dataKey="matured"
+          stackId="a"
+          name="Matured"
+          fill="#90caf9"
+          radius={[0, 0, 0, 0]}
+        />
+
+        <Bar
+          yAxisId="left"
+          dataKey="lt1"
+          stackId="a"
+          name="< 1 Year"
+          fill="#1565C0"
+        />
+
+        <Bar
+          yAxisId="left"
+          dataKey="y1to3"
+          stackId="a"
+          name="1 - 3 Years"
+          fill="#1E88E5"
+        />
+
+        <Bar
+          yAxisId="left"
+          dataKey="y3to5"
+          stackId="a"
+          name="3 - 5 Years"
+          fill="#42A5F5"
+        />
+
+        <Bar
+          yAxisId="left"
+          dataKey="gt5"
+          stackId="a"
+          name="> 5 Years"
+          fill="#0288D1"
+          radius={[4, 4, 0, 0]}
+        />
+
+        {/* AVG EIR LINE */}
+
+        <Line
+          yAxisId="right"
+          type="monotone"
+          dataKey="avgEir"
+          name="Avg EIR %"
+          stroke="#F57C00"
+          strokeWidth={2.5}
+          dot={{
+            r: 4,
+            stroke: "#F57C00",
+            strokeWidth: 2,
+            fill: "#fff",
+          }}
+          activeDot={{ r: 5 }}
+          isAnimationActive={false}
+        />
+      </ComposedChart>
+    </ResponsiveContainer>
+  );
+}
+export default function MaturityProductTypeStackedBar({
+  data = [],
+  height = 520,
+  formatter,
+}) {
+  return (
+    <ResponsiveContainer width="100%" height={height}>
+      <BarChart
+        data={data}
+        margin={{
+          top: 20,
+          right: 20,
+          left: 10,
+          bottom: 80,
+        }}
+        barCategoryGap="24%" // SAME as MaturityClosingTrendChart
+      >
+        <CartesianGrid
+          stroke="rgba(0,0,0,0.08)"
+          horizontal={true}
+          vertical={true} // SAME as reference chart
+        />
+
+        <XAxis
+          dataKey="name"
+          axisLine={false}
+          tickLine={false}
+          interval={0}
+          angle={-35}
+          textAnchor="end"
+          height={80}
+          tick={{
+            fontSize: 10,
+            fill: "#6a9cbf",
+            fontFamily: "Inter",
+          }}
+        />
+
+        <YAxis
+          axisLine={false}
+          tickLine={false}
+          tick={{
+            fontSize: 10,
+            fill: "#6a9cbf",
+          }}
+          tickFormatter={(v) =>
+            Math.round(v / 10000000).toLocaleString("en-IN")
+          }
+          label={{
+            value: "₹ Cr",
+            angle: -90,
+            position: "insideLeft",
+            style: {
+              fontSize: 9,
+              fill: "#6a9cbf",
+            },
+          }}
+        />
+
+        <Tooltip
+          cursor={{ fill: "transparent" }}
+          content={buildUnifiedTooltip({
+            valueFormatter: (value) =>
+              formatter
+                ? formatter(value)
+                : `₹${Math.round(Number(value || 0) / 10000000).toLocaleString(
+                    "en-IN",
+                  )} Cr`,
+          })}
+        />
+
+        {/* SAME COLORS AS MaturityClosingTrendChart */}
+
+        <Bar
+          dataKey="matured"
+          stackId="a"
+          name="Matured"
+          fill="#90caf9"
+          radius={[0, 0, 0, 0]}
+          maxBarSize={50}
+        />
+
+        <Bar
+          dataKey="lt1"
+          stackId="a"
+          name="< 1 Year"
+          fill="#1565C0"
+          maxBarSize={50}
+        />
+
+        <Bar
+          dataKey="y1to3"
+          stackId="a"
+          name="1 - 3 Years"
+          fill="#1E88E5"
+          maxBarSize={50}
+        />
+
+        <Bar
+          dataKey="y3to5"
+          stackId="a"
+          name="3 - 5 Years"
+          fill="#42A5F5"
+          maxBarSize={50}
+        />
+
+        <Bar
+          dataKey="gt5"
+          stackId="a"
+          name="> 5 Years"
+          fill="#0288D1"
+          radius={[4, 4, 0, 0]}
+          maxBarSize={50}
+        />
+      </BarChart>
+    </ResponsiveContainer>
+  );
+}
+
+export function RateTypeMaturityStackedBar({
+  data = [],
+  height = 420,
+  formatter,
+}) {
+  return (
+    <ResponsiveContainer width="100%" height={height}>
+      <BarChart
+        data={data}
+        margin={{
+          top: 20,
+          right: 20,
+          left: 10,
+          bottom: 10,
+        }}
+        barCategoryGap="24%"
+      >
+        {/* GRADIENTS SAME AS REFERENCE */}
+        <defs>
+          {/* Fixed = Dark Blue */}
+          <linearGradient id="rateTypeFixedGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="rgba(21,101,192,0.90)" />
+            <stop offset="100%" stopColor="rgba(145, 197, 240, 0.24)" />
+          </linearGradient>
+
+          {/* Floating = Light Blue */}
+          <linearGradient
+            id="rateTypeFloatingGrad"
+            x1="0"
+            y1="0"
+            x2="0"
+            y2="1"
+          >
+            <stop offset="0%" stopColor="rgba(144,202,249,0.72)" />
+            <stop offset="100%" stopColor="rgba(46, 146, 228, 0.1)" />
+          </linearGradient>
+        </defs>
+
+        <CartesianGrid
+          stroke="rgba(0,0,0,0.08)"
+          horizontal={true}
+          vertical={true}
+        />
+
+        <XAxis
+          dataKey="name"
+          axisLine={false}
+          tickLine={false}
+          tick={{
+            fontSize: 10,
+            fill: "#6a9cbf",
+            fontFamily: "Inter",
+          }}
+        />
+
+        <YAxis
+          axisLine={false}
+          tickLine={false}
+          tick={{
+            fontSize: 10,
+            fill: "#6a9cbf",
+          }}
+          tickFormatter={(v) =>
+            Math.round(v / 10000000).toLocaleString("en-IN")
+          }
+        />
+
+        <Tooltip
+          cursor={{ fill: "transparent" }}
+          content={buildUnifiedTooltip({
+            valueFormatter: (value) =>
+              formatter
+                ? formatter(value)
+                : `₹${Math.round(
+                    Number(value || 0) / 10000000
+                  ).toLocaleString("en-IN")} Cr`,
+          })}
+        />
+
+        {/* FIXED */}
+        <Bar
+          dataKey="fixed"
+          name="Fixed"
+          stackId="a"
+          fill="url(#rateTypeFixedGrad)"
+          radius={[0, 0, 0, 0]}
+          maxBarSize={48}
+        />
+
+        {/* FLOATING */}
+        <Bar
+          dataKey="floating"
+          name="Floating"
+          stackId="a"
+          fill="url(#rateTypeFloatingGrad)"
+          radius={[4, 4, 0, 0]}
+          maxBarSize={48}
+        />
+      </BarChart>
     </ResponsiveContainer>
   );
 }
