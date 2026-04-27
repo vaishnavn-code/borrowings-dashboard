@@ -1,9 +1,20 @@
 import React, { useState, useMemo } from "react";
-import { HorizontalBar, VerticalBar } from "../components/charts/BarCharts";
+import MaturityProductTypeStackedBar, {
+  HorizontalBar,
+  MaturityClosingTrendChart,
+  RateTypeMaturityStackedBar,
+  VerticalBar,
+} from "../components/charts/BarCharts";
 import DataTable from "../components/ui/DataTable";
 import { TopNSelector } from "../components/ui/helpers";
 import { fmt } from "../utils/formatters";
 import { TOP_N_OPTIONS } from "../utils/constants";
+// inside Maturity.jsx
+
+import KpiCard from "../components/ui/KpiCard";
+import { mapMaturityAnalysis } from "../mappers/maturityMapper";
+import DonutChart from "../components/charts/DonutChart";
+import DonutLegend from "../components/charts/DonutLegend";
 
 const COLUMNS = [
   { key: "customer", label: "Customer" },
@@ -24,9 +35,7 @@ const COLUMNS = [
     key: "outstanding",
     label: "Outstanding (₹ Cr)",
     render: (v) => (
-      <span style={{ fontWeight: 700, color: "#2E6090" }}>
-        {fmt.cr(v)}
-      </span>
+      <span style={{ fontWeight: 700, color: "#2E6090" }}>{fmt.cr(v)}</span>
     ),
   },
 
@@ -80,8 +89,9 @@ const COLUMNS = [
 ];
 
 export default function Maturity({ data }) {
+  console.log("MATURITY PAGE DATA", data);
   const [page, setPage] = useState(1);
-const PER_PAGE = 25;
+  const PER_PAGE = 25;
   const [topN, setTopN] = useState({ outstanding: 15, sanction: 15 });
 
   const borrowersTable = data?.borrowers?.table || [];
@@ -93,7 +103,7 @@ const PER_PAGE = 25;
 
   const topCustomer = borrowersTable.reduce(
     (max, b) => (b.outstanding > max ? b.outstanding : max),
-    0
+    0,
   );
 
   const avgRate =
@@ -107,7 +117,7 @@ const PER_PAGE = 25;
     .slice(0, topN.outstanding)
     .map((c) => ({
       name: c.customer,
-      value: c.outstanding
+      value: c.outstanding,
     }));
 
   const sancData = borrowersTable
@@ -116,99 +126,440 @@ const PER_PAGE = 25;
     .slice(0, topN.sanction)
     .map((c) => ({
       name: c.customer,
-      value: c.sanction_amt
+      value: c.sanction_amt,
     }));
 
-    const paginatedRows = useMemo(() => {
-  const start = (page - 1) * PER_PAGE;
-  return borrowersTable.slice(start, start + PER_PAGE);
-}, [borrowersTable, page]);
+  const paginatedRows = useMemo(() => {
+    const start = (page - 1) * PER_PAGE;
+    return borrowersTable.slice(start, start + PER_PAGE);
+  }, [borrowersTable, page]);
 
+  const totalPages = Math.ceil(borrowersTable.length / PER_PAGE);
 
-const totalPages = Math.ceil(borrowersTable.length / PER_PAGE);
+  /*
+========================================
+MAPPER DATA
+========================================
+*/
 
+  const mappedData = mapMaturityAnalysis(data);
+
+  const annualMaturityProfileData = mappedData?.annualMaturityProfileData || [];
+
+  const kpis = mappedData?.kpis || {};
+
+  const maturityClosingTrendData = mappedData?.maturityClosingTrendData || [];
+  // add this mapped data
+
+  const maturityBucketDistributionData =
+    mappedData?.maturityBucketDistributionData || [];
+
+  const productTypeMaturityBucketData =
+    mappedData?.productTypeMaturityBucketData || [];
+
+  const rateTypeByMaturityBucketData =
+    mappedData?.rateTypeByMaturityBucketData || [];
+
+  /*
+========================================
+FORMATTER
+========================================
+*/
+
+  const formatDisplay = (v) => {
+    if (v === null || v === undefined || v === "") return "-";
+
+    return fmt.cr(Number(v || 0));
+  };
   return (
     <div>
       <div className="section-label">Borrower / Customer View</div>
 
-      {/* CHARTS */}
-      <div className="two-col">
-        <div className="chart-card">
-          <div className="chart-title">Top {topN.outstanding} Customers by Outstanding</div>
-          <div className="chart-subtitle">₹ BILLIONS</div>
+      {/* KPI CARDS */}
 
-          <TopNSelector
-            options={TOP_N_OPTIONS}
-            value={topN.outstanding}
-            onChange={(n) =>
-              setTopN((p) => ({ ...p, outstanding: n }))
+      <div className="four-col">
+        <KpiCard
+          label="Weighted Avg Residual"
+          value={Number(kpis.wtdAvgResidual?.title || 0).toFixed(2)}
+          sub={kpis.wtdAvgResidual?.subtitle}
+          footer={kpis.wtdAvgResidual?.footer}
+          sparkPct={100}
+          accent="c1"
+          iconName="dollar"
+          badge={{
+            label: "Residual",
+            bgColor: "#E8F1FF",
+            textColor: "#1D4ED8",
+            dotColor: "#1D4ED8",
+          }}
+        />
+
+        <KpiCard
+          label="Maturing"
+          value={formatDisplay(kpis.maturing?.title)}
+          sub={kpis.maturing?.subtitle}
+          footer={kpis.maturing?.footer}
+          sparkPct={80}
+          accent="c2"
+          iconName="graph"
+          badge={{
+            label: "<1Y",
+            bgColor: "#E8F5E9",
+            textColor: "#43A047",
+            dotColor: "#43A047",
+          }}
+        />
+
+        <KpiCard
+          label="Already Matured"
+          value={formatDisplay(kpis.alreadyMatured?.title)}
+          sub={kpis.alreadyMatured?.subtitle}
+          footer={kpis.alreadyMatured?.footer}
+          sparkPct={60}
+          accent="c3"
+          iconName="settings"
+          badge={{
+            label: "Overdue",
+            bgColor: "#FFF3E0",
+            textColor: "#FB8C00",
+            dotColor: "#FB8C00",
+          }}
+        />
+
+        <KpiCard
+          label="Long Term"
+          value={formatDisplay(kpis.longTerm?.title)}
+          sub={kpis.longTerm?.subtitle}
+          footer={kpis.longTerm?.footer}
+          sparkPct={90}
+          accent="c4"
+          iconName="personFolder"
+          badge={{
+            label: ">3Y",
+            bgColor: "#F3E5F5",
+            textColor: "#7B1FA2",
+            dotColor: "#7B1FA2",
+          }}
+        />
+      </div>
+
+      <div className="chart-card" style={{ marginBottom: "20px" }}>
+        <div className="chart-title">
+          Closing Balance by Maturity Bucket — Monthly Trend
+        </div>
+        <div className="chart-subtitle">
+          STACKED BARS: &lt;1Y | 1–3Y | 3–5Y | &gt;5Y | MATURED · 13 MONTHS
+        </div>
+
+        {/* CUSTOM LEGEND */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "22px",
+            flexWrap: "wrap",
+            marginTop: "14px",
+            marginBottom: "10px",
+            fontSize: "13px",
+            fontWeight: 500,
+            color: "#3b5f86",
+          }}
+        >
+          {/* Matured */}
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <span
+              style={{
+                width: "12px",
+                height: "12px",
+                borderRadius: "3px",
+                background: "#90caf9",
+                display: "inline-block",
+              }}
+            />
+            Matured
+          </div>
+
+          {/* < 1 Year */}
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <span
+              style={{
+                width: "12px",
+                height: "12px",
+                borderRadius: "3px",
+                background: "#1565C0",
+                display: "inline-block",
+              }}
+            />
+            &lt; 1 Year
+          </div>
+
+          {/* 1 - 3 Years */}
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <span
+              style={{
+                width: "12px",
+                height: "12px",
+                borderRadius: "3px",
+                background: "#1E88E5",
+                display: "inline-block",
+              }}
+            />
+            1 - 3 Years
+          </div>
+
+          {/* 3 - 5 Years */}
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <span
+              style={{
+                width: "12px",
+                height: "12px",
+                borderRadius: "3px",
+                background: "#42A5F5",
+                display: "inline-block",
+              }}
+            />
+            3 - 5 Years
+          </div>
+
+          {/* > 5 Years */}
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <span
+              style={{
+                width: "12px",
+                height: "12px",
+                borderRadius: "3px",
+                background: "#0288D1",
+                display: "inline-block",
+              }}
+            />
+            &gt; 5 Years
+          </div>
+
+          {/* Avg EIR */}
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <span
+              style={{
+                width: "20px",
+                height: "2px",
+                background: "#F57C00",
+                display: "inline-block",
+                position: "relative",
+              }}
+            />
+            Avg EIR %
+          </div>
+        </div>
+        <MaturityClosingTrendChart
+          data={maturityClosingTrendData}
+          height={380}
+        />
+      </div>
+
+      <div className="two-col">
+        <div className="chart-card" style={{ marginBottom: "20px" }}>
+          <div className="chart-title">Maturity Bucket Distribution</div>
+
+          <div className="chart-subtitle">
+            CONTRIBUTION TO TOTAL CLOSING BALANCE
+          </div>
+
+          <DonutChart
+            data={maturityBucketDistributionData}
+            colors={[
+              "#90CAF9", // Matured
+              "#1565C0", // <1Y
+              "#1E88E5", // 1-3Y
+              "#42A5F5", // 3-5Y
+              "#0288D1", // >5Y
+            ]}
+            height={320}
+            formatter={(v) =>
+              `₹${(Number(v || 0) / 10000000).toLocaleString("en-IN")} Cr`
             }
           />
 
-          <VerticalBar
-            data={osData}
-            dataKey="value"
-            nameKey="name"
-            color="url(#intGrad)"
-            slantLabels={true}
-            isCurrency={true}
-            height={360}
-            formatter={(v) => `₹${(v / 1e7).toLocaleString("en-IN")} Cr`} 
+          <DonutLegend
+            data={maturityBucketDistributionData}
+            colors={["#90CAF9", "#1565C0", "#1E88E5", "#42A5F5", "#0288D1"]}
+            showPercent={true}
+            showValue={true}
+            valueFormatter={(v) =>
+              `₹${Math.round(Number(v || 0) / 10000000).toLocaleString("en-IN")} Cr`
+            }
           />
         </div>
 
-        <div className="chart-card">
-          <div className="chart-title">Top {topN.sanction} Customers by Sanction</div>
-          <div className="chart-subtitle">₹ BILLIONS</div>
+        <div className="chart-card" style={{ marginBottom: "20px" }}>
+          <div className="chart-title">Maturity Bucket Distribution</div>
 
-          <TopNSelector
-            options={TOP_N_OPTIONS}
-            value={topN.sanction}
-            onChange={(n) =>
-              setTopN((p) => ({ ...p, sanction: n }))
-            }
-          />
+          <div className="chart-subtitle">
+            CONTRIBUTION TO TOTAL CLOSING BALANCE
+          </div>
 
-          <VerticalBar
-            data={sancData}
+          <HorizontalBar
+            data={maturityBucketDistributionData}
             dataKey="value"
             nameKey="name"
-            color="url(#intGrad)"
-            slantLabels={true}
-            isCurrency={true}
-            height={360}
-            formatter={(v) => `₹${(v / 1e7).toLocaleString("en-IN")} Cr`} 
+            height={420}
+            barSize={18}
+            formatter={(v) =>
+              `₹${(Number(v || 0) / 10000000).toLocaleString("en-IN")} Cr`
+            }
           />
         </div>
       </div>
 
-      {/* TABLE */}
-      <div className="card">
-        <div className="card-title">
-          Customer Exposure Register
-          <span className="card-badge">
-            {uniqueCustomers} CUSTOMERS
-          </span>
+      <div className="two-col">
+        <div className="chart-card" style={{ marginBottom: "20px" }}>
+          {" "}
+          <div className="chart-title">
+            {" "}
+            Product Type vs Maturity Bucket{" "}
+          </div>{" "}
+          <div className="chart-subtitle">
+            {" "}
+            STACKED BAR BY PRODUCT TYPE · NO LINE{" "}
+          </div>{" "}
+          {/* CUSTOM LEGEND */}{" "}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "22px",
+              flexWrap: "wrap",
+              marginTop: "14px",
+              marginBottom: "10px",
+              fontSize: "13px",
+              fontWeight: 500,
+              color: "#3b5f86",
+            }}
+          >
+            {" "}
+            {[
+              ["Matured", "#90CAF9"],
+              ["< 1 Year", "#1565C0"],
+              ["1 - 3 Years", "#1E88E5"],
+              ["3 - 5 Years", "#42A5F5"],
+              ["> 5 Years", "#0288D1"],
+            ].map(([label, color]) => (
+              <div
+                key={label}
+                style={{ display: "flex", alignItems: "center", gap: "8px" }}
+              >
+                {" "}
+                <span
+                  style={{
+                    width: "12px",
+                    height: "12px",
+                    borderRadius: "3px",
+                    background: color,
+                    display: "inline-block",
+                  }}
+                />{" "}
+                {label}{" "}
+              </div>
+            ))}{" "}
+          </div>{" "}
+          <MaturityProductTypeStackedBar
+            data={productTypeMaturityBucketData}
+            nameKey="name"
+            height={520}
+            stacked={true}
+            series={[
+              { key: "matured", label: "Matured", color: "#90CAF9" },
+              { key: "lt1", label: "<1Y", color: "#1565C0" },
+              { key: "y1to3", label: "1-3Y", color: "#1E88E5" },
+              { key: "y3to5", label: "3-5Y", color: "#42A5F5" },
+              { key: "gt5", label: ">5Y", color: "#0288D1" },
+            ]}
+            formatter={(v) =>
+              `₹${(Number(v || 0) / 10000000).toLocaleString("en-IN")} Cr`
+            }
+          />
+        </div>
+        <div className="chart-card" style={{ marginBottom: "20px" }}>
+          <div className="chart-title">Rate Type by Maturity Bucket</div>
+
+          <div className="chart-subtitle">FIXED vs FLOATING — ₹ CR</div>
+
+          {/* CUSTOM LEGEND */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "22px",
+              flexWrap: "wrap",
+              marginTop: "14px",
+              marginBottom: "10px",
+              fontSize: "13px",
+              fontWeight: 500,
+              color: "#3b5f86",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+              }}
+            >
+              <span
+                style={{
+                  width: "12px",
+                  height: "12px",
+                  borderRadius: "3px",
+                  background: "#1565C0",
+                  display: "inline-block",
+                }}
+              />
+              Fixed
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+              }}
+            >
+              <span
+                style={{
+                  width: "12px",
+                  height: "12px",
+                  borderRadius: "3px",
+                  background: "#90CAF9",
+                  display: "inline-block",
+                }}
+              />
+              Floating
+            </div>
+          </div>
+
+          <RateTypeMaturityStackedBar
+            data={rateTypeByMaturityBucketData}
+            height={420}
+            formatter={(v) =>
+              `₹${(Number(v || 0) / 10000000).toLocaleString("en-IN")} Cr`
+            }
+          />
+        </div>
+      </div>
+
+      <div className="chart-card" style={{ marginTop: "20px" }}>
+        <div className="chart-title">Annual Maturity Profile</div>
+
+        <div className="chart-subtitle">
+          MATURING AMOUNT BY CALENDAR YEAR | ₹ CRORES | 2026–2036
         </div>
 
-        <div className="cio-note">
-          <strong>{uniqueCustomers} customers</strong> across{" "}
-          <strong>{uniqueGroups} groups</strong>. Top customer outstanding:{" "}
-          <strong>₹{(topCustomer / 1e9).toFixed(2)} Bn</strong>. Avg interest rate:{" "}
-          <strong>{avgRate.toFixed(1)}%</strong>.
-        </div>
-
-        <DataTable
-          columns={COLUMNS}
-          rows={paginatedRows}
-          total={borrowersTable.length}
-          page={page}
-          totalPages={totalPages}
-          onPage={(p) => setPage(Number(p))}
-          sortBy={null}
-          sortDir={null}
-          onSort={() => {}}
-          loading={false}
+        <RateTypeMaturityStackedBar
+          data={annualMaturityProfileData}
+          height={420}
+          formatter={(v) =>
+            `₹${Math.round(Number(v || 0) / 10000000).toLocaleString(
+              "en-IN",
+            )} Cr`
+          }
         />
       </div>
     </div>
