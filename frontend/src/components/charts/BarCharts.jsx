@@ -14,6 +14,7 @@ import {
   Cell,
   LabelList,
   Area,
+  LineChart,
 } from "recharts";
 import { buildUnifiedTooltip } from "./ChartTooltip";
 import { fmt } from "../../utils/formatters";
@@ -318,7 +319,7 @@ export function GroupedBar({
           }}
           tickLine={false}
           axisLine={false}
-          tickFormatter={(v) => (v / 1e7).toFixed(0)}
+          tickFormatter={(v) => `${Number(v).toFixed(2)}%`}
           padding={{ top: 1 }}
           label={{
             value: "In ₹ Crs",
@@ -1117,6 +1118,260 @@ export function AdditionVsRedemptionChart({ data, height = 320 }) {
           radius={[4, 4, 0, 0]}
         />
       </BarChart>
+    </ResponsiveContainer>
+  );
+}
+
+/* =========================================================
+   RateTrendMixedChart
+   FIXED + FLOATING BAR
+   AVG EIR + EXIT RATE LINE
+========================================================= */
+
+export function RateTrendMixedChart({ data = [], height = 360 }) {
+  return (
+    <ResponsiveContainer width="100%" height={height}>
+      <ComposedChart
+        data={data}
+        margin={{
+          top: 20,
+          right: 30,
+          left: 10,
+          bottom: 10,
+        }}
+        barCategoryGap="28%"
+      >
+        <defs>
+          {/* SAME COLORS AS VerticalBarWithLineOverview */}
+
+          <linearGradient id="rateFixedGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="rgba(21,101,192,0.90)" />
+            <stop offset="100%" stopColor="rgba(144,202,249,0.24)" />
+          </linearGradient>
+
+          <linearGradient id="rateFloatingGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="rgba(144,202,249,0.72)" />
+            <stop offset="100%" stopColor="rgba(144,202,249,0.10)" />
+          </linearGradient>
+        </defs>
+
+        <CartesianGrid
+          stroke="rgba(0,0,0,0.08)"
+          horizontal={true}
+          vertical={false}
+        />
+
+        <XAxis
+          dataKey="name"
+          axisLine={false}
+          tickLine={false}
+          tick={{
+            fontSize: 10,
+            fill: "#6a9cbf",
+            fontFamily: "Inter",
+          }}
+        />
+
+        {/* LEFT AXIS */}
+        <YAxis
+          yAxisId="left"
+          tick={{
+            fontSize: 10,
+            fill: "#6a9cbf",
+          }}
+          axisLine={false}
+          tickLine={false}
+          tickFormatter={(v) =>
+            Math.round(v / 10000000).toLocaleString("en-IN")
+          }
+          label={{
+            value: "Fixed / Floating Balance (₹ Cr)",
+            angle: -90,
+            position: "insideLeft",
+            style: {
+              fontSize: 9,
+              fill: "#6a9cbf",
+            },
+          }}
+        />
+
+        {/* RIGHT AXIS */}
+        <YAxis
+          yAxisId="right"
+          orientation="right"
+          tick={{
+            fontSize: 10,
+            fill: "#6a9cbf",
+          }}
+          axisLine={false}
+          tickLine={false}
+          domain={[0, 10]}
+          tickFormatter={(v) => `${Number(v).toFixed(2)}%`}
+          label={{
+            value: "EIR / Exit Rate (%)",
+            angle: 90,
+            position: "insideRight",
+            style: {
+              fontSize: 9,
+              fill: "#6a9cbf",
+            },
+          }}
+        />
+
+        {/* SAME TOOLTIP AS OVERVIEW */}
+        <Tooltip
+          cursor={{ fill: "transparent" }}
+          content={buildUnifiedTooltip({
+            valueFormatter: (value, _name, entry) => {
+              if (
+                entry.dataKey === "avgEir" ||
+                entry.dataKey === "exitRate"
+              ) {
+                return `${Number(value).toFixed(2)} %`;
+              }
+
+              return `₹${Math.round(
+                Number(value) / 10000000
+              ).toLocaleString("en-IN")} Cr`;
+            },
+          })}
+        />
+
+        {/* FIXED BALANCE */}
+        <Bar
+          yAxisId="left"
+          dataKey="fixedBalance"
+          fill="url(#rateFixedGrad)"
+          radius={[5, 5, 0, 0]}
+          maxBarSize={26}
+        />
+
+        {/* FLOATING BALANCE */}
+        <Bar
+          yAxisId="left"
+          dataKey="floatingBalance"
+          fill="url(#rateFloatingGrad)"
+          radius={[5, 5, 0, 0]}
+          maxBarSize={26}
+        />
+
+        {/* AVG EIR */}
+        <Line
+          yAxisId="right"
+          type="monotone"
+          dataKey="avgEir"
+          name="Avg EIR %"
+          stroke="#F57C00"
+          strokeWidth={2.5}
+          dot={{
+            r: 4,
+            stroke: "#fff",
+            strokeWidth: 2,
+            fill: "#F57C00",
+          }}
+          activeDot={{ r: 5 }}
+          isAnimationActive={false}
+        />
+
+        {/* EXIT RATE */}
+        <Line
+          yAxisId="right"
+          type="monotone"
+          dataKey="exitRate"
+          name="Exit Rate %"
+          stroke="#1565C0"
+          strokeDasharray="5 5"
+          strokeWidth={2}
+          dot={false}
+          isAnimationActive={false}
+        />
+      </ComposedChart>
+    </ResponsiveContainer>
+  );
+}
+
+/* =========================================================
+   EirMonthlyMovementChart
+   PURE LINE CHART
+========================================================= */
+
+export function EirMonthlyMovementChart({ data = [], height = 320 }) {
+  return (
+    <ResponsiveContainer width="100%" height={height}>
+      <LineChart
+        data={data}
+        margin={{
+          top: 20,
+          right: 20,
+          left: 10,
+          bottom: 10,
+        }}
+      >
+        <CartesianGrid
+          stroke="rgba(0,0,0,0.08)"
+          horizontal={true}
+          vertical={false}
+        />
+
+        <XAxis
+          dataKey="name"
+          axisLine={false}
+          tickLine={false}
+          tick={{
+            fontSize: 10,
+            fill: "#6a9cbf",
+            fontFamily: "Inter",
+          }}
+        />
+
+        <YAxis
+          axisLine={false}
+          tickLine={false}
+          tick={{
+            fontSize: 10,
+            fill: "#6a9cbf",
+          }}
+          domain={["auto", "auto"]}
+          tickFormatter={(v) => `${Number(v).toFixed(2)}%`}
+          label={{
+            value: "Avg EIR Rate (%)",
+            angle: -90,
+            position: "insideLeft",
+            style: {
+              fontSize: 9,
+              fill: "#6a9cbf",
+            },
+          }}
+        />
+
+        {/* SAME TOOLTIP AS OVERVIEW */}
+        <Tooltip
+          cursor={{ fill: "transparent" }}
+          content={buildUnifiedTooltip({
+            valueFormatter: (value) =>
+              `${Number(value).toFixed(2)} %`,
+          })}
+        />
+
+        <Line
+          type="monotone"
+          dataKey="value"
+          name="Avg EIR %"
+          stroke="#00acc1"
+          strokeWidth={2.5}
+          dot={{
+            r: 4,
+            stroke: "#fff",
+            strokeWidth: 2,
+            fill: "#00acc1",
+          }}
+          activeDot={{
+            r: 5,
+            fill: "#00acc1",
+          }}
+          isAnimationActive={false}
+        />
+      </LineChart>
     </ResponsiveContainer>
   );
 }
