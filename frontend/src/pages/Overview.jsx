@@ -17,7 +17,6 @@ export default function Overview({ data }) {
   const mappedData = useMemo(() => mapOverviewData(data), [data]);
 
   console.log("monthlyTrend", mappedData.monthlyTrend);
-  console.log("portfolioRateTypeData", mappedData.portfolioRateTypeData);
   const {
     insights,
     loading: aiLoading,
@@ -139,15 +138,10 @@ export default function Overview({ data }) {
     ];
   }, [data]);
 
-  const portfolioRateTypeData = mappedData.portfolioRateTypeData;
+  const portfolioSplitData = mappedData.portfolioSplitData;
+  const rateTypeData = mappedData.rateTypeData;
 
-  const fixedFloatingData = useMemo(
-    () => [
-      { label: "Fixed", count: 19502 },
-      { label: "Floating", count: 2453 },
-    ],
-    [],
-  );
+  const fixedFloatingData = mappedData.rateTypeData;
 
   const topGroupsOutstanding = mappedData.borrowingBookByProduct;
 
@@ -199,8 +193,6 @@ export default function Overview({ data }) {
   const disbursementSubtitle = `BARS = OPENING & CLOSING BALANCE (₹ CR) | LINE = AVG EIR RATE (%)`;
 
   const monthlySummaryRows = mappedData.monthlySummaryTable;
-
-  console.log("portfolioRateTypeData", portfolioRateTypeData);
 
   return (
     <div>
@@ -658,14 +650,27 @@ export default function Overview({ data }) {
             APR 2026 — ₹ CR
           </div>
 
-          <VerticalBar
-            data={portfolioRateTypeData}
-            dataKey="count"
-            nameKey="label"
-            height={300}
-            barSize={44}
-            slantLabels={false}
-            formatter={(v) => `${Number(v || 0).toLocaleString("en-IN")}`}
+          <DonutChart
+            data={portfolioSplitData.map((item) => ({
+              name: item.label,
+              value: Number(item.count || 0),
+            }))}
+            colors={["#1565c0", "#00acc1", "#90caf9", "#42a5f5"]}
+            height={320}
+            formatter={(v) => `₹${Number(v || 0).toLocaleString("en-IN")} Cr`}
+          />
+
+          <DonutLegend
+            data={portfolioSplitData.map((item) => ({
+              name: item.label,
+              value: Number(item.count || 0),
+            }))}
+            colors={["#1565c0", "#00acc1", "#90caf9", "#42a5f5"]}
+            showPercent={true}
+            showValue={true}
+            valueFormatter={(v) =>
+              `₹${Number(v || 0).toLocaleString("en-IN")} Cr`
+            }
           />
         </div>
 
@@ -675,14 +680,27 @@ export default function Overview({ data }) {
             APR 2026 — ₹ CR
           </div>
 
-          <VerticalBar
-            data={fixedFloatingData}
-            dataKey="count"
-            nameKey="label"
-            height={300}
-            barSize={44}
-            slantLabels={false}
+          <DonutChart
+            data={rateTypeData.map((item) => ({
+              name: item.label,
+              value: Number(item.count || 0),
+            }))}
+            colors={["#1565c0", "#00acc1"]}
+            height={320}
             formatter={(v) => `₹${Number(v || 0).toLocaleString("en-IN")} Cr`}
+          />
+
+          <DonutLegend
+            data={rateTypeData.map((item) => ({
+              name: item.label,
+              value: Number(item.count || 0),
+            }))}
+            colors={["#1565c0", "#00acc1"]}
+            showPercent={true}
+            showValue={true}
+            valueFormatter={(v) =>
+              `₹${Number(v || 0).toLocaleString("en-IN")} Cr`
+            }
           />
         </div>
       </div>

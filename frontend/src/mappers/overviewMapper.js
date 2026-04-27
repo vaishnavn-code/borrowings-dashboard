@@ -60,15 +60,15 @@ export const mapOverviewData = (apiData) => {
     charts?.["Monthly Closing Balance & Accrual Trend"]?.Months || {};
 
   const monthlyTrend = Object.entries(monthlyTrendRaw)
-  .sort((a, b) => Number(a[0]) - Number(b[0])) // proper month order
-  .slice(-13) // only latest 13 months
-  .map(([month, value]) => ({
-    name: month,
-    opening: Number(value?.Opening_amt || 0),
-    closing: Number(value?.Closing_bal || 0),
-    eir: Number(value?.["Avg Eir"] || 0),
-    count: Number(value?.count || 0),
-  }));
+    .sort((a, b) => Number(a[0]) - Number(b[0])) // proper month order
+    .slice(-13) // only latest 13 months
+    .map(([month, value]) => ({
+      name: month,
+      opening: Number(value?.Opening_amt || 0),
+      closing: Number(value?.Closing_bal || 0),
+      eir: Number(value?.["Avg Eir"] || 0),
+      count: Number(value?.count || 0),
+    }));
 
   /*
   =====================================================
@@ -141,16 +141,23 @@ export const mapOverviewData = (apiData) => {
     peakMaturity: Number(rateMixRaw?.["Peak_Maturity"] || 0),
   };
 
-  const portfolioRateTypeData = [
-    {
-      label: "Fixed",
-      count: Number(rateMixRaw?.["Fixed Rate"] || 0),
-    },
-    {
-      label: "Floating",
-      count: Number(rateMixRaw?.["Floating Rate"] || 0),
-    },
-  ];
+  const portfolioSplitRaw =
+    charts?.["Portfolio & Rate Type Split"]?.Portfolio || {};
+
+  const portfolioSplitData = Object.entries(portfolioSplitRaw).map(
+    ([label, value]) => ({
+      label,
+      count: toCr(value),
+    }),
+  );
+
+  const rateTypeRaw =
+    charts?.["Portfolio & Rate Type Split"]?.["Rate Type"] || {};
+
+  const rateTypeData = Object.entries(rateTypeRaw).map(([label, value]) => ({
+    label,
+    count: toCr(value),
+  }));
 
   /*
   =====================================================
@@ -185,7 +192,8 @@ export const mapOverviewData = (apiData) => {
     productMix,
     summaryMetrics,
     rateMixSnapshot,
-    portfolioRateTypeData,
+    portfolioSplitData,
+    rateTypeData,
     monthlySummaryTable,
   };
 };

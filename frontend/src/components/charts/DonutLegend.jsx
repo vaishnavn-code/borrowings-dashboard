@@ -1,4 +1,5 @@
 import React from "react";
+import { fmt } from "../../utils/formatters";
 
 export default function DonutLegend({
   data = [],
@@ -40,15 +41,11 @@ export default function DonutLegend({
       {/* Text */}
       <span style={{ lineHeight: 1.5 }}>
         {item.name}:{" "}
-
         {showValue && (
           <strong style={{ marginLeft: "4px" }}>
-            {valueFormatter
-              ? valueFormatter(item.value)
-              : `₹${Number(item.value || 0).toLocaleString("en-IN")} Cr`}
+            {valueFormatter ? valueFormatter(item.value) : fmt.cr(item.value)}
           </strong>
         )}
-
         {showPercent && (
           <strong style={{ marginLeft: "8px" }}>
             ({Number(item.percent || 0).toFixed(1)}%)
@@ -69,15 +66,11 @@ export default function DonutLegend({
       }}
     >
       {/* LEFT COLUMN */}
-      <div>
-        {leftItems.map((item, idx) => renderItem(item, idx))}
-      </div>
+      <div>{leftItems.map((item, idx) => renderItem(item, idx))}</div>
 
       {/* RIGHT COLUMN */}
       <div>
-        {rightItems.map((item, idx) =>
-          renderItem(item, idx + midpoint)
-        )}
+        {rightItems.map((item, idx) => renderItem(item, idx + midpoint))}
       </div>
     </div>
   );

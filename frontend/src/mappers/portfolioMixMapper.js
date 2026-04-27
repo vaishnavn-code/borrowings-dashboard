@@ -1,14 +1,42 @@
 export function mapPortfolioMix(rawData) {
-  const portfolioRaw = rawData?.["Portfolio Mix"] || {};
+  /*
+   ==================================================
+   TWO ROOTS
+   ==================================================
 
-  const kpi = portfolioRaw?.kpi || {};
-  const charts = portfolioRaw?.Charts || {};
-  const table = portfolioRaw?.table || [];
+   Portfolio Mix:
+   - KPI cards
+   - Addition vs Redemption
+   - Table
+
+   Cost Analysis:
+   - Closing Balance by Product Type
+   - Accrual by Product Type
+   - Product Share %
+  */
+
+  const portfolioMixRaw = rawData?.["Portfolio Mix"] || {};
+  const costAnalysisRaw = rawData?.["Cost Analysis"] || {};
 
   /*
-   =========================
+   ==================================================
+   SOURCES
+   ==================================================
+  */
+
+  // Portfolio Mix
+  const kpi = portfolioMixRaw?.kpi || {};
+  const table = portfolioMixRaw?.table || [];
+  const portfolioCharts =
+    portfolioMixRaw?.Charts || portfolioMixRaw?.charts || {};
+
+  // Cost Analysis
+  const costCharts = costAnalysisRaw?.charts || {};
+
+  /*
+   ==================================================
    KPI MAPPING
-   =========================
+   ==================================================
   */
 
   const mappedKpis = {
@@ -38,12 +66,33 @@ export function mapPortfolioMix(rawData) {
   };
 
   /*
-   =========================
+   ==================================================
    ADDITION VS REDEMPTION
-   =========================
+   (FROM PORTFOLIO MIX)
+   ==================================================
   */
 
-  const additionRaw = charts?.["Addition vs Redemption"]?.values || {};
+  const additionRaw =
+    portfolioCharts?.["Addition vs Redemption"]?.values || {};
+
+  const additionVsRedemption = Object.entries(additionRaw)
+    .map(([month, item]) => ({
+      name: month,
+
+      // positive bar
+      addition: Number(item?.Addition || 0),
+
+      // negative for UI effect
+      redemption: -Math.abs(Number(item?.Redemption || 0)),
+    }))
+    .slice(-13);
+
+  /*
+   ==================================================
+   TABLE
+   (FROM PORTFOLIO MIX)
+   ==================================================
+  */
 
   const mappedTable = table.map((item, index) => ({
     id: index + 1,
@@ -61,42 +110,65 @@ export function mapPortfolioMix(rawData) {
     transactions: Number(item?.Txns || 0),
   }));
 
-  const productBreakdownChart = table
-    .map((item) => ({
-      name: item?.ptype || "-",
+  /*
+   ==================================================
+   COST ANALYSIS CHARTS
+   (FROM COST ANALYSIS)
+   ==================================================
+  */
+
+  const accrualProductRaw =
+    costCharts?.["Accrual by Product Type — Apr 2026"]?.values || {};
+
+  /*
+   ==================================================
+   ACCRUAL BY PRODUCT TYPE
+   ==================================================
+  */
+
+  const productBreakdownChart = Object.entries(accrualProductRaw)
+    .map(([name, item]) => ({
+      name,
+      value: Number(item?.Accrual || 0),
+    }))
+    .filter((item) => item.value > 0)
+    .sort((a, b) => b.value - a.value);
+
+  /*
+   ==================================================
+   CLOSING BALANCE BY PRODUCT TYPE
+   ==================================================
+  */
+
+  const closingBalanceChart = Object.entries(accrualProductRaw)
+    .map(([name, item]) => ({
+      name,
       value: Number(item?.Closing || 0),
     }))
     .filter((item) => item.value > 0)
-    .sort((a, b) => b.value - a.value)
-    .slice(0, 13);
+    .sort((a, b) => b.value - a.value);
 
-  const closingBalanceChart = table
-    .map((item) => ({
-      name: item?.ptype || "-",
-      value: Number(item?.Closing || 0),
-    }))
-    .filter((item) => item.value > 0)
-    .sort((a, b) => b.value - a.value)
-    .slice(0, 13);
+  /*
+   ==================================================
+   PRODUCT SHARE DONUT
+   ==================================================
+  */
 
-  const productShareDonut = table
-    .map((item) => ({
-      name: item?.ptype || "-",
+  const productShareDonut = Object.entries(accrualProductRaw)
+    .map(([name, item]) => ({
+      name,
       value: Number(item?.Closing || 0),
+      percent: parseFloat(
+        String(item?.Share || "0").replace("%", "")
+      ),
     }))
     .filter((item) => item.value > 0);
 
-  const additionVsRedemption = Object.entries(additionRaw)
-    .map(([month, item]) => ({
-      name: month,
-
-      // positive bar
-      addition: Number(item?.Addition || 0),
-
-      // negative bar for UI effect
-      redemption: -Math.abs(Number(item?.Redemption || 0)),
-    }))
-    .slice(-13);
+  /*
+   ==================================================
+   FINAL RETURN
+   ==================================================
+  */
 
   return {
     kpis: mappedKpis,
@@ -104,6 +176,6 @@ export function mapPortfolioMix(rawData) {
     tableData: mappedTable,
     productBreakdownChart,
     closingBalanceChart,
-    productShareDonut
+    productShareDonut,
   };
 }

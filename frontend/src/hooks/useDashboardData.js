@@ -83,7 +83,7 @@ export function usePaginatedData(fetcher, defaults = {}) {
 
 async function getInsightsContext(sessionId, token) {
   const res = await api.post(
-    "/data/query/ai",   // no localhost here
+    "/data/ai",   // no localhost here
     {
     //   query_type: "cof_dashboard",
       session_id: sessionId,

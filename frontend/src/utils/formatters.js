@@ -9,12 +9,16 @@ export const fmt = {
     `₹${(v / 1e9).toFixed(decimals)} Bn`,
 
   /** ₹ 1,234.56 Cr  (raw value in INR) */
- cr: (v) => {
-  const val = (v || 0) / 1e7;
+cr: (v) => {
+  const val = Number(v || 0) / 1e7; // INR → Cr
 
-  return val < 1
-    ? `₹${val.toFixed(2)} Cr`   // show decimals for small values
-    : `₹${Math.round(val).toLocaleString("en-IN")} Cr`;
+  // Very large values → Lakh Cr
+  if (val >= 100000) {
+    return `₹${Math.round(val / 100000).toLocaleString("en-IN")} L Cr`;
+  }
+
+  // Normal values → Cr
+  return `₹${Math.round(val).toLocaleString("en-IN")} Cr`;
 },
 
   /** ₹ 1,234.56 Mn */
