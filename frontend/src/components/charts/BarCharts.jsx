@@ -223,10 +223,14 @@ export function HorizontalBar({
           axisLine={false}
         />
         <Tooltip
-          cursor={{ fill: "transparent" }} // ✅ ADD THIS
+          cursor={{ fill: "transparent" }}
           content={buildUnifiedTooltip({
             valueFormatter: (value) =>
-              formatter ? formatter(value) : `${value}${unit}`,
+              formatter
+                ? formatter(value)
+                : `₹${Math.round(Number(value || 0) / 10000000).toLocaleString(
+                    "en-IN",
+                  )} Cr`,
           })}
         />
         <Bar
@@ -454,7 +458,9 @@ export function VerticalBarWithLineOverview({ data, height = 320, viewMode }) {
           tick={{ fontSize: 10, fill: "#6a9cbf" }}
           axisLine={false}
           tickLine={false}
-          tickFormatter={(v) => Math.round(v)}
+          tickFormatter={(v) =>
+            Math.round(v / 10000000).toLocaleString("en-IN")
+          }
           label={{
             value: "Opening / Closing Balance (₹ Cr)",
             angle: -90,
@@ -496,7 +502,7 @@ export function VerticalBarWithLineOverview({ data, height = 320, viewMode }) {
                 return `${Number(value).toFixed(2)} %`;
               }
 
-              return `₹${Number(value).toLocaleString("en-IN")} Cr`;
+              return fmt.cr(value);
             },
           })}
         />
@@ -522,12 +528,14 @@ export function VerticalBarWithLineOverview({ data, height = 320, viewMode }) {
         />
 
         <Area
-          yAxisId="left"
+          yAxisId="right"
           type="monotone"
-          dataKey="closing"
+          dataKey="eir"
           fill="url(#closingAreaGrad)"
           stroke="none"
           tooltipType="none"
+          fillOpacity={1}
+          isAnimationActive={false}
         />
 
         {/* AVG EIR LINE */}
@@ -1363,7 +1371,7 @@ export function EirMonthlyMovementChart({ data = [], height = 320 }) {
           }}
           activeDot={{
             r: 5,
-            fill: "#00acc1",
+            fill: "#005ac1",
           }}
           isAnimationActive={false}
         />
@@ -1670,13 +1678,7 @@ export function RateTypeMaturityStackedBar({
           </linearGradient>
 
           {/* Floating = Light Blue */}
-          <linearGradient
-            id="rateTypeFloatingGrad"
-            x1="0"
-            y1="0"
-            x2="0"
-            y2="1"
-          >
+          <linearGradient id="rateTypeFloatingGrad" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="rgba(144,202,249,0.72)" />
             <stop offset="100%" stopColor="rgba(46, 146, 228, 0.1)" />
           </linearGradient>
@@ -1712,16 +1714,14 @@ export function RateTypeMaturityStackedBar({
         />
 
         <Tooltip
-          cursor={{ fill: "transparent" }}
-          content={buildUnifiedTooltip({
-            valueFormatter: (value) =>
-              formatter
-                ? formatter(value)
-                : `₹${Math.round(
-                    Number(value || 0) / 10000000
-                  ).toLocaleString("en-IN")} Cr`,
-          })}
-        />
+  cursor={{ fill: "transparent" }}
+  content={buildUnifiedTooltip({
+    valueFormatter: (value) =>
+      `₹${Math.round(
+        Number(value || 0) / 10000000
+      ).toLocaleString("en-IN")} Cr`,
+  })}
+/>
 
         {/* FIXED */}
         <Bar

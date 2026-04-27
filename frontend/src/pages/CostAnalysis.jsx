@@ -85,21 +85,23 @@ export default function CostAnalysis({ data }) {
 
     if (isNaN(num)) return v;
 
+    // keep decimals only for %
     if (str.includes("%")) {
       return `${num.toFixed(2)} %`;
     }
 
+    // CR values → no decimals
     if (str.toLowerCase().includes("cr")) {
-      return `₹${num.toLocaleString("en-IN")} Cr`;
+      return `₹${Math.round(num).toLocaleString("en-IN")} Cr`;
     }
 
+    // BN values → convert to CR + no decimals
     if (str.toLowerCase().includes("bn")) {
-      return `₹${(num * 100).toLocaleString("en-IN")} Cr`;
+      return `₹${Math.round(num * 100).toLocaleString("en-IN")} Cr`;
     }
 
-    return `₹${(num / 1e7).toLocaleString("en-IN", {
-      maximumFractionDigits: 2,
-    })} Cr`;
+    // raw INR → convert to CR + no decimals
+    return `₹${Math.round(num / 10000000).toLocaleString("en-IN")} Cr`;
   };
 
   return (
@@ -126,7 +128,7 @@ export default function CostAnalysis({ data }) {
         />
 
         <KpiCard
-          label="Monthly Accrual"
+          label="EIR Weighted Int"
           value={formatDisplay(kpis.eirWeightedInt?.title)}
           sub={kpis.eirWeightedInt?.subtitle}
           footer={kpis.eirWeightedInt?.footer}
@@ -142,7 +144,7 @@ export default function CostAnalysis({ data }) {
         />
 
         <KpiCard
-          label="Avg EIR Rate"
+          label="Coupon / Yield Int"
           value={formatDisplay(kpis.couponYield?.title)}
           sub={kpis.couponYield?.subtitle}
           footer={kpis.couponYield?.footer}
@@ -157,7 +159,7 @@ export default function CostAnalysis({ data }) {
         />
 
         <KpiCard
-          label="Total Closing"
+          label="Average Funds"
           value={formatDisplay(kpis.averageFunds?.title)}
           sub={kpis.averageFunds?.subtitle}
           footer={kpis.averageFunds?.footer}

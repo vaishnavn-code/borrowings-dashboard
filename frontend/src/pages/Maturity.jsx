@@ -390,11 +390,9 @@ FORMATTER
         </div>
 
         <div className="chart-card" style={{ marginBottom: "20px" }}>
-          <div className="chart-title">Maturity Bucket Distribution</div>
+          <div className="chart-title">Maturity Bucket — Closing Balance</div>
 
-          <div className="chart-subtitle">
-            CONTRIBUTION TO TOTAL CLOSING BALANCE
-          </div>
+          <div className="chart-subtitle">₹ CRORES — HORIZONTAL BAR </div>
 
           <HorizontalBar
             data={maturityBucketDistributionData}
@@ -402,9 +400,6 @@ FORMATTER
             nameKey="name"
             height={420}
             barSize={18}
-            formatter={(v) =>
-              `₹${(Number(v || 0) / 10000000).toLocaleString("en-IN")} Cr`
-            }
           />
         </div>
       </div>
@@ -472,9 +467,6 @@ FORMATTER
               { key: "y3to5", label: "3-5Y", color: "#42A5F5" },
               { key: "gt5", label: ">5Y", color: "#0288D1" },
             ]}
-            formatter={(v) =>
-              `₹${(Number(v || 0) / 10000000).toLocaleString("en-IN")} Cr`
-            }
           />
         </div>
         <div className="chart-card" style={{ marginBottom: "20px" }}>
