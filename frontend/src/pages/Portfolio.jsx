@@ -1,383 +1,229 @@
-import { useState, useCallback, useMemo } from "react";
-import {
-  HorizontalBar,
-  GroupedBar,
-  VerticalBar,
-} from "../components/charts/BarCharts";
-import DataTable from "../components/ui/DataTable";
-import { TopNSelector } from "../components/ui/helpers";
-import KpiCard from "../components/ui/KpiCard";
-import { usePaginatedData } from "../hooks/useDashboardData";
-import { dashboardApi } from "../api/client";
-import { fmt } from "../utils/formatters";
-import { TOP_N_OPTIONS } from "../utils/constants";
 import React from "react";
-
-const COLUMNS = [
-  {
-    key: "bp_group",
-    label: "Group",
-    render: (v) => (
-      <span style={{ fontWeight: 700, color: "#111" }}>
-        {v}
-      </span>
-    ),
-  },
-
-  { key: "loan_count", label: "Loans" },
-
-  {
-    key: "sanction_amt",
-    label: "Sanction (₹ Cr)",
-    render: (v) => fmt.cr(v),
-  },
-
-  {
-    key: "loan_amt",
-    label: "Loan Amt (₹ Cr)",
-    render: (v) => fmt.cr(v),
-  },
-
-  {
-    key: "outstanding_amt",
-    label: "Outstanding (₹ Cr)",
-    render: (v) => (
-      <span style={{ fontWeight: 700, color: "#2E6090" }}>
-        {fmt.cr(v)}
-      </span>
-    ),
-  },
-
-  {
-    key: "exposure_amt",
-    label: "Exposure (₹ Cr)",
-    render: (v) => fmt.cr(v),
-  },
-
-  {
-    key: "principle_recv", // correct key
-    label: "Princ Recv (₹ Cr)",
-    render: (v) => fmt.cr(v),
-  },
-
-  {
-    key: "int_recv",
-    label: "Int Recv (₹ Cr)",
-    render: (v) => fmt.cr(v),
-  },
-
-  {
-    key: "upcoming_int",
-    label: "Upcoming Int (₹ Cr)",
-    render: (v) => fmt.cr(v),
-  },
-  {
-    key: "avg_rate",
-    label: "Avg Rate",
-    render: (_, row) => {
-      const outstanding = Number(row.outstanding_amt || 0);
-      const interest = Number(row.int_recv || 0);
-
-      const rate =
-        outstanding > 0 ? ((interest / outstanding) * 100).toFixed(1) : 0;
-
-      return (
-        <span
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "6px",
-            background: "rgba(21,101,192,0.08)",
-            color: "#1565c0",
-            padding: "3px 8px",
-            borderRadius: "10px",
-            fontWeight: 600,
-            fontSize: "11px",
-          }}
-        >
-          {/* blue dot */}
-          <span
-            style={{
-              width: "6px",
-              height: "6px",
-              borderRadius: "50%",
-              background: "#1565c0",
-            }}
-          />
-          {rate}%
-        </span>
-      );
-    },
-  },
-];
+import KpiCard from "../components/ui/KpiCard";
+import DataTable from "../components/ui/DataTable";
+import { fmt } from "../utils/formatters";
+import { mapPortfolioMix } from "../mappers/portfolioMixMapper";
+import {
+  AdditionVsRedemptionChart,
+  HorizontalBar,
+} from "../components/charts/BarCharts";
+import DonutChart from "../components/charts/DonutChart";
+import DonutLegend from "../components/charts/DonutLegend";
 
 export default function Portfolio({ data }) {
-  console.log("Exposure data:", data);
-  const kpis = data?.exposure?.kpi || {};
-  const exposureTable = data?.exposure?.table || [];
-  const [topN, setTopN] = useState({
-    hbar: 15,
-    triple: 8,
-    intBar: 15,
-    rateBar: 15,
-  });
-  const [search, setSearch] = useState("");
-  const PAGE_SIZE = 25;
-  const fetcher = useCallback((p) => dashboardApi.getGroups(p), []);
-  const { rows, total, totalPages, loading, params, updateParams } =
-    usePaginatedData(fetcher, {
-      sort_by: "outstanding_amt",
-      sort_dir: "desc",
-      per_page: 20,
-    });
+  const COLUMNS = [
+    {
+      key: "productType",
+      label: "Product Type",
+    },
+    {
+      key: "closingBalance",
+      label: "Closing Balance (₹ Cr)",
+      render: (v) => fmt.cr(v),
+    },
+    {
+      key: "accrual",
+      label: "Accrual (₹ Cr)",
+      render: (v) => fmt.cr(v),
+    },
+    {
+      key: "eirInterest",
+      label: "EIR Interest (₹ Cr)",
+      render: (v) => fmt.cr(v),
+    },
+    {
+      key: "productCode",
+      label: "Code",
+    },
+    {
+      key: "transactions",
+      label: "Transactions",
+      render: (v) => fmt.int(v),
+    },
+  ];
+  const mappedData = mapPortfolioMix(data);
+  const additionData = mappedData?.additionVsRedemption || [];
 
-  const allFetcher = useCallback(
-    (p) => dashboardApi.getGroups({ ...p, per_page: 100 }),
-    [],
-  );
-  const { rows: allGroups } = usePaginatedData(allFetcher, {
-    sort_by: "outstanding_amt",
-    sort_dir: "desc",
-  });
+  const kpis = mappedData?.kpis || {};
 
-  const hBarData = useMemo(() => {
-    if (!exposureTable.length) return [];
+  const tableData = mappedData?.tableData || [];
 
-    return exposureTable
-      .map((item) => ({
-        name: item.bp_group,
-        value: Number(item.outstanding_amt || 0),
-      }))
-      .sort((a, b) => b.value - a.value)
-      .slice(0, topN.hbar);
-  }, [exposureTable, topN.hbar]);
+  const [page, setPage] = React.useState(1);
+  const PER_PAGE = 25;
 
-  const tripleData = useMemo(() => {
-    if (!exposureTable.length) return [];
+  const paginatedRows = React.useMemo(() => {
+    const start = (page - 1) * PER_PAGE;
+    return tableData.slice(start, start + PER_PAGE);
+  }, [tableData, page]);
 
-    return exposureTable
-      .map((g) => ({
-        name: g.bp_group,
+  const totalPages = Math.ceil(tableData.length / PER_PAGE);
 
-        // CORRECT KEYS
-        Sanction: Number(g.sanction_amt || 0),
-        "Loan Amt": Number(g.loan_amt || 0),
-        Outstanding: Number(g.outstanding_amt || 0),
-      }))
-      .sort((a, b) => b.Outstanding - a.Outstanding) // 🔥 important
-      .slice(0, topN.triple);
-  }, [exposureTable, topN.triple]);
-
-  const intBarData = useMemo(() => {
-    if (!exposureTable.length) return [];
-
-    return exposureTable
-      .map((g) => ({
-        name: g.bp_group,
-        value: Number(g.int_recv || 0), // ₹ Mn
-      }))
-      .sort((a, b) => b.value - a.value)
-      .slice(0, topN.intBar);
-  }, [exposureTable, topN.intBar]);
-
-  const rateBarData = useMemo(() => {
-    if (!exposureTable.length) return [];
-
-    return exposureTable
-      .map((g) => ({
-        name: g.bp_group,
-
-        // 🎯 MOCK RANDOM RATE (6% - 14%)
-        value: Number((6 + Math.random() * 8).toFixed(2)),
-      }))
-      .sort((a, b) => b.value - a.value)
-      .slice(0, topN.rateBar);
-  }, [exposureTable, topN.rateBar]);
-
-const handleSearch = (e) => {
-  setSearch(e.target.value);
-  updateParams({ page: 1 }); 
-};
-  const handleSort = (key) => {
-    const dir =
-      params.sort_by === key && params.sort_dir === "desc" ? "asc" : "desc";
-    updateParams({ sort_by: key, sort_dir: dir });
+  const formatDisplay = (v) => {
+    if (v === null || v === undefined || v === "") return "-";
+    return fmt.cr(Number(v || 0));
   };
 
-  const KPI_ORDER = [
-    "Total_Records",
-    "Borrower_Groups",
-    "TL_Disbursements",
-    "DEB_Disbursements",
-  ];
-const filteredRows = useMemo(() => {
-  const source = allGroups?.length ? allGroups : exposureTable;
+  const hBarData = mappedData?.productBreakdownChart || [];
+  const closingBalanceData = mappedData?.closingBalanceChart || [];
+  const productDonut = mappedData?.productShareDonut || [];
 
-  if (!search) return source;
-
-  return source.filter((row) =>
-    row.bp_group?.toLowerCase().includes(search.toLowerCase())
-  );
-}, [search, allGroups, exposureTable]);
-const paginatedRows = useMemo(() => {
-  const start = (params.page - 1) * PAGE_SIZE;
-  return filteredRows.slice(start, start + PAGE_SIZE);
-}, [filteredRows, params.page]);
-const totalPagesLocal = Math.ceil(filteredRows.length / PAGE_SIZE);  return (
+  return (
     <div>
-      <div className="section-label">Exposure Analytics — Group Breakdown</div>
+      <div className="section-label">Portfolio Mix — Product Breakdown</div>
+
+      {/* KPI CARDS */}
 
       <div className="four-col">
-        {KPI_ORDER.map((key, index) => {
-          console.log("Exposure KPI:", data?.exposure?.kpi);
-          const item = kpis[key];
-          if (!item) return null;
+        <KpiCard
+          label="Term Loans"
+          value={formatDisplay(kpis.termLoans?.title)}
+          sub={`Accrual: ${formatDisplay(kpis.termLoans?.subtitle)}`}
+          footer={kpis.termLoans?.footer}
+          sparkPct={100}
+          accent="c1"
+          iconName="threeLines"
+          badge={{
+            label: "Term Loan",
+            bgColor: "#E8F1FF",
+            textColor: "#1D4ED8",
+            dotColor: "#1D4ED8",
+          }}
+        />
 
-          return (
-            <KpiCard
-              key={key}
-              label={item.Subtitle}
-              value={Number(item.Title)}
-              footer={item.Footer}
-              accent={`c${index + 1}`}
-            />
-          );
-        })}
+        <KpiCard
+          label="Long Term Deb"
+          value={formatDisplay(kpis.longTermDeb?.title)}
+          sub={`Accrual: ${formatDisplay(kpis.longTermDeb?.subtitle)}`}
+          footer={kpis.longTermDeb?.footer}
+          sparkPct={80}
+          accent="c2"
+          iconName="document"
+          badge={{
+            label: "Debentures",
+            bgColor: "#E8F5E9",
+            textColor: "#43A047",
+            dotColor: "#43A047",
+          }}
+        />
+
+        <KpiCard
+          label="Commercial Paper"
+          value={formatDisplay(kpis.commercialPaper?.title)}
+          sub={`Accrual: ${formatDisplay(kpis.commercialPaper?.subtitle)}`}
+          footer={kpis.commercialPaper?.footer}
+          sparkPct={60}
+          accent="c3"
+          iconName="paper"
+          badge={{
+            label: "Comm Paper",
+            bgColor: "#FFF3E0",
+            textColor: "#FB8C00",
+            dotColor: "#FB8C00",
+          }}
+        />
+
+        <KpiCard
+          label="ECB Swap"
+          value={formatDisplay(kpis.ecbSwap?.title)}
+          sub={`Accrual: ${formatDisplay(kpis.ecbSwap?.subtitle)}`}
+          footer={kpis.ecbSwap?.footer}
+          sparkPct={90}
+          accent="c4"
+          iconName="globe"
+          badge={{
+            label: "ECB SWAP",
+            bgColor: "#F3E5F5",
+            textColor: "#7B1FA2",
+            dotColor: "#7B1FA2",
+          }}
+        />
       </div>
 
       <div className="two-col">
         <div className="chart-card">
-          <div className="chart-title">Outstanding Amount by Group</div>
-          <div className="chart-subtitle">HORIZONTAL BAR · ₹ Cr</div>
-          <TopNSelector
-            options={TOP_N_OPTIONS}
-            value={topN.hbar}
-            onChange={(n) => setTopN((p) => ({ ...p, hbar: n }))}
+          <div className="chart-title">Closing Balance by Product Type</div>
+
+          <div className="chart-subtitle">₹ CRORES — APR 2026</div>
+
+          <HorizontalBar
+            data={closingBalanceData}
+            dataKey="value"
+            nameKey="name"
+            height={360}
+            barSize={18}
+            formatter={(v) =>
+              `₹${(Number(v || 0) / 1e7).toLocaleString("en-IN")} Cr`
+            }
           />
+        </div>
+        <div className="chart-card">
+          <div className="chart-title">Accrual by Product Type</div>
+
+          <div className="chart-subtitle">₹ CRORES — APR 2026</div>
+
           <HorizontalBar
             data={hBarData}
             dataKey="value"
             nameKey="name"
-            height={320}
+            height={360}
             barSize={18}
-            formatter={(v) => `₹${(v / 1e7).toLocaleString("en-IN")} Cr`}
-          />
-        </div>
-        <div className="chart-card">
-          <div className="chart-title">Sanction vs Loan vs Outstanding</div>
-          <div className="chart-subtitle" style={{ marginBottom: "20px" }}>
-            TOP {topN.triple} GROUPS · 3-WAY ₹ BN
-          </div>
-          <GroupedBar
-            data={tripleData}
-            nameKey="name"
-            series={[
-              {
-                key: "Sanction",
-                label: "Sanction",
-                gradient: "blueGrad", //  same as other charts
-              },
-              {
-                key: "Loan Amt",
-                label: "Loan Amt",
-                color: "rgba(123, 214, 226, 1)", // your color
-              },
-              {
-                key: "Outstanding",
-                label: "Outstanding",
-                color: "rgba(252, 218, 172, 1)", //  your color
-              },
-            ]}
-            height={300}
-            formatter={(v) => `₹${(v / 1e7).toLocaleString("en-IN")} Cr`}
+            formatter={(v) =>
+              `₹${(Number(v || 0) / 1e7).toLocaleString("en-IN")} Cr`
+            }
           />
         </div>
       </div>
+
+      {/* ADDITION VS REDEMPTION   { Pie chart} */}
 
       <div className="two-col">
-        <div className="chart-card">
-          <div className="chart-title">Interest Received by Group</div>
-          <div className="chart-subtitle">₹ Cr</div>
-          <TopNSelector
-            options={TOP_N_OPTIONS}
-            value={topN.intBar}
-            onChange={(n) => setTopN((p) => ({ ...p, intBar: n }))}
-          />
-          <VerticalBar
-            data={intBarData}
-            dataKey="value"
-            nameKey="name"
-            color="url(#intGrad)"
-            height={360}
-            barSize={30}
-            slantLabels={true}
-            isCurrency={true}
-            formatter={(v) => `₹${(v / 1e7).toLocaleString("en-IN")} Cr`}
-          />
+        <div className="chart-card" style={{ marginTop: "20px" }}>
+          <div className="chart-title">Addition vs Redemption</div>
+
+          <div className="chart-subtitle">MONTHLY FLOW ₹ CR</div>
+
+          <AdditionVsRedemptionChart data={additionData} height={560} />
         </div>
+
         <div className="chart-card">
-          <div className="chart-title">Avg Interest Rate per Group</div>
-          <div className="chart-subtitle">RATE COMPARISON %</div>
-          <TopNSelector
-            options={TOP_N_OPTIONS}
-            value={topN.rateBar}
-            onChange={(n) => setTopN((p) => ({ ...p, rateBar: n }))}
+          <div className="chart-title">Product Share % — Apr 2026</div>
+
+          <div className="chart-subtitle">CONTRIBUTION TO TOTAL CLOSING</div>
+
+          <DonutChart
+            data={productDonut}
+            colors={["#1565c0", "#00acc1"]}
+            height={320}
+            formatter={(v) =>
+              `₹${(Number(v || 0) / 1e7).toLocaleString("en-IN")} Cr`
+            }
           />
-          <VerticalBar
-            data={rateBarData}
-            dataKey="value"
-            nameKey="name"
-            color="url(#rateGrad)"
-            height={360}
-            barSize={30}
-            unit="%"
-            slantLabels={true}
-            formatter={(v) => `${v}%`}
+
+          <DonutLegend
+            data={productDonut}
+            colors={["#1565c0", "#00acc1"]}
+            showPercent={true}
+            showValue={true}
+            valueFormatter={(v) =>
+              `₹${Math.round(Number(v || 0) / 1e7).toLocaleString("en-IN")} Cr`
+            }
           />
         </div>
       </div>
 
-      <div className="section-label">Group Summary Table</div>
-      <div className="card">
-        <div className="card-title">
-          Group-Level Exposure Summary
-          <span className="card-badge">{exposureTable.length} GROUPS</span>
-        </div>
-        <div className="cio-note">
-          Portfolio covers <strong>{exposureTable.length} borrower groups</strong>
-          with active exposure data.
-        </div>
-        <div className="toolbar">
-          <input
-            className="toolbar-input"
-            placeholder="Search Group Name…"
-            value={search}
-            onChange={handleSearch}
-          />
-          <button
-            className="toolbar-btn"
-            onClick={() => {
-              setSearch("");
-              updateParams({ search: "", page: 1 });
-            }}
-          >
-            Clear
-          </button>
-          <span className="toolbar-count">
-            {total.toLocaleString("en-IN")} groups
-          </span>
-        </div>
+      <div className="chart-card" style={{ marginTop: "20px" }}>
+        <div className="card-title">Product Breakdown</div>
         <DataTable
           columns={COLUMNS}
           rows={paginatedRows}
-          total={filteredRows.length}
-          page={params.page}
-          totalPages={totalPagesLocal}
-          onPage={(p) => updateParams({ page: p })}
-          sortBy={params.sort_by}
-          sortDir={params.sort_dir}
-          onSort={handleSort}
-          loading={loading}
+          total={tableData.length}
+          page={page}
+          totalPages={totalPages}
+          onPage={(p) => setPage(Number(p))}
+          sortBy={null}
+          sortDir={null}
+          onSort={() => {}}
+          loading={false}
         />
       </div>
     </div>

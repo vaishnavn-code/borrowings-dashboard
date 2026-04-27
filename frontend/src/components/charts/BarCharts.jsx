@@ -673,10 +673,7 @@ export function VerticalBarWithLineTransactions({ data, height = 320 }) {
   );
 }
 
-export function VerticalBarWithLineCostAnalysis({
-  data,
-  height = 320,
-}) {
+export function VerticalBarWithLineCostAnalysis({ data, height = 320 }) {
   return (
     <ResponsiveContainer width="100%" height={height}>
       <ComposedChart
@@ -766,7 +763,7 @@ export function VerticalBarWithLineCostAnalysis({
           content={buildUnifiedTooltip({
             valueFormatter: (value) =>
               `₹${Math.round(Number(value) / 10000000).toLocaleString(
-                "en-IN"
+                "en-IN",
               )} Cr`,
           })}
         />
@@ -819,6 +816,307 @@ export function VerticalBarWithLineCostAnalysis({
           isAnimationActive={false}
         />
       </ComposedChart>
+    </ResponsiveContainer>
+  );
+}
+
+export function StackedBarWithLine({ data, height = 360 }) {
+  return (
+    <ResponsiveContainer width="100%" height={height}>
+      <ComposedChart
+        data={data}
+        margin={{ top: 20, right: 20, left: 10, bottom: 10 }}
+        barCategoryGap="25%"
+      >
+        <CartesianGrid
+          stroke="rgba(0,0,0,0.08)"
+          vertical={true}
+          horizontal={true}
+        />
+
+        <XAxis
+          dataKey="name"
+          tickLine={false}
+          axisLine={false}
+          tick={{
+            fontSize: 10,
+            fill: "#6a9cbf",
+            fontFamily: "Inter",
+          }}
+        />
+
+        {/* LEFT AXIS */}
+        <YAxis
+          yAxisId="left"
+          tickLine={false}
+          axisLine={false}
+          tick={{
+            fontSize: 10,
+            fill: "#6a9cbf",
+          }}
+          tickFormatter={(v) => Math.round(v / 10000000)}
+          label={{
+            value: "Closing ₹ Cr",
+            angle: -90,
+            position: "insideLeft",
+            style: {
+              fontSize: 9,
+              fill: "#6a9cbf",
+            },
+          }}
+        />
+
+        {/* RIGHT AXIS */}
+        <YAxis
+          yAxisId="right"
+          orientation="right"
+          tickLine={false}
+          axisLine={false}
+          tick={{
+            fontSize: 10,
+            fill: "#f57c00",
+          }}
+          tickFormatter={(v) => `${v.toFixed(2)}%`}
+        />
+
+        <Tooltip
+          cursor={{ fill: "transparent" }}
+          content={buildUnifiedTooltip({
+            valueFormatter: (value, name) => {
+              if (name === "Avg EIR %") {
+                return `${Number(value).toFixed(2)}%`;
+              }
+              return fmt.cr(value);
+            },
+          })}
+        />
+
+        {/* STACKED BARS */}
+
+        <Bar
+          yAxisId="left"
+          dataKey="matured"
+          stackId="a"
+          fill="#90caf9"
+          name="Matured"
+        />
+
+        <Bar
+          yAxisId="left"
+          dataKey="lt1"
+          stackId="a"
+          fill="#1565c0"
+          name="< 1 Year"
+        />
+
+        <Bar
+          yAxisId="left"
+          dataKey="y1to3"
+          stackId="a"
+          fill="#1e88e5"
+          name="1 - 3 Years"
+        />
+
+        <Bar
+          yAxisId="left"
+          dataKey="y3to5"
+          stackId="a"
+          fill="#42a5f5"
+          name="3 - 5 Years"
+        />
+
+        <Bar
+          yAxisId="left"
+          dataKey="gt5"
+          stackId="a"
+          fill="#0288d1"
+          name="> 5 Years"
+        />
+
+        {/* LINE */}
+
+        <Line
+          yAxisId="right"
+          type="monotone"
+          dataKey="eir"
+          name="Avg EIR %"
+          stroke="#f57c00"
+          strokeWidth={2.5}
+          dot={{
+            r: 4,
+            stroke: "#f57c00",
+            strokeWidth: 2,
+            fill: "#fff",
+          }}
+          activeDot={{ r: 5 }}
+          isAnimationActive={false}
+        />
+      </ComposedChart>
+    </ResponsiveContainer>
+  );
+}
+
+export function StackedBarOnly({ data, height = 360 }) {
+  return (
+    <ResponsiveContainer width="100%" height={height}>
+      <ComposedChart
+        data={data}
+        margin={{ top: 20, right: 20, left: 10, bottom: 10 }}
+        barCategoryGap="25%"
+      >
+        <CartesianGrid
+          stroke="rgba(0,0,0,0.08)"
+          vertical={true}
+          horizontal={true}
+        />
+
+        <XAxis
+          dataKey="name"
+          tickLine={false}
+          axisLine={false}
+          tick={{
+            fontSize: 10,
+            fill: "#6a9cbf",
+            fontFamily: "Inter",
+          }}
+        />
+
+        {/* LEFT AXIS */}
+        <YAxis
+          yAxisId="left"
+          tickLine={false}
+          axisLine={false}
+          tick={{
+            fontSize: 10,
+            fill: "#6a9cbf",
+          }}
+          tickFormatter={(v) => Math.round(v / 10000000)}
+          label={{
+            value: "Closing ₹ Cr",
+            angle: -90,
+            position: "insideLeft",
+            style: {
+              fontSize: 9,
+              fill: "#6a9cbf",
+            },
+          }}
+        />
+
+        <Tooltip
+          cursor={{ fill: "transparent" }}
+          content={buildUnifiedTooltip({
+            valueFormatter: (value, name) => {
+              if (name === "Avg EIR %") {
+                return `${Number(value).toFixed(2)}%`;
+              }
+              return fmt.cr(value);
+            },
+          })}
+        />
+
+        {/* STACKED BARS */}
+
+        <Bar
+          yAxisId="left"
+          dataKey="matured"
+          stackId="a"
+          fill="#90caf9"
+          name="Matured"
+        />
+
+        <Bar
+          yAxisId="left"
+          dataKey="lt1"
+          stackId="a"
+          fill="#1565c0"
+          name="< 1 Year"
+        />
+
+        <Bar
+          yAxisId="left"
+          dataKey="y1to3"
+          stackId="a"
+          fill="#1e88e5"
+          name="1 - 3 Years"
+        />
+
+        <Bar
+          yAxisId="left"
+          dataKey="y3to5"
+          stackId="a"
+          fill="#42a5f5"
+          name="3 - 5 Years"
+        />
+
+        <Bar
+          yAxisId="left"
+          dataKey="gt5"
+          stackId="a"
+          fill="#0288d1"
+          name="> 5 Years"
+        />
+      </ComposedChart>
+    </ResponsiveContainer>
+  );
+}
+
+export function AdditionVsRedemptionChart({ data, height = 320 }) {
+  return (
+    <ResponsiveContainer width="100%" height={height}>
+      <BarChart
+        data={data}
+        margin={{ top: 20, right: 10, left: 10, bottom: 10 }}
+        barCategoryGap="30%"
+      >
+        <CartesianGrid
+          stroke="rgba(0,0,0,0.08)"
+          vertical={true}
+          horizontal={true}
+        />
+
+        <XAxis
+          dataKey="name"
+          axisLine={false}
+          tickLine={false}
+          tick={{
+            fontSize: 10,
+            fill: "#6a9cbf",
+          }}
+        />
+
+        <YAxis
+          axisLine={false}
+          tickLine={false}
+          tick={{
+            fontSize: 10,
+            fill: "#6a9cbf",
+          }}
+          tickFormatter={(v) => Math.round(Math.abs(v) / 10000000)}
+        />
+
+        <Tooltip
+          cursor={{ fill: "transparent" }}
+          content={buildUnifiedTooltip({
+            valueFormatter: (value, name) => {
+              return fmt.cr(Math.abs(Number(value || 0)));
+            },
+          })}
+        />
+
+        <Bar
+          dataKey="addition"
+          name="Addition"
+          fill="rgba(111, 164, 221, 0.9)"
+          radius={[4, 4, 0, 0]}
+        />
+
+        <Bar
+          dataKey="redemption"
+          name="Redemption"
+          fill="rgba(255, 205, 210, 0.8)"
+          radius={[4, 4, 0, 0]}
+        />
+      </BarChart>
     </ResponsiveContainer>
   );
 }
