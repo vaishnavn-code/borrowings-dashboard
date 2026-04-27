@@ -43,7 +43,12 @@ export default function DonutLegend({
         {item.name}:{" "}
         {showValue && (
           <strong style={{ marginLeft: "4px" }}>
-            {valueFormatter ? valueFormatter(item.value) : fmt.cr(item.value)}
+            {valueFormatter
+              ? valueFormatter(item.value)
+              : `₹${Number(item.value || 0).toLocaleString("en-IN", {
+                  maximumFractionDigits: 0,
+                  minimumFractionDigits: 0,
+                })} Cr`}
           </strong>
         )}
         {showPercent && (

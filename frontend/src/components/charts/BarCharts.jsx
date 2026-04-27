@@ -1367,7 +1367,7 @@ export function EirMonthlyMovementChart({ data = [], height = 320 }) {
           }}
           activeDot={{
             r: 5,
-            fill: "#00acc1",
+            fill: "#005ac1",
           }}
           isAnimationActive={false}
         />

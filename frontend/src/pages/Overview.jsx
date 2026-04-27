@@ -247,9 +247,9 @@ export default function Overview({ data }) {
 
         <KpiCard
           label="Total Closing"
-          value={formatDisplay(kpi.Avg_IntRate?.Title)}
-          sub={kpi.Avg_IntRate?.Subtitle}
-          footer={kpi.Avg_IntRate?.Footer}
+          value={formatDisplay(kpi.totalClosing?.Title)}
+          sub={kpi.totalClosing?.Subtitle}
+          footer={kpi.totalClosing?.Footer}
           sparkPct={40}
           accent="c4"
           iconName="personFolder"
@@ -657,7 +657,6 @@ export default function Overview({ data }) {
             }))}
             colors={["#1565c0", "#00acc1", "#90caf9", "#42a5f5"]}
             height={320}
-            formatter={(v) => `₹${Number(v || 0).toLocaleString("en-IN")} Cr`}
           />
 
           <DonutLegend
@@ -668,9 +667,6 @@ export default function Overview({ data }) {
             colors={["#1565c0", "#00acc1", "#90caf9", "#42a5f5"]}
             showPercent={true}
             showValue={true}
-            valueFormatter={(v) =>
-              `₹${Number(v || 0).toLocaleString("en-IN")} Cr`
-            }
           />
         </div>
 

@@ -1,18 +1,25 @@
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts'
-import { CHART_PALETTE } from '../../utils/constants'
-import React from 'react'
-import { buildUnifiedTooltip } from './ChartTooltip'
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from "recharts";
+import { CHART_PALETTE } from "../../utils/constants";
+import React from "react";
+import { buildUnifiedTooltip } from "./ChartTooltip";
 
 export default function DonutChart({
-  data,           // Array<{ name, value }>
-  colors,         // optional color array
+  data, // Array<{ name, value }>
+  colors, // optional color array
   height = 200,
-  innerRadius = '55%',
-  outerRadius = '80%',
+  innerRadius = "55%",
+  outerRadius = "80%",
   showLegend = true,
-  formatter,      // (value) => string
+  formatter, // (value) => string
 }) {
-  const palette = colors || CHART_PALETTE
+  const palette = colors || CHART_PALETTE;
 
   return (
     <ResponsiveContainer width="100%" height={height}>
@@ -32,9 +39,15 @@ export default function DonutChart({
           ))}
         </Pie>
         <Tooltip
-        cursor={{ fill: "transparent" }}
+          cursor={{ fill: "transparent" }}
           content={buildUnifiedTooltip({
-            valueFormatter: (value) => (formatter ? formatter(value) : value),
+            valueFormatter: (value) => {
+              const formattedValue = Number(value || 0).toLocaleString("en-IN", {
+                maximumFractionDigits: 0,
+                minimumFractionDigits: 0,
+              });
+              return `₹${formattedValue} Cr`;
+            },
           })}
         />
         {/* {showLegend && (
@@ -46,5 +59,5 @@ export default function DonutChart({
         )} */}
       </PieChart>
     </ResponsiveContainer>
-  )
+  );
 }
