@@ -130,15 +130,15 @@ export default function Rates({ data }) {
 
       <div className="four-col">
         <KpiCard
-          label="Fixed Balance"
+          label="Avg EIR Rate"
           value={formatDisplay(kpis.fixedBalance?.title)}
           sub={kpis.fixedBalance?.subtitle}
           footer={kpis.fixedBalance?.footer}
           sparkPct={100}
           accent="c1"
-          iconName="dollar"
+          iconName="trending"
           badge={{
-            label: "Fixed",
+            label: "EIR",
             bgColor: "#E8F1FF",
             textColor: "#1D4ED8",
             dotColor: "#1D4ED8",
@@ -146,15 +146,15 @@ export default function Rates({ data }) {
         />
 
         <KpiCard
-          label="Avg Coupon Yield"
+          label="Avg Exit Rate"
           value={`${kpis.avgCouponYield?.title || 0}%`}
           sub={kpis.avgCouponYield?.subtitle}
           footer={kpis.avgCouponYield?.footer}
           sparkPct={80}
           accent="c2"
-          iconName="graph"
+          iconName="trending"
           badge={{
-            label: "Coupon",
+            label: "Exit Rate",
             bgColor: "#E8F5E9",
             textColor: "#43A047",
             dotColor: "#43A047",
@@ -162,15 +162,15 @@ export default function Rates({ data }) {
         />
 
         <KpiCard
-          label="Avg EIR Rate"
+          label="Avg Coupon/Yield"
           value={`${kpis.avgEirRate?.title || 0}%`}
           sub={kpis.avgEirRate?.subtitle}
           footer={kpis.avgEirRate?.footer}
           sparkPct={60}
           accent="c3"
-          iconName="settings"
+          iconName="trending"
           badge={{
-            label: "EIR",
+            label: "Yield",
             bgColor: "#FFF3E0",
             textColor: "#FB8C00",
             dotColor: "#FB8C00",
@@ -178,15 +178,15 @@ export default function Rates({ data }) {
         />
 
         <KpiCard
-          label="Avg Exit Rate"
+          label="Fixed Balance"
           value={`${kpis.avgExitRate?.title || 0}%`}
           sub={kpis.avgExitRate?.subtitle}
           footer={kpis.avgExitRate?.footer}
           sparkPct={90}
           accent="c4"
-          iconName="personFolder"
+          iconName="lock"
           badge={{
-            label: "Exit",
+            label: "Fixed/Float",
             bgColor: "#F3E5F5",
             textColor: "#7B1FA2",
             dotColor: "#7B1FA2",
@@ -292,46 +292,46 @@ export default function Rates({ data }) {
           <div className="chart-subtitle">MONTHLY % COMPARISON</div>
 
           {/* CUSTOM LEGEND */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "22px",
-            flexWrap: "wrap",
-            marginTop: "14px",
-            marginBottom: "10px",
-            fontSize: "13px",
-            fontWeight: 500,
-            color: "#3b5f86",
-            justifyContent: "center",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <span
-              style={{
-                width: "12px",
-                height: "12px",
-                borderRadius: "3px",
-                background: "#4F8EF7",
-                display: "inline-block",
-              }}
-            />
-            Avg EIR %
-          </div>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "22px",
+              flexWrap: "wrap",
+              marginTop: "14px",
+              marginBottom: "10px",
+              fontSize: "13px",
+              fontWeight: 500,
+              color: "#3b5f86",
+              justifyContent: "center",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <span
+                style={{
+                  width: "12px",
+                  height: "12px",
+                  borderRadius: "3px",
+                  background: "#4F8EF7",
+                  display: "inline-block",
+                }}
+              />
+              Avg EIR %
+            </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <span
-              style={{
-                width: "12px",
-                height: "12px",
-                borderRadius: "3px",
-                background: "#C9E3FF",
-                display: "inline-block",
-              }}
-            />
-            Avg CoupYield %
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <span
+                style={{
+                  width: "12px",
+                  height: "12px",
+                  borderRadius: "3px",
+                  background: "#C9E3FF",
+                  display: "inline-block",
+                }}
+              />
+              Avg CoupYield %
+            </div>
           </div>
-        </div>
 
           <GroupedBar
             data={comparisonData}
