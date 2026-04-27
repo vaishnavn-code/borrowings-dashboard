@@ -673,6 +673,156 @@ export function VerticalBarWithLineTransactions({ data, height = 320 }) {
   );
 }
 
+export function VerticalBarWithLineCostAnalysis({
+  data,
+  height = 320,
+}) {
+  return (
+    <ResponsiveContainer width="100%" height={height}>
+      <ComposedChart
+        data={data}
+        margin={{ top: 22, right: 16, left: 8, bottom: 2 }}
+        barCategoryGap="30%"
+        barGap={2}
+      >
+        <defs>
+          {/* Accrual */}
+          <linearGradient id="accrualGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="rgba(21,101,192,0.90)" />
+            <stop offset="100%" stopColor="rgba(144,202,249,0.24)" />
+          </linearGradient>
+
+          {/* EIR Interest */}
+          <linearGradient id="eirGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="rgba(144,202,249,0.72)" />
+            <stop offset="100%" stopColor="rgba(144,202,249,0.10)" />
+          </linearGradient>
+
+          {/* Closing Balance Area */}
+          <linearGradient id="costClosingAreaGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="rgba(0,172,193,0.30)" />
+            <stop offset="100%" stopColor="rgba(0,172,193,0.05)" />
+          </linearGradient>
+        </defs>
+
+        <CartesianGrid
+          stroke="rgba(0,0,0,0.08)"
+          horizontal={true}
+          vertical={false}
+        />
+
+        <XAxis
+          dataKey="name"
+          axisLine={false}
+          tickLine={false}
+          tick={{
+            fontSize: 10,
+            fill: "#6a9cbf",
+            fontFamily: "Inter",
+          }}
+        />
+
+        {/* LEFT → Accrual + EIR */}
+        <YAxis
+          yAxisId="left"
+          tick={{ fontSize: 10, fill: "#6a9cbf" }}
+          axisLine={false}
+          tickLine={false}
+          tickFormatter={(v) => Math.round(v / 10000000)}
+          label={{
+            value: "Accrual + EIR (₹ Cr)",
+            angle: -90,
+            dx: -9,
+            dy: 35,
+            position: "insideLeft",
+            style: {
+              fontSize: 9,
+              fill: "#6a9cbf",
+            },
+          }}
+        />
+
+        {/* RIGHT → Closing Balance */}
+        <YAxis
+          yAxisId="right"
+          orientation="right"
+          tick={{ fontSize: 10, fill: "#6a9cbf" }}
+          axisLine={false}
+          tickLine={false}
+          tickFormatter={(v) => Math.round(v / 10000000)}
+          label={{
+            value: "Closing Balance (₹ Cr)",
+            angle: 90,
+            position: "insideRight",
+            style: {
+              fontSize: 9,
+              fill: "#6a9cbf",
+            },
+          }}
+        />
+
+        <Tooltip
+          cursor={{ fill: "transparent" }}
+          content={buildUnifiedTooltip({
+            valueFormatter: (value) =>
+              `₹${Math.round(Number(value) / 10000000).toLocaleString(
+                "en-IN"
+              )} Cr`,
+          })}
+        />
+
+        {/* Accrual Bar */}
+        <Bar
+          yAxisId="left"
+          dataKey="loan"
+          name="Accrual Amount"
+          fill="url(#accrualGrad)"
+          radius={[5, 5, 0, 0]}
+          maxBarSize={28}
+        />
+
+        {/* EIR Bar */}
+        <Bar
+          yAxisId="left"
+          dataKey="sanction"
+          name="EIR Interest"
+          fill="url(#eirGrad)"
+          radius={[5, 5, 0, 0]}
+          maxBarSize={28}
+        />
+
+        {/* Closing Balance Area */}
+        <Area
+          yAxisId="right"
+          type="monotone"
+          dataKey="outstanding"
+          fill="url(#costClosingAreaGrad)"
+          stroke="none"
+          tooltipType="none"
+        />
+
+        {/* Closing Balance Line */}
+        <Line
+          yAxisId="right"
+          type="monotone"
+          dataKey="outstanding"
+          name="Closing Balance"
+          stroke="#00acc1"
+          strokeWidth={2.5}
+          dot={{
+            r: 4,
+            stroke: "#fff",
+            strokeWidth: 2,
+            fill: "#00acc1",
+          }}
+          activeDot={{ r: 5 }}
+          isAnimationActive={false}
+        />
+      </ComposedChart>
+    </ResponsiveContainer>
+  );
+}
+
 // Backward-compatible alias.
 export function VerticalBarWithLine(props) {
   return <VerticalBarWithLineOverview {...props} />;

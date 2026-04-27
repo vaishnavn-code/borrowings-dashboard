@@ -2,14 +2,16 @@ import { useState, useMemo } from "react";
 import {
   HorizontalBar,
   VerticalBarWithLineOverview,
+  VerticalBarWithLineCostAnalysis,
 } from "../components/charts/BarCharts";
 import KpiCard from "../components/ui/KpiCard";
 import { fmt } from "../utils/formatters";
 import React from "react";
+import { mapCostAnalysis } from "../mappers/costAnalysisMapper";
 import DonutChart from "../components/charts/DonutChart";
 import DonutLegend from "../components/charts/DonutLegend";
 
-export default function Portfolio({ data }) {
+export default function CostAnalysis({ data }) {
   const disbursementTitle =
     "Accrual Cost & EIR Interest vs Closing Balance Trend";
 
@@ -22,7 +24,7 @@ export default function Portfolio({ data }) {
    ========================================
   */
 
-  const mappedCost = data?.costAnalysis || {};
+  const mappedCost = mapCostAnalysis(data);
 
   const kpis = mappedCost?.kpis || {};
   const disbursementData = mappedCost?.trendChart || [];
@@ -34,7 +36,16 @@ export default function Portfolio({ data }) {
    ========================================
   */
 
-  const exposureTable = data?.exposure?.table || [];
+  const hBarData = mappedCost?.accrualByProduct || [];
+  const productDonut = mappedCost?.productDonut || [];
+
+  const accrualAmountChart = mappedCost?.accrualAmountChart || [];
+
+  const wtAvgAmountChart = mappedCost?.wtAvgAmountChart || [];
+
+  const avgFundsChart = mappedCost?.avgFundsChart || [];
+
+  const intAmtEirChart = mappedCost?.intAmtEirChart || [];
 
   /*
    ========================================
@@ -54,34 +65,11 @@ export default function Portfolio({ data }) {
    ========================================
   */
 
-  const hBarData = useMemo(() => {
-    if (!exposureTable.length) return [];
-
-    return exposureTable
-      .map((item) => ({
-        name: item.bp_group,
-        value: Number(item.outstanding_amt || 0),
-      }))
-      .sort((a, b) => b.value - a.value)
-      .slice(0, topN.hbar);
-  }, [exposureTable, topN.hbar]);
-
   /*
    ========================================
    DONUT CHART DATA
    ========================================
   */
-
-  const productDonut = useMemo(() => {
-    const productChart = data?.overview?.charts?.["Product Type"];
-
-    if (!productChart) return [];
-
-    return Object.entries(productChart.values).map(([key, value]) => ({
-      name: key.replace(" - Disbursements", ""),
-      value: parseFloat(value || 0),
-    }));
-  }, [data]);
 
   /*
    ========================================
@@ -122,13 +110,13 @@ export default function Portfolio({ data }) {
 
       <div className="four-col">
         <KpiCard
-          label="Closing Balance"
+          label="Monthly Accrual"
           value={formatDisplay(kpis.monthlyAccrual?.title)}
           sub={kpis.monthlyAccrual?.subtitle}
           footer={kpis.monthlyAccrual?.footer}
           sparkPct={100}
           accent="c1"
-          iconName="dollar"
+          iconName="settings"
           badge={{
             label: "Closing Amt",
             bgColor: "#E8F1FF",
@@ -144,7 +132,7 @@ export default function Portfolio({ data }) {
           footer={kpis.eirWeightedInt?.footer}
           sparkPct={60}
           accent="c2"
-          iconName="graph"
+          iconName="dollar"
           badge={{
             label: "Accrual",
             bgColor: "#E8F5E9",
@@ -160,7 +148,7 @@ export default function Portfolio({ data }) {
           footer={kpis.couponYield?.footer}
           sparkPct={80}
           accent="c3"
-          iconName="trending"
+          iconName="settings"
           badge={{
             label: "EIR Rate",
             bgColor: "#FFF3E0",
@@ -175,7 +163,7 @@ export default function Portfolio({ data }) {
           footer={kpis.averageFunds?.footer}
           sparkPct={40}
           accent="c4"
-          iconName="personFolder"
+          iconName="dollar"
           badge={{
             label: "Balance",
             bgColor: "#FFF3E0",
@@ -218,7 +206,7 @@ export default function Portfolio({ data }) {
 
         <div className="chart-subtitle">{disbursementSubtitle}</div>
 
-        <VerticalBarWithLineOverview
+        <VerticalBarWithLineCostAnalysis
           data={disbursementData}
           height={320}
           viewMode={viewMode}
@@ -229,9 +217,7 @@ export default function Portfolio({ data }) {
 
       <div className="two-col" style={{ marginTop: "20px" }}>
         <div className="chart-card">
-          <div className="chart-title">
-            Accrual by Product Type — Apr 2026
-          </div>
+          <div className="chart-title">Accrual by Product Type — Apr 2026</div>
 
           <div className="chart-subtitle">₹ CRORES</div>
 
@@ -239,7 +225,7 @@ export default function Portfolio({ data }) {
             data={hBarData}
             dataKey="value"
             nameKey="name"
-            height={320}
+            height={620}
             barSize={18}
             formatter={(v) =>
               `₹${(Number(v || 0) / 1e7).toLocaleString("en-IN")} Cr`
@@ -250,9 +236,7 @@ export default function Portfolio({ data }) {
         <div className="chart-card">
           <div className="chart-title">Cost Distribution %</div>
 
-          <div className="chart-subtitle">
-            ACCRUAL SHARE — APR 2026
-          </div>
+          <div className="chart-subtitle">ACCRUAL SHARE — APR 2026</div>
 
           <DonutChart
             data={productDonut}
@@ -266,9 +250,63 @@ export default function Portfolio({ data }) {
             colors={["#1565c0", "#00acc1"]}
             showPercent={true}
             showValue={true}
-            valueFormatter={(v) =>
-              `₹${Math.round(v || 0)} Cr`
-            }
+            valueFormatter={(v) => `₹${Math.round(v || 0)} Cr`}
+          />
+        </div>
+      </div>
+
+      <div className="two-col" style={{ marginTop: "20px" }}>
+        <div className="chart-card">
+          <div className="chart-title">Accrual Amount</div>
+          <div className="chart-subtitle">₹ CRORES · BY PRODUCT</div>
+
+          <HorizontalBar
+            data={accrualAmountChart}
+            dataKey="value"
+            nameKey="name"
+            height={420}
+            formatter={(v) => fmt.cr(v)}
+          />
+        </div>
+
+        <div className="chart-card">
+          <div className="chart-title">Wt Avg Amount</div>
+          <div className="chart-subtitle">₹ CRORES · BY PRODUCT</div>
+
+          <HorizontalBar
+            data={wtAvgAmountChart}
+            dataKey="value"
+            nameKey="name"
+            height={420}
+            formatter={(v) => fmt.cr(v)}
+          />
+        </div>
+      </div>
+
+      <div className="two-col" style={{ marginTop: "20px" }}>
+        <div className="chart-card">
+          <div className="chart-title">Avg Funds Wt</div>
+          <div className="chart-subtitle">₹ CRORES · BY PRODUCT</div>
+
+          <HorizontalBar
+            data={avgFundsChart}
+            dataKey="value"
+            nameKey="name"
+            height={420}
+            formatter={(v) => fmt.cr(v)}
+          />
+        </div>
+
+        <div className="chart-card">
+          <div className="chart-title">Int Amt-EIR</div>
+          <div className="chart-subtitle">₹ CRORES · BY PRODUCT</div>
+
+          <HorizontalBar
+            data={intAmtEirChart}
+            dataKey="value"
+            nameKey="name"
+            height={420}
+            formatter={(v) => fmt.cr(v)}
           />
         </div>
       </div>
