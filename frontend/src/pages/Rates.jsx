@@ -49,21 +49,23 @@ export default function Rates({ data }) {
 
     if (isNaN(num)) return v;
 
+    // keep decimals only for percentage values
     if (str.includes("%")) {
       return `${num.toFixed(2)} %`;
     }
 
+    // CR values → no decimals
     if (str.toLowerCase().includes("cr")) {
-      return `₹${num.toLocaleString("en-IN")} Cr`;
+      return `₹${Math.round(num).toLocaleString("en-IN")} Cr`;
     }
 
+    // BN values → convert to CR + no decimals
     if (str.toLowerCase().includes("bn")) {
-      return `₹${(num * 100).toLocaleString("en-IN")} Cr`;
+      return `₹${Math.round(num * 100).toLocaleString("en-IN")} Cr`;
     }
 
-    return `₹${(num / 1e7).toLocaleString("en-IN", {
-      maximumFractionDigits: 2,
-    })} Cr`;
+    // raw INR → convert to CR + no decimals
+    return `₹${Math.round(num / 10000000).toLocaleString("en-IN")} Cr`;
   };
 
   /*
@@ -131,9 +133,9 @@ export default function Rates({ data }) {
       <div className="four-col">
         <KpiCard
           label="Avg EIR Rate"
-          value={formatDisplay(kpis.fixedBalance?.title)}
-          sub={kpis.fixedBalance?.subtitle}
-          footer={kpis.fixedBalance?.footer}
+          value={`${kpis.avgEirRate?.title || 0}%`}
+          sub={kpis.avgEirRate?.subtitle}
+          footer={kpis.avgEirRate?.footer}
           sparkPct={100}
           accent="c1"
           iconName="trending"
@@ -179,9 +181,9 @@ export default function Rates({ data }) {
 
         <KpiCard
           label="Fixed Balance"
-          value={`${kpis.avgExitRate?.title || 0}%`}
-          sub={kpis.avgExitRate?.subtitle}
-          footer={kpis.avgExitRate?.footer}
+          value={formatDisplay(kpis.fixedBalance?.title)}
+          sub={kpis.fixedBalance?.subtitle}
+          footer={kpis.fixedBalance?.footer}
           sparkPct={90}
           accent="c4"
           iconName="lock"

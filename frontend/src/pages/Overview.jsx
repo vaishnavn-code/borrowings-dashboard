@@ -164,26 +164,22 @@ export default function Overview({ data }) {
   const disbursementData = mappedData.monthlyTrend;
 
   const formatDisplay = (v) => {
-    if (!v) return "-";
+    if (!v && v !== 0) return "-";
 
     const str = String(v);
 
-    // Extract number
+    // Extract numeric value
     const num = parseFloat(str.replace(/₹|,|Cr|%/gi, ""));
 
-    if (isNaN(num)) return v; // return original if not numeric
+    if (isNaN(num)) return v;
 
-    // Handle %
+    // If percentage → keep decimals
     if (str.includes("%")) {
       return `${num.toFixed(2)} %`;
     }
 
-    // Handle Cr
-    if (str.toLowerCase().includes("cr")) {
-      return `₹${num.toLocaleString("en-IN")} Cr`;
-    }
-
-    return v;
+    // For amount values → no decimals
+    return `₹${Math.round(num).toLocaleString("en-IN")} Cr`;
   };
 
   const formatViewMode = (mode) => mode.charAt(0).toUpperCase() + mode.slice(1);
@@ -210,7 +206,7 @@ export default function Overview({ data }) {
             label: "CLosing Amt",
             bgColor: "#E8F1FF",
             textColor: "#1D4ED8",
-            dotColor: "#1D4ED8", //  key line for badge dot
+            dotColor: "#1D4ED8",
           }}
         />
 
@@ -226,13 +222,13 @@ export default function Overview({ data }) {
             label: "Accrual",
             bgColor: "#E8F5E9",
             textColor: "#43A047",
-            dotColor: "#43A047", //  key line for badge dot
+            dotColor: "#43A047",
           }}
         />
 
         <KpiCard
           label="Avg EIR Rate"
-          value={formatDisplay(kpi.avgEirRate?.Title)}
+          value={Number(kpi.avgEirRate?.Title || 0).toFixed(2)}
           sub={kpi.avgEirRate?.Subtitle}
           footer={kpi.avgEirRate?.Footer}
           sparkPct={80}

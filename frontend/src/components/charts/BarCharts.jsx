@@ -223,10 +223,14 @@ export function HorizontalBar({
           axisLine={false}
         />
         <Tooltip
-          cursor={{ fill: "transparent" }} // ✅ ADD THIS
+          cursor={{ fill: "transparent" }}
           content={buildUnifiedTooltip({
             valueFormatter: (value) =>
-              formatter ? formatter(value) : `${value}${unit}`,
+              formatter
+                ? formatter(value)
+                : `₹${Math.round(Number(value || 0) / 10000000).toLocaleString(
+                    "en-IN",
+                  )} Cr`,
           })}
         />
         <Bar
@@ -1710,16 +1714,14 @@ export function RateTypeMaturityStackedBar({
         />
 
         <Tooltip
-          cursor={{ fill: "transparent" }}
-          content={buildUnifiedTooltip({
-            valueFormatter: (value) =>
-              formatter
-                ? formatter(value)
-                : `₹${Math.round(Number(value || 0) / 10000000).toLocaleString(
-                    "en-IN",
-                  )} Cr`,
-          })}
-        />
+  cursor={{ fill: "transparent" }}
+  content={buildUnifiedTooltip({
+    valueFormatter: (value) =>
+      `₹${Math.round(
+        Number(value || 0) / 10000000
+      ).toLocaleString("en-IN")} Cr`,
+  })}
+/>
 
         {/* FIXED */}
         <Bar
