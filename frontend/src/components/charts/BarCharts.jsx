@@ -673,10 +673,7 @@ export function VerticalBarWithLineTransactions({ data, height = 320 }) {
   );
 }
 
-export function VerticalBarWithLineCostAnalysis({
-  data,
-  height = 320,
-}) {
+export function VerticalBarWithLineCostAnalysis({ data, height = 320 }) {
   return (
     <ResponsiveContainer width="100%" height={height}>
       <ComposedChart
@@ -766,7 +763,7 @@ export function VerticalBarWithLineCostAnalysis({
           content={buildUnifiedTooltip({
             valueFormatter: (value) =>
               `₹${Math.round(Number(value) / 10000000).toLocaleString(
-                "en-IN"
+                "en-IN",
               )} Cr`,
           })}
         />
@@ -823,10 +820,7 @@ export function VerticalBarWithLineCostAnalysis({
   );
 }
 
-export function StackedBarWithLine({
-  data,
-  height = 360,
-}) {
+export function StackedBarWithLine({ data, height = 360 }) {
   return (
     <ResponsiveContainer width="100%" height={height}>
       <ComposedChart
@@ -962,10 +956,7 @@ export function StackedBarWithLine({
   );
 }
 
-export function StackedBarOnly({
-  data,
-  height = 360,
-}) {
+export function StackedBarOnly({ data, height = 360 }) {
   return (
     <ResponsiveContainer width="100%" height={height}>
       <ComposedChart
@@ -1065,6 +1056,67 @@ export function StackedBarOnly({
           name="> 5 Years"
         />
       </ComposedChart>
+    </ResponsiveContainer>
+  );
+}
+
+export function AdditionVsRedemptionChart({ data, height = 320 }) {
+  return (
+    <ResponsiveContainer width="100%" height={height}>
+      <BarChart
+        data={data}
+        margin={{ top: 20, right: 10, left: 10, bottom: 10 }}
+        barCategoryGap="30%"
+      >
+        <CartesianGrid
+          stroke="rgba(0,0,0,0.08)"
+          vertical={true}
+          horizontal={true}
+        />
+
+        <XAxis
+          dataKey="name"
+          axisLine={false}
+          tickLine={false}
+          tick={{
+            fontSize: 10,
+            fill: "#6a9cbf",
+          }}
+        />
+
+        <YAxis
+          axisLine={false}
+          tickLine={false}
+          tick={{
+            fontSize: 10,
+            fill: "#6a9cbf",
+          }}
+          tickFormatter={(v) => Math.round(Math.abs(v) / 10000000)}
+        />
+
+        <Tooltip
+          cursor={{ fill: "transparent" }}
+          content={buildUnifiedTooltip({
+            valueFormatter: (value, name) => {
+              return fmt.cr(Math.abs(Number(value || 0)));
+            },
+          })}
+        />
+
+        <Bar
+          dataKey="addition"
+          name="Addition"
+          fill="rgba(111, 164, 221, 0.9)"
+          radius={[4, 4, 0, 0]}
+        />
+
+        <Bar
+          dataKey="redemption"
+          name="Redemption"
+          fill="rgba(255, 205, 210, 0.8)"
+          radius={[4, 4, 0, 0]}
+        />
+      </BarChart>
     </ResponsiveContainer>
   );
 }
