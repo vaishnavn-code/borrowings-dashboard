@@ -3,6 +3,8 @@ import DataTable from "../components/ui/DataTable";
 import KpiCard from "../components/ui/KpiCard";
 import { mapTransactions } from "../mappers/transactionMapper";
 import { fmt } from "../utils/formatters";
+import {formatMonth} from "../utils/formatters";
+
 
 export default function Transactions({ data }) {
   const mappedTxn = mapTransactions(data);
@@ -148,7 +150,9 @@ export default function Transactions({ data }) {
       <div className="four-col">
         <KpiCard
           label="Total Records"
-          value={txnKpis.totalRecords || 0}
+          value={txnKpis.totalRecords?.title || 0}
+          sub={txnKpis.totalRecords?.subtitle}
+          footer={txnKpis.totalRecords?.footer}
           iconName="document"
           accent="c1"
           sparkPct={100}
@@ -161,7 +165,9 @@ export default function Transactions({ data }) {
 
         <KpiCard
           label="Total Closing Balance"
-          value={fmt.cr(txnKpis.totalClosingBal)}
+          value={fmt.cr(txnKpis.totalClosingBal?.title)}
+          sub={txnKpis.totalClosingBal?.subtitle}
+          footer={txnKpis.totalClosingBal?.footer}
           iconName="dollar"
           accent="c2"
           sparkPct={80}
@@ -174,7 +180,9 @@ export default function Transactions({ data }) {
 
         <KpiCard
           label="Total Accrual"
-          value={fmt.cr(txnKpis.totalAccrual)}
+          value={fmt.cr(txnKpis.totalAccrual?.title)}
+          sub={txnKpis.totalAccrual?.subtitle}
+          footer={txnKpis.totalAccrual?.footer}
           iconName="storage"
           accent="c3"
           sparkPct={60}
@@ -187,7 +195,9 @@ export default function Transactions({ data }) {
 
         <KpiCard
           label="Reporting Period"
-          value={txnKpis.reportingPeriod || "-"}
+          value={txnKpis.reportingPeriod?.title || "-"}
+          sub={txnKpis.reportingPeriod?.subtitle}
+          footer={txnKpis.reportingPeriod?.footer}
           iconName="graph"
           accent="c4"
           sparkPct={40}

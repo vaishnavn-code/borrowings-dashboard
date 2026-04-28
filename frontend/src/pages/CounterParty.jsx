@@ -4,6 +4,7 @@ import DataTable from "../components/ui/DataTable";
 import { fmt } from "../utils/formatters";
 import KpiCard from "../components/ui/KpiCard";
 import DonutChart from "../components/charts/DonutChart";
+import {formatMonth} from "../utils/formatters";
 import DonutLegend from "../components/charts/DonutLegend";
 
 const COLUMNS = [
@@ -175,7 +176,7 @@ export default function CounterParty({ data }) {
 
   return (
     <div>
-      <div className="section-label">Borrower / Customer View</div>
+      <div className="section-label">Counterparty Analysis — {formatMonth(data.curr_month)} · ₹ Crores</div>
 
       <div className="four-col">
         <KpiCard

@@ -10,6 +10,8 @@ import KpiCard from "../components/ui/KpiCard";
 import DataTable from "../components/ui/DataTable";
 import { fmt } from "../utils/formatters";
 import { mapRateTrends } from "../mappers/rateTrendMapper";
+import {formatMonth} from "../utils/formatters";
+
 
 export default function Rates({ data }) {
   /*
@@ -126,7 +128,7 @@ export default function Rates({ data }) {
 
   return (
     <div>
-      <div className="section-label">Interest Rate & Tenor Analysis</div>
+      <div className="section-label">Rate Analysis — 12 Months Trend</div>
 
       {/* KPI CARDS */}
 

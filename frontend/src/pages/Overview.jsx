@@ -12,6 +12,7 @@ import { useInsights } from "../hooks/useDashboardData";
 import DonutLegend from "../components/charts/DonutLegend";
 import React from "react";
 import MonthlySummaryTable from "../components/ui/MonthlySummaryTable";
+import {formatMonth} from "../utils/formatters";
 
 export default function Overview({ data }) {
   const mappedData = useMemo(() => mapOverviewData(data), [data]);
@@ -147,6 +148,16 @@ export default function Overview({ data }) {
     mappedData.latestBorrowingBookMonth,
   );
 
+  const summaryMetricsData = data?.overview?.Charts?.["Summary Metrics"] || {};
+
+  const summaryMetricMonths = Object.keys(summaryMetricsData);
+
+  const [selectedSummaryMonth, setSelectedSummaryMonth] = useState(
+    summaryMetricMonths[summaryMetricMonths.length - 1] || "",
+  );
+
+  const selectedSummaryData = summaryMetricsData[selectedSummaryMonth] || {};
+
   const topGroupsOutstanding =
     mappedData.borrowingBookByMonth?.[selectedBBMonth] || [];
 
@@ -187,6 +198,22 @@ export default function Overview({ data }) {
     return `₹${Math.round(num).toLocaleString("en-IN")} Cr`;
   };
 
+  const formatSubtitle = (v) => {
+    if (!v && v !== 0) return "-";
+
+    let str = String(v);
+
+    return str.replace(/₹?([\d,]+(?:\.\d+)?)/g, (_, numStr) => {
+      const num = Number(numStr.replace(/,/g, ""));
+
+      if (isNaN(num)) return numStr;
+
+      const valueInCr = Math.round(num / 10000000);
+
+      return `₹${valueInCr.toLocaleString("en-IN")}`;
+    });
+  };
+
   const formatViewMode = (mode) => mode.charAt(0).toUpperCase() + mode.slice(1);
 
   const disbursementTitle = `${formatViewMode(viewMode)} Closing Balance & Accrual Trend`;
@@ -197,12 +224,14 @@ export default function Overview({ data }) {
 
   return (
     <div>
-      <div className="section-label">Portfolio KPIs — All Figures in INR</div>
+      <div className="section-label">
+        Portfolio KPIs — {formatMonth(data.curr_month)} All Figures in INR
+      </div>
       <div className="four-col">
         <KpiCard
           label="Closing Balance"
           value={formatDisplay(kpi.closingBalance?.Title)}
-          sub={kpi.closingBalance?.Subtitle}
+          sub={formatSubtitle(kpi.closingBalance?.Subtitle)}
           footer={kpi.closingBalance?.Footer}
           sparkPct={100}
           accent="c1"
@@ -218,7 +247,7 @@ export default function Overview({ data }) {
         <KpiCard
           label="Monthly Accrual"
           value={formatDisplay(kpi.monthlyAccrual?.Title)}
-          sub={kpi.monthlyAccrual?.Subtitle}
+          sub={formatSubtitle(kpi.monthlyAccrual?.Subtitle)}
           footer={kpi.monthlyAccrual?.Footer}
           sparkPct={60}
           accent="c2"
@@ -249,7 +278,7 @@ export default function Overview({ data }) {
         <KpiCard
           label="Total Closing"
           value={formatDisplay(kpi.totalClosing?.Title)}
-          sub={kpi.totalClosing?.Subtitle}
+          sub={formatSubtitle(kpi.totalClosing?.Subtitle)}
           footer={kpi.totalClosing?.Footer}
           sparkPct={40}
           accent="c4"
@@ -327,22 +356,23 @@ export default function Overview({ data }) {
                       {/* <div className="ai-insight-tag general">
                         {item.tag || "Insight"}
                       </div> */}
-                      <div
-                        className={`ai-insight-tag ${
-                          idx === 0
-                            ? "concentration-risk"
-                            : idx === 1
-                              ? "asset-quality"
-                              : idx === 2
-                                ? "maturity-profile"
-                                : idx === 3
-                                  ? "utilization"
-                                  : idx === 4
-                                    ? "currency-risk"
-                                    : "currency-risk"
-                        }`}
-                      >
-                        {hardcodedInsightTags[idx] || "CURRENCY RISK"}
+                      <div className="ai-insight-tags-wrap">
+                        <div className="ai-insight-tag category-tag">
+                          {item.category || "General"}
+                        </div>
+
+                        <div
+                          className={`ai-insight-tag severity-tag ${
+                            String(item.severity || "").toLowerCase() === "high"
+                              ? "severity-high"
+                              : String(item.severity || "").toLowerCase() ===
+                                  "medium"
+                                ? "severity-medium"
+                                : "severity-info"
+                          }`}
+                        >
+                          {item.severity || "Info"}
+                        </div>
                       </div>
                     </div>
 
@@ -368,6 +398,17 @@ export default function Overview({ data }) {
                               <li key={evidenceIndex}>{evidence}</li>
                             ))}
                           </ul>
+                        </div>
+                      )}
+
+                      {item.recommended_action && (
+                        <div className="ai-detail-section">
+                          <div className="ai-detail-heading">
+                            Recommended Action
+                          </div>
+                          <div className="ai-recommendation-text">
+                            {item.recommended_action}
+                          </div>
                         </div>
                       )}
                     </div>
@@ -642,7 +683,7 @@ export default function Overview({ data }) {
           <div className="chart-subtitle">CLOSING BALANCE ₹ CR</div>
           <DonutChart
             data={productDonut}
-            colors={["#1565c0", "#00acc1"]}
+            colors={["#1565c0", "#00acc1", "#42a5f5",  "#5c6bc0",]}
             height={320}
           />
           <DonutLegend
@@ -744,7 +785,8 @@ export default function Overview({ data }) {
 
         <select
           id="sumMetricsSel"
-          onChange={() => {}}
+          value={selectedSummaryMonth}
+          onChange={(e) => setSelectedSummaryMonth(e.target.value)}
           style={{
             fontFamily: "var(--font)",
             fontSize: "0.8rem",
@@ -759,9 +801,11 @@ export default function Overview({ data }) {
             minWidth: "160px",
           }}
         >
-          <option>Apr 2026</option>
-          <option>Mar 2026</option>
-          <option>Feb 2026</option>
+          {summaryMetricMonths.map((month) => (
+            <option key={month} value={month}>
+              {month}
+            </option>
+          ))}
         </select>
 
         <span
@@ -772,7 +816,7 @@ export default function Overview({ data }) {
             marginLeft: "auto",
           }}
         >
-          Showing data for Apr 2026
+          Showing data for {selectedSummaryMonth}
         </span>
       </div>
 
@@ -782,7 +826,7 @@ export default function Overview({ data }) {
         <div className="chart-card summary-metrics-card">
           <div className="chart-title summary-metrics-title">
             Summary Metrics
-            <span className="card-badge">Apr 2026</span>
+            <span className="card-badge">{selectedSummaryMonth}</span>
           </div>
 
           <table
@@ -799,19 +843,19 @@ export default function Overview({ data }) {
             <tbody>
               <tr>
                 <td>Total Book</td>
-                <td>{mappedData.summaryMetrics.totalBook} (Cr)</td>
+                <td>{formatDisplay(selectedSummaryData["Total Book"])}</td>
               </tr>
               <tr>
                 <td>Wtd Avg EIR</td>
-                <td>{mappedData.summaryMetrics.wtdAvgEir} %</td>
+                <td>{Number(selectedSummaryData["Wtd Avg EIR"] || 0).toFixed(4)} %</td>
               </tr>
               <tr>
                 <td>Total Accrual</td>
-                <td>{mappedData.summaryMetrics.totalAccrual} (Cr)</td>
+                <td>{formatDisplay(selectedSummaryData["Total Accrual"])}</td>
               </tr>
               <tr>
                 <td>Active Lines</td>
-                <td>{mappedData.summaryMetrics.activeLines}</td>
+                <td>{selectedSummaryData["Active Lines"] || 0}</td>
               </tr>
             </tbody>
           </table>
@@ -821,7 +865,7 @@ export default function Overview({ data }) {
         <div className="chart-card summary-metrics-card">
           <div className="chart-title summary-metrics-title">
             Rate & Mix Snapshot
-            <span className="card-badge">Apr 2026</span>
+            <span className="card-badge">{selectedSummaryMonth}</span>
           </div>
 
           <table

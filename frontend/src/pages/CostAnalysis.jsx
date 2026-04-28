@@ -10,6 +10,7 @@ import React from "react";
 import { mapCostAnalysis } from "../mappers/costAnalysisMapper";
 import DonutChart from "../components/charts/DonutChart";
 import DonutLegend from "../components/charts/DonutLegend";
+import {formatMonth} from "../utils/formatters";
 
 export default function CostAnalysis({ data }) {
   const disbursementTitle =
@@ -106,7 +107,7 @@ export default function CostAnalysis({ data }) {
 
   return (
     <div>
-      <div className="section-label">Exposure Analytics — Group Breakdown</div>
+      <div className="section-label">Exposure Analytics — {formatMonth(data.curr_month)} Group Breakdown</div>
 
       {/* KPI CARDS */}
 
@@ -242,7 +243,7 @@ export default function CostAnalysis({ data }) {
 
           <DonutChart
             data={productDonut}
-            colors={["#1565c0", "#00acc1"]}
+            colors={["#1565c0", "#00acc1", "#42a5f5",  "#5c6bc0",]}
             height={320}
             formatter={(v) =>
               `₹${Math.round(Number(v || 0)).toLocaleString("en-IN")} Cr`

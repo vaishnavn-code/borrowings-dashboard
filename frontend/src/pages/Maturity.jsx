@@ -15,6 +15,7 @@ import KpiCard from "../components/ui/KpiCard";
 import { mapMaturityAnalysis } from "../mappers/maturityMapper";
 import DonutChart from "../components/charts/DonutChart";
 import DonutLegend from "../components/charts/DonutLegend";
+import {formatMonth} from "../utils/formatters";
 
 const COLUMNS = [
   { key: "customer", label: "Customer" },
@@ -173,7 +174,7 @@ FORMATTER
   };
   return (
     <div>
-      <div className="section-label">Borrower / Customer View</div>
+      <div className="section-label">Maturity Analysis — {formatMonth(data.curr_month)} · ₹ Crores</div>
 
       {/* KPI CARDS */}
 

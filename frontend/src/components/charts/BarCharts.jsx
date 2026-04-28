@@ -1836,12 +1836,38 @@ export function PortfolioProductTrendChart({
             );
           }}
           label={{
-            value: isOnlyLine ? "Avg EIR %" : "Amount (₹ Cr)",
+            value: "Amount (₹ Cr)",
             angle: -90,
             position: "insideLeft",
+            dx: -18,
+            style: {
+              fontSize: 11,
+              fill: "#5f7ea3",
+              fontFamily: "Inter",
+              fontWeight: 500,
+            },
+          }}
+        />
+
+        <YAxis
+          yAxisId="right"
+          orientation="right"
+          axisLine={false}
+          tickLine={false}
+          domain={[0, 10]}
+          tickFormatter={(v) => `${Number(v || 0).toFixed(1)}%`}
+          tick={{
+            fontSize: 11,
+            fill: "#E27D00",
+            fontFamily: "Inter",
+          }}
+          label={{
+            value: "Avg EIR %",
+            angle: 90,
+            position: "insideRight",
             style: {
               fontSize: 10,
-              fill: "#5f7ea3",
+              fill: "#E27D00",
             },
           }}
         />
@@ -1849,12 +1875,13 @@ export function PortfolioProductTrendChart({
         <Tooltip
           cursor={{ fill: "transparent" }}
           content={buildUnifiedTooltip({
-            valueFormatter: (value) => {
-              if (isOnlyLine) {
+            valueFormatter: (value, name) => {
+              // specifically for Avg EIR line
+              if (String(name).includes("EIR")) {
                 return `${Number(value || 0).toFixed(2)}%`;
               }
 
-              // convert to Cr
+              // amount values → convert to Cr
               const valueInCr = Number(value || 0) / 10000000;
 
               return `₹${Math.round(valueInCr).toLocaleString("en-IN")} Cr`;
@@ -1868,10 +1895,22 @@ export function PortfolioProductTrendChart({
           iconType="circle"
           iconSize={10}
           wrapperStyle={{
-            fontSize: 12,
             paddingBottom: 20,
+            marginTop: -20,
             fontFamily: "Inter",
+            fontSize: 13,
           }}
+          formatter={(value) => (
+            <span
+              style={{
+                color: "#1F2937", // dark readable text
+                fontWeight: 600,
+                fontSize: 13,
+              }}
+            >
+              {value}
+            </span>
+          )}
         />
 
         {/* BARS → only when not avg_eir */}
@@ -1917,7 +1956,7 @@ export function PortfolioProductTrendChart({
 
         {/* LINE GRAPH */}
         <Line
-          yAxisId="left"
+          yAxisId="right"
           type="monotone"
           dataKey="debenturesEir"
           name="Avg EIR %"

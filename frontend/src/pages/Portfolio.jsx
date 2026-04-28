@@ -11,6 +11,7 @@ import {
 } from "../components/charts/BarCharts";
 import DonutChart from "../components/charts/DonutChart";
 import DonutLegend from "../components/charts/DonutLegend";
+import {formatMonth} from "../utils/formatters";
 
 export default function Portfolio({ data }) {
   const COLUMNS = [
@@ -69,7 +70,7 @@ export default function Portfolio({ data }) {
 
   return (
     <div>
-      <div className="section-label">Portfolio Mix — Product Breakdown</div>
+      <div className="section-label">Portfolio Mix — {formatMonth(data.curr_month)} Product Breakdown</div>
 
       {/* KPI CARDS */}
 
@@ -224,7 +225,6 @@ export default function Portfolio({ data }) {
               <option value="closing">Closing Amount</option>
               <option value="redemption">Redemption Amount</option>
               <option value="addition">Addition Amount</option>
-              <option value="avg_eir">Avg EIR %</option>
             </select>
           </div>
         </div>

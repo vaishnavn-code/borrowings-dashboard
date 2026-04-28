@@ -13,7 +13,7 @@ const formatRate = (value) =>
   });
 
 export default function MonthlySummaryTable({
-  title = "13-Month Summary",
+  title = "12-Month Summary",
   periodLabel,
   rows = [],
   highlightLastRow = true,
