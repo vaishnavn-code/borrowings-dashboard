@@ -44,31 +44,31 @@ export default function Rates({ data }) {
   */
 
   const formatDisplay = (v) => {
-    if (v === null || v === undefined || v === "") return "-";
+  if (v === null || v === undefined || v === "") return "-";
 
-    const str = String(v);
-    const num = parseFloat(str.replace(/₹|,|Cr|%|Bn|Mn/gi, ""));
+  const str = String(v);
+  const num = parseFloat(str.replace(/₹|,|Cr|%|Bn|Mn/gi, ""));
 
-    if (isNaN(num)) return v;
+  if (isNaN(num)) return v;
 
-    // keep decimals only for percentage values
-    if (str.includes("%")) {
-      return `${num.toFixed(2)} %`;
-    }
+  // percentage values
+  if (str.includes("%")) {
+    return `${num.toFixed(2)} %`;
+  }
 
-    // CR values → no decimals
-    if (str.toLowerCase().includes("cr")) {
-      return `₹${Math.round(num).toLocaleString("en-IN")} Cr`;
-    }
+  // CR values
+  if (str.toLowerCase().includes("cr")) {
+    return `₹${Math.round(num).toLocaleString("en-IN")} Cr`;
+  }
 
-    // BN values → convert to CR + no decimals
-    if (str.toLowerCase().includes("bn")) {
-      return `₹${Math.round(num * 100).toLocaleString("en-IN")} Cr`;
-    }
+  // BN values → convert to CR
+  if (str.toLowerCase().includes("bn")) {
+    return `₹${Math.round(num * 100).toLocaleString("en-IN")} Cr`;
+  }
 
-    // raw INR → convert to CR + no decimals
-    return `₹${Math.round(num / 10000000).toLocaleString("en-IN")} Cr`;
-  };
+  // already in Cr from API
+  return `₹${Math.round(num).toLocaleString("en-IN")} Cr`;
+};
 
   /*
    ========================================
