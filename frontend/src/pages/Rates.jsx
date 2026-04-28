@@ -97,17 +97,17 @@ export default function Rates({ data }) {
     {
       key: "fixedCr",
       label: "Fixed ₹ Cr",
-      render: (v) => fmt.cr(v),
+      render: (v) => fmt.n_cr(v),
     },
     {
       key: "floatingCr",
       label: "Floating ₹ Cr",
-      render: (v) => fmt.cr(v),
+      render: (v) => fmt.n_cr(v),
     },
     {
       key: "closingCr",
       label: "Closing ₹ Cr",
-      render: (v) => fmt.cr(v),
+      render: (v) => fmt.n_cr(v),
     },
   ];
 

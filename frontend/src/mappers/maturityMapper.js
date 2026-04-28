@@ -177,15 +177,18 @@ export function mapMaturityAnalysis(rawData) {
     floating: Number(rateTypeRaw?.[bucket]?.Floating || 0),
   }));
 
-  const annualMaturityRaw = charts?.["Annual Maturity Profile"]?.values || {};
+  const annualMaturityRaw =
+  charts?.["Annual Maturity Profile"]?.values || {};
 
-  const annualMaturityProfileData = Object.entries(annualMaturityRaw).map(
-    ([year, value]) => ({
-      name: year,
-      fixed: Number(value || 0), // using existing chart key
-      floating: 0, // keep 0 since we reuse same stacked bar component
-    }),
-  );
+const annualMaturityProfileData = Object.entries(annualMaturityRaw).map(
+  ([year, value]) => ({
+    name: year,
+
+    // using same reusable chart structure
+    fixed: Number(value || 0),
+    floating: 0,
+  })
+);
 
   return {
     kpis: mappedKpis,

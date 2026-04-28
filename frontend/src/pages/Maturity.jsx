@@ -539,7 +539,7 @@ FORMATTER
           </div>
 
           <RateTypeMaturityStackedBar
-            data={rateTypeByMaturityBucketData}
+            data={annualMaturityProfileData}
             height={420}
             formatter={(v) =>
               `₹${(Number(v || 0) / 10000000).toLocaleString("en-IN")} Cr`
@@ -548,6 +548,7 @@ FORMATTER
         </div>
       </div>
 
+      {/* Annual Maturity Profile */}
       <div className="chart-card" style={{ marginBottom: "20px" }}>
         <div
           style={{
@@ -563,7 +564,7 @@ FORMATTER
             </div>
           </div>
 
-          {/* BAR / LINE toggle */}
+          {/* BAR / LINE TOGGLE */}
           <div
             style={{
               display: "flex",
@@ -586,6 +587,7 @@ FORMATTER
             >
               BAR
             </button>
+
             <button
               onClick={() => setMaturityChartType("line")}
               style={{
@@ -601,7 +603,7 @@ FORMATTER
           </div>
         </div>
 
-        {/* Legend — only show for bar */}
+        {/* BAR LEGEND */}
         {maturityChartType === "bar" && (
           <div
             style={{
@@ -628,6 +630,7 @@ FORMATTER
               />
               Fixed
             </div>
+
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <span
                 style={{
@@ -645,15 +648,17 @@ FORMATTER
 
         {maturityChartType === "bar" ? (
           <RateTypeMaturityStackedBar
-            data={rateTypeByMaturityBucketData}
+            data={annualMaturityProfileData}
             height={420}
             formatter={(v) =>
-              `₹${(Number(v || 0) / 10000000).toLocaleString("en-IN")} Cr`
+              `₹${Math.round(Number(v || 0) / 10000000).toLocaleString(
+                "en-IN",
+              )} Cr`
             }
           />
         ) : (
           <AnnualMaturityLineChart
-            data={rateTypeByMaturityBucketData}
+            data={annualMaturityProfileData}
             height={420}
           />
         )}

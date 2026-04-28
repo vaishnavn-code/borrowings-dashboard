@@ -226,6 +226,25 @@ export default function Portfolio({ data }) {
               <option value="closing">Closing Amount</option>
               <option value="redemption">Redemption Amount</option>
               <option value="addition">Addition Amount</option>
+              <option value="wt_avg_amt">WT AVG AMT</option>
+              <option value="avg_funds">AVG FUNDS</option>
+              <option value="open_eir">OPEN EIR</option>
+              <option value="exit_eir">EXIT EIR</option>
+              <option value="wt_int_amt_eir">WT INT AMT EIR</option>
+              <option value="avg_rate_eir">AVG RATE EIR</option>
+              <option value="avg_rate_eir_papm">AVG RATE EIR PAPM</option>
+              <option value="exit_rate">EXIT RATE</option>
+              <option value="exit_spread">EXIT SPREAD</option>
+              <option value="exit_final_rate">EXIT FINAL RATE</option>
+              <option value="exit_final_rate_papm">EXIT FINAL RATE PAPM</option>
+              <option value="avg_rate_yield">AVG RATE YIELD</option>
+              <option value="avg_rate_yield_papm">AVG RATE YIELD PAPM</option>
+              <option value="wt_int_amt_coupon_yield">
+                WT INT AMT COUPON YIELD
+              </option>
+              <option value="wt_amt_coupon_yield">
+                WT AMT COUPON YIELD
+              </option>
             </select>
           </div>
         </div>

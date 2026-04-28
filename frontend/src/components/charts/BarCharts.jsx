@@ -1772,43 +1772,147 @@ export function PortfolioProductTrendChart({
   height = 420,
   barSize = 28,
 }) {
-  const fieldMap = {
-    opening: {
-      debentures: "debenturesOpening",
-      commercialPaper: "commercialPaperOpening",
-      others: "othersOpening",
-      loans: "loansOpening",
-    },
+const fieldMap = {
+  opening: {
+    debentures: "debenturesOpening",
+    commercialPaper: "commercialPaperOpening",
+    others: "othersOpening",
+    loans: "loansOpening",
+  },
 
-    closing: {
-      debentures: "debenturesClosing",
-      commercialPaper: "commercialPaperClosing",
-      others: "othersClosing",
-      loans: "loansClosing",
-    },
+  closing: {
+    debentures: "debenturesClosing",
+    commercialPaper: "commercialPaperClosing",
+    others: "othersClosing",
+    loans: "loansClosing",
+  },
 
-    redemption: {
-      debentures: "debenturesRedemption",
-      commercialPaper: "commercialPaperRedemption",
-      others: "othersRedemption",
-      loans: "loansRedemption",
-    },
+  redemption: {
+    debentures: "debenturesRedemption",
+    commercialPaper: "commercialPaperRedemption",
+    others: "othersRedemption",
+    loans: "loansRedemption",
+  },
 
-    addition: {
-      debentures: "debenturesAddition",
-      commercialPaper: "commercialPaperAddition",
-      others: "othersAddition",
-      loans: "loansAddition",
-    },
+  addition: {
+    debentures: "debenturesAddition",
+    commercialPaper: "commercialPaperAddition",
+    others: "othersAddition",
+    loans: "loansAddition",
+  },
 
-    avg_eir: {
-      debentures: "debenturesEir",
-      commercialPaper: "commercialPaperEir",
-      others: "othersEir",
-      loans: "loansEir",
-    },
-  };
+  avg_eir: {
+    debentures: "debenturesEir",
+    commercialPaper: "commercialPaperEir",
+    others: "othersEir",
+    loans: "loansEir",
+  },
 
+  wt_avg_amt: {
+    debentures: "debenturesWtAvgAmt",
+    commercialPaper: "commercialPaperWtAvgAmt",
+    others: "othersWtAvgAmt",
+    loans: "loansWtAvgAmt",
+  },
+
+  avg_funds: {
+    debentures: "debenturesAvgFunds",
+    commercialPaper: "commercialPaperAvgFunds",
+    others: "othersAvgFunds",
+    loans: "loansAvgFunds",
+  },
+
+  open_eir: {
+    debentures: "debenturesOpenEir",
+    commercialPaper: "commercialPaperOpenEir",
+    others: "othersOpenEir",
+    loans: "loansOpenEir",
+  },
+
+  exit_eir: {
+    debentures: "debenturesExitEir",
+    commercialPaper: "commercialPaperExitEir",
+    others: "othersExitEir",
+    loans: "loansExitEir",
+  },
+
+  wt_int_amt_eir: {
+    debentures: "debenturesWtIntAmtEir",
+    commercialPaper: "commercialPaperWtIntAmtEir",
+    others: "othersWtIntAmtEir",
+    loans: "loansWtIntAmtEir",
+  },
+
+  avg_rate_eir: {
+    debentures: "debenturesAvgRateEir",
+    commercialPaper: "commercialPaperAvgRateEir",
+    others: "othersAvgRateEir",
+    loans: "loansAvgRateEir",
+  },
+
+  avg_rate_eir_papm: {
+    debentures: "debenturesAvgRateEirPapm",
+    commercialPaper: "commercialPaperAvgRateEirPapm",
+    others: "othersAvgRateEirPapm",
+    loans: "loansAvgRateEirPapm",
+  },
+
+  exit_rate: {
+    debentures: "debenturesExitRate",
+    commercialPaper: "commercialPaperExitRate",
+    others: "othersExitRate",
+    loans: "loansExitRate",
+  },
+
+  exit_spread: {
+    debentures: "debenturesExitSpread",
+    commercialPaper: "commercialPaperExitSpread",
+    others: "othersExitSpread",
+    loans: "loansExitSpread",
+  },
+
+  exit_final_rate: {
+    debentures: "debenturesExitFinalRate",
+    commercialPaper: "commercialPaperExitFinalRate",
+    others: "othersExitFinalRate",
+    loans: "loansExitFinalRate",
+  },
+
+  exit_final_rate_papm: {
+    debentures: "debenturesExitFinalRatePapm",
+    commercialPaper: "commercialPaperExitFinalRatePapm",
+    others: "othersExitFinalRatePapm",
+    loans: "loansExitFinalRatePapm",
+  },
+
+  avg_rate_yield: {
+    debentures: "debenturesAvgRateYield",
+    commercialPaper: "commercialPaperAvgRateYield",
+    others: "othersAvgRateYield",
+    loans: "loansAvgRateYield",
+  },
+
+  avg_rate_yield_papm: {
+    debentures: "debenturesAvgRateYieldPapm",
+    commercialPaper: "commercialPaperAvgRateYieldPapm",
+    others: "othersAvgRateYieldPapm",
+    loans: "loansAvgRateYieldPapm",
+  },
+
+  wt_int_amt_coupon_yield: {
+    debentures: "debenturesWtIntAmtCouponYield",
+    commercialPaper: "commercialPaperWtIntAmtCouponYield",
+    others: "othersWtIntAmtCouponYield",
+    loans: "loansWtIntAmtCouponYield",
+  },
+
+  wt_amt_coupon_yield: {
+    debentures: "debenturesWtAmtCouponYield",
+    commercialPaper: "commercialPaperWtAmtCouponYield",
+    others: "othersWtAmtCouponYield",
+    loans: "loansWtAmtCouponYield",
+  },
+};
   const isOnlyLine = selectedField === "avg_eir";
 
   return (
@@ -1833,7 +1937,7 @@ export function PortfolioProductTrendChart({
             x2="0"
             y2="1"
           >
-            <stop offset="0%" stopColor="#9FC5EC" />
+            <stop offset="0%" stopColor="#619AD8" />
             <stop offset="100%" stopColor="rgba(159, 197, 236, 0.18)" />
           </linearGradient>
 
@@ -1845,7 +1949,7 @@ export function PortfolioProductTrendChart({
             x2="0"
             y2="1"
           >
-            <stop offset="0%" stopColor="#D4F1F5" />
+            <stop offset="0%" stopColor="#359FA9" />
             <stop offset="100%" stopColor="rgba(212, 241, 245, 0.18)" />
           </linearGradient>
 
@@ -1857,7 +1961,7 @@ export function PortfolioProductTrendChart({
             x2="0"
             y2="1"
           >
-            <stop offset="0%" stopColor="#FCFDFF" />
+            <stop offset="0%" stopColor="#A16CBF" />
             <stop offset="100%" stopColor="rgba(252, 253, 255, 0.18)" />
           </linearGradient>
 
@@ -1869,7 +1973,7 @@ export function PortfolioProductTrendChart({
             x2="0"
             y2="1"
           >
-            <stop offset="0%" stopColor="#FBE9D4" />
+            <stop offset="0%" stopColor="#EF955C" />
             <stop offset="100%" stopColor="rgba(251, 233, 212, 0.18)" />
           </linearGradient>
         </defs>
