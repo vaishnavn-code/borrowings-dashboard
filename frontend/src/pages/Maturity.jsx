@@ -15,7 +15,7 @@ import KpiCard from "../components/ui/KpiCard";
 import { mapMaturityAnalysis } from "../mappers/maturityMapper";
 import DonutChart from "../components/charts/DonutChart";
 import DonutLegend from "../components/charts/DonutLegend";
-import {formatMonth} from "../utils/formatters";
+import { formatMonth } from "../utils/formatters";
 
 const COLUMNS = [
   { key: "customer", label: "Customer" },
@@ -170,11 +170,17 @@ FORMATTER
   const formatDisplay = (v) => {
     if (v === null || v === undefined || v === "") return "-";
 
-    return fmt.cr(Number(v || 0));
+    const num = Number(v);
+
+    if (isNaN(num)) return "-";
+
+    return `₹${Math.round(num).toLocaleString("en-IN")} Cr`;
   };
   return (
     <div>
-      <div className="section-label">Maturity Analysis — {formatMonth(data.curr_month)} · ₹ Crores</div>
+      <div className="section-label">
+        Maturity Analysis — {formatMonth(data.curr_month)} · ₹ Crores
+      </div>
 
       {/* KPI CARDS */}
 
