@@ -1,40 +1,79 @@
 /** Navigation pages — remove or add entries here to change the sidebar. */
 export const NAV_PAGES = [
-  { id: 'overview', label: 'Overview', section: 'Navigation' },
-  { id: 'portfolioMix', label: 'Portfolio Mix', section: 'Navigation' },
+  {
+    id: "overview",
+    label: "Overview",
+    section: "Navigation",
+  },
+  {
+    id: "portfolioMix",
+    label: "Portfolio Mix",
+    section: "Navigation",
+  },
 
-  { id: 'costAnalysis', label: 'Cost Analysis', section: 'Data Views' },
-  { id: 'rateTrends', label: 'Rate Trends', section: 'Data Views' },
-  { id: 'maturityAnalysis', label: 'Maturity Analysis', section: 'Data Views' },
-  { id: 'counterparties', label: 'Counterparties', section: 'Data Views' },
-  { id: 'transactions', label: 'Transactions', section: 'Data Views' },
-]
+  // divider comes here automatically because section changes
+
+  {
+    id: "costAnalysis",
+    label: "Cost Analysis",
+    section: "Analysis",
+  },
+  {
+    id: "rateTrends",
+    label: "Rate Trends",
+    section: "Analysis",
+  },
+  {
+    id: "maturityAnalysis",
+    label: "Maturity Analysis",
+    section: "Analysis",
+  },
+  {
+    id: "counterparties",
+    label: "Counterparties",
+    section: "Analysis",
+  },
+
+  // another divider before transactions
+
+  {
+    id: "transactions",
+    label: "Transactions",
+    section: "",
+  },
+];
 
 /** Recharts color palette */
 export const COLORS = {
-  blue:    '#1565c0',
-  blueMid: '#1e88e5',
-  blueLt:  '#90caf9',
-  teal:    '#00acc1',
-  tealLt:  '#4dd0e1',
-  green:   '#2e7d32',
-  greenLt: '#43a047',
-  orange:  '#fb8c00',
-  red:     '#e53935',
-  purple:  '#7b1fa2',
-}
+  blue: "#1565c0",
+  blueMid: "#1e88e5",
+  blueLt: "#90caf9",
+  teal: "#00acc1",
+  tealLt: "#4dd0e1",
+  green: "#2e7d32",
+  greenLt: "#43a047",
+  orange: "#fb8c00",
+  red: "#e53935",
+  purple: "#7b1fa2",
+};
 
 export const CHART_PALETTE = [
-  COLORS.blue, COLORS.teal, COLORS.orange, COLORS.purple,
-  COLORS.green, COLORS.blueLt, COLORS.tealLt, '#ff7043',
-]
+  COLORS.blue,
+  COLORS.teal,
+  COLORS.orange,
+  COLORS.purple,
+  COLORS.green,
+  COLORS.blueLt,
+  COLORS.tealLt,
+  "#ff7043",
+];
 
 /** TopN options reused by multiple charts */
-export const TOP_N_OPTIONS = [5, 10, 15, 20]
+export const TOP_N_OPTIONS = [5, 10, 15, 20];
 
 /** Product type labels — must match backend */
 export const PRODUCT_TYPES = [
-  { value: '',                    label: 'All Products' },
-  { value: 'TL - Disbursements',  label: 'TL – Disbursements' },
-  { value: 'DEB - Disbursements', label: 'DEB – Disbursements' },
-]
+  { value: "", label: "All Products" },
+  { value: "TL - Disbursements", label: "TL – Disbursements" },
+  { value: "DEB - Disbursements", label: "DEB – Disbursements" },
+];

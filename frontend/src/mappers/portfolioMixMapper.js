@@ -72,8 +72,7 @@ export function mapPortfolioMix(rawData) {
    ==================================================
   */
 
-  const additionRaw =
-    portfolioCharts?.["Addition vs Redemption"]?.values || {};
+  const additionRaw = portfolioCharts?.["Addition vs Redemption"]?.values || {};
 
   const additionVsRedemption = Object.entries(additionRaw)
     .map(([month, item]) => ({
@@ -97,7 +96,7 @@ export function mapPortfolioMix(rawData) {
   const mappedTable = table.map((item, index) => ({
     id: index + 1,
 
-    productType: item?.ptype || "-",
+    productType: item?.pgroup || "-",
 
     closingBalance: Number(item?.Closing || 0),
 
@@ -158,11 +157,55 @@ export function mapPortfolioMix(rawData) {
     .map(([name, item]) => ({
       name,
       value: Number(item?.Closing || 0),
-      percent: parseFloat(
-        String(item?.Share || "0").replace("%", "")
-      ),
+      percent: parseFloat(String(item?.Share || "0").replace("%", "")),
     }))
     .filter((item) => item.value > 0);
+
+  const portfolioTrendRaw =
+    portfolioCharts?.["Portfolio Month-Year Product Group Split"]?.values || {};
+
+  const portfolioTrendData = Object.entries(portfolioTrendRaw)
+    .map(([month, products]) => {
+      const debentures = products?.Debentures || {};
+      const commercialPaper = products?.["Commerical Paper"] || {};
+      const others = products?.Others || {};
+      const loans = products?.Loans || {};
+
+      return {
+        name: month,
+
+        /* OPENING */
+        debenturesOpening: Number(debentures?.opening || 0),
+        commercialPaperOpening: Number(commercialPaper?.opening || 0),
+        othersOpening: Number(others?.opening || 0),
+        loansOpening: Number(loans?.opening || 0),
+
+        /* CLOSING */
+        debenturesClosing: Number(debentures?.closing || 0),
+        commercialPaperClosing: Number(commercialPaper?.closing || 0),
+        othersClosing: Number(others?.closing || 0),
+        loansClosing: Number(loans?.closing || 0),
+
+        /* REDEMPTION */
+        debenturesRedemption: Number(debentures?.redemption || 0),
+        commercialPaperRedemption: Number(commercialPaper?.redemption || 0),
+        othersRedemption: Number(others?.redemption || 0),
+        loansRedemption: Number(loans?.redemption || 0),
+
+        /* ADDITION */
+        debenturesAddition: Number(debentures?.addition || 0),
+        commercialPaperAddition: Number(commercialPaper?.addition || 0),
+        othersAddition: Number(others?.addition || 0),
+        loansAddition: Number(loans?.addition || 0),
+
+        /* AVG EIR */
+        debenturesEir: Number(debentures?.avg_eir || 0),
+        commercialPaperEir: Number(commercialPaper?.avg_eir || 0),
+        othersEir: Number(others?.avg_eir || 0),
+        loansEir: Number(loans?.avg_eir || 0),
+      };
+    })
+    .slice(-13);
 
   /*
    ==================================================
@@ -177,5 +220,6 @@ export function mapPortfolioMix(rawData) {
     productBreakdownChart,
     closingBalanceChart,
     productShareDonut,
+    portfolioTrendData,
   };
 }

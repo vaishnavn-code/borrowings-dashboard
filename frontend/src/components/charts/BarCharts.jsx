@@ -1714,14 +1714,14 @@ export function RateTypeMaturityStackedBar({
         />
 
         <Tooltip
-  cursor={{ fill: "transparent" }}
-  content={buildUnifiedTooltip({
-    valueFormatter: (value) =>
-      `₹${Math.round(
-        Number(value || 0) / 10000000
-      ).toLocaleString("en-IN")} Cr`,
-  })}
-/>
+          cursor={{ fill: "transparent" }}
+          content={buildUnifiedTooltip({
+            valueFormatter: (value) =>
+              `₹${Math.round(Number(value || 0) / 10000000).toLocaleString(
+                "en-IN",
+              )} Cr`,
+          })}
+        />
 
         {/* FIXED */}
         <Bar
@@ -1743,6 +1743,196 @@ export function RateTypeMaturityStackedBar({
           maxBarSize={48}
         />
       </BarChart>
+    </ResponsiveContainer>
+  );
+}
+
+export function PortfolioProductTrendChart({
+  data = [],
+  selectedField = "opening",
+  height = 420,
+}) {
+  const fieldMap = {
+    opening: {
+      debentures: "debenturesOpening",
+      commercialPaper: "commercialPaperOpening",
+      others: "othersOpening",
+      loans: "loansOpening",
+    },
+
+    closing: {
+      debentures: "debenturesClosing",
+      commercialPaper: "commercialPaperClosing",
+      others: "othersClosing",
+      loans: "loansClosing",
+    },
+
+    redemption: {
+      debentures: "debenturesRedemption",
+      commercialPaper: "commercialPaperRedemption",
+      others: "othersRedemption",
+      loans: "loansRedemption",
+    },
+
+    addition: {
+      debentures: "debenturesAddition",
+      commercialPaper: "commercialPaperAddition",
+      others: "othersAddition",
+      loans: "loansAddition",
+    },
+
+    avg_eir: {
+      debentures: "debenturesEir",
+      commercialPaper: "commercialPaperEir",
+      others: "othersEir",
+      loans: "loansEir",
+    },
+  };
+
+  const isOnlyLine = selectedField === "avg_eir";
+
+  return (
+    <ResponsiveContainer width="100%" height={height}>
+      <ComposedChart
+        data={data}
+        margin={{
+          top: 20,
+          right: 30,
+          left: 20,
+          bottom: 20,
+        }}
+        barCategoryGap="22%"
+      >
+        <CartesianGrid stroke="rgba(0,0,0,0.08)" vertical horizontal />
+
+        <XAxis
+          dataKey="name"
+          axisLine={false}
+          tickLine={false}
+          tick={{
+            fontSize: 11,
+            fill: "#5f7ea3",
+            fontFamily: "Inter",
+          }}
+        />
+
+        <YAxis
+          yAxisId="left"
+          axisLine={false}
+          tickLine={false}
+          tick={{
+            fontSize: 11,
+            fill: "#5f7ea3",
+            fontFamily: "Inter",
+          }}
+          tickFormatter={(v) => {
+            if (isOnlyLine) {
+              return `${Number(v || 0).toFixed(2)}%`;
+            }
+
+            // convert to Cr for readable Y-axis
+            return Math.round(Number(v || 0) / 10000000).toLocaleString(
+              "en-IN",
+            );
+          }}
+          label={{
+            value: isOnlyLine ? "Avg EIR %" : "Amount (₹ Cr)",
+            angle: -90,
+            position: "insideLeft",
+            style: {
+              fontSize: 10,
+              fill: "#5f7ea3",
+            },
+          }}
+        />
+
+        <Tooltip
+          cursor={{ fill: "transparent" }}
+          content={buildUnifiedTooltip({
+            valueFormatter: (value) => {
+              if (isOnlyLine) {
+                return `${Number(value || 0).toFixed(2)}%`;
+              }
+
+              // convert to Cr
+              const valueInCr = Number(value || 0) / 10000000;
+
+              return `₹${Math.round(valueInCr).toLocaleString("en-IN")} Cr`;
+            },
+          })}
+        />
+
+        <Legend
+          verticalAlign="top"
+          align="left"
+          iconType="circle"
+          iconSize={10}
+          wrapperStyle={{
+            fontSize: 12,
+            paddingBottom: 20,
+            fontFamily: "Inter",
+          }}
+        />
+
+        {/* BARS → only when not avg_eir */}
+        {!isOnlyLine && (
+          <>
+            <Bar
+              yAxisId="left"
+              dataKey={fieldMap[selectedField].debentures}
+              name="Debentures"
+              fill="#77A9E0"
+              radius={[4, 4, 0, 0]}
+              barSize={20}
+            />
+
+            <Bar
+              yAxisId="left"
+              dataKey={fieldMap[selectedField].commercialPaper}
+              name="Commercial Paper"
+              fill="#D6F2F6"
+              radius={[4, 4, 0, 0]}
+              barSize={20}
+            />
+
+            <Bar
+              yAxisId="left"
+              dataKey={fieldMap[selectedField].others}
+              name="Others"
+              fill="#E2CCEB"
+              radius={[4, 4, 0, 0]}
+              barSize={20}
+            />
+
+            <Bar
+              yAxisId="left"
+              dataKey={fieldMap[selectedField].loans}
+              name="Loans"
+              fill="#FCEEDC"
+              radius={[4, 4, 0, 0]}
+              barSize={20}
+            />
+          </>
+        )}
+
+        {/* LINE GRAPH */}
+        <Line
+          yAxisId="left"
+          type="monotone"
+          dataKey="debenturesEir"
+          name="Avg EIR %"
+          stroke="#E27D00"
+          strokeWidth={2.5}
+          dot={{
+            r: 4,
+            strokeWidth: 2,
+            fill: "#ffffff",
+          }}
+          activeDot={{
+            r: 5,
+          }}
+        />
+      </ComposedChart>
     </ResponsiveContainer>
   );
 }

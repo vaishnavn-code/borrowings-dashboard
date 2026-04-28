@@ -41,13 +41,13 @@ export default function DonutChart({
         <Tooltip
           cursor={{ fill: "transparent" }}
           content={buildUnifiedTooltip({
-            valueFormatter: (value) =>
-              formatter
-                ? formatter(value)
-                : `₹${Number(value || 0).toLocaleString("en-IN", {
-                    maximumFractionDigits: 0,
-                    minimumFractionDigits: 0,
-                  })} Cr`,
+            valueFormatter: (value) => {
+              if (formatter) {
+                return formatter(Math.round(Number(value || 0)));
+              }
+
+              return `₹${Math.round(Number(value || 0)).toLocaleString("en-IN")} Cr`;
+            },
           })}
         />
         {/* {showLegend && (
