@@ -1341,6 +1341,14 @@ export function EirMonthlyMovementChart({ data = [], height = 320 }) {
           bottom: 10,
         }}
       >
+        {/* Gradient Shade */}
+        <defs>
+          <linearGradient id="eirAreaGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#00acc1" stopOpacity={0.45} />
+            <stop offset="100%" stopColor="#00acc1" stopOpacity={0.08} />
+          </linearGradient>
+        </defs>
+
         <CartesianGrid
           stroke="rgba(0,0,0,0.08)"
           horizontal={true}
@@ -1365,7 +1373,7 @@ export function EirMonthlyMovementChart({ data = [], height = 320 }) {
             fontSize: 10,
             fill: "#6a9cbf",
           }}
-          domain={["auto", "auto"]}
+          domain={["dataMin - 0.15", "dataMax + 0.15"]}
           tickFormatter={(v) => `${Number(v).toFixed(2)}%`}
           label={{
             value: "Avg EIR Rate (%)",
@@ -1378,7 +1386,6 @@ export function EirMonthlyMovementChart({ data = [], height = 320 }) {
           }}
         />
 
-        {/* SAME TOOLTIP AS OVERVIEW */}
         <Tooltip
           cursor={{ fill: "transparent" }}
           content={buildUnifiedTooltip({
@@ -1386,6 +1393,18 @@ export function EirMonthlyMovementChart({ data = [], height = 320 }) {
           })}
         />
 
+        {/* Area Shade */}
+        <Area
+          type="monotone"
+          dataKey="value"
+          fill="url(#eirAreaGrad)"
+          stroke="none"
+          tooltipType="none"
+          fillOpacity={1}
+          isAnimationActive={false}
+        />
+
+        {/* Main Line */}
         <Line
           type="monotone"
           dataKey="value"

@@ -13,11 +13,9 @@ import DonutLegend from "../components/charts/DonutLegend";
 import React from "react";
 import MonthlySummaryTable from "../components/ui/MonthlySummaryTable";
 import { formatMonth } from "../utils/formatters";
-import { formatMonthLabel } from "../utils/formatters";
 
 export default function Overview({ data }) {
   const mappedData = useMemo(() => mapOverviewData(data), [data]);
-  const monthOptions = [...mappedData.borrowingBookMonths].slice(0, 12);
 
   console.log("monthlyTrend", mappedData.monthlyTrend);
   const {
@@ -618,9 +616,9 @@ export default function Overview({ data }) {
                   cursor: "pointer",
                 }}
               >
-                {monthOptions.map((month) => (
+                {mappedData.borrowingBookMonths.map((month) => (
                   <option key={month} value={month}>
-                    {formatMonthLabel(month)}
+                    {month}
                   </option>
                 ))}
               </select>
@@ -672,7 +670,7 @@ export default function Overview({ data }) {
             nameKey="label"
             height={360}
             barSize={36}
-            slantLabels={true}
+            slantLabels={false}
             formatter={(v) =>
               bbToggle === "eir"
                 ? `${Number(v || 0).toFixed(2)}%`
