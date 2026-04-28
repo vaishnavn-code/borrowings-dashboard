@@ -534,7 +534,7 @@ export function VerticalBarWithLineOverview({ data, height = 320, viewMode }) {
           maxBarSize={32}
         />
 
-        <Area
+        {/* <Area
           yAxisId="right"
           type="monotone"
           dataKey="eir"
@@ -543,7 +543,7 @@ export function VerticalBarWithLineOverview({ data, height = 320, viewMode }) {
           tooltipType="none"
           fillOpacity={1}
           isAnimationActive={false}
-        />
+        /> */}
 
         {/* AVG EIR LINE */}
         <Line
