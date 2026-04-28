@@ -3,6 +3,7 @@ import DataTable from "../components/ui/DataTable";
 import KpiCard from "../components/ui/KpiCard";
 import { mapTransactions } from "../mappers/transactionMapper";
 import { fmt } from "../utils/formatters";
+import { formatMonth } from "../utils/formatters";
 
 export default function Transactions({ data }) {
   const mappedTxn = mapTransactions(data);
@@ -47,23 +48,154 @@ export default function Transactions({ data }) {
   };
 
   const TXN_COLUMNS = [
-    { key: "counterParty", label: "Counter Party" },
-    { key: "productType", label: "Product Type" },
-    { key: "rateType", label: "Rate Type" },
-    { key: "portfolio", label: "Portfolio" },
-    { key: "txnType", label: "Txn Type" },
+    {
+      key: "counterParty",
+      label: "Counter Party",
+      render: (v) => <strong>{v || "-"}</strong>,
+    },
+    { key: "productType", label: "Product Group" },
+    {
+      key: "rateType",
+      label: "Rate Type",
+      render: (v) => {
+        const value = String(v || "").toLowerCase();
+
+        const isFixed = value === "fixed";
+        const isFloating = value === "floating";
+
+        return (
+          <span
+            className="pill"
+            style={{
+              background: isFixed
+                ? "#E8F1FF"
+                : isFloating
+                  ? "#FFF4E5"
+                  : "#F3F4F6",
+              color: isFixed ? "#1565C0" : isFloating ? "#F57C00" : "#374151",
+            }}
+          >
+            <span
+              className="dot"
+              style={{
+                background: isFixed
+                  ? "#1565C0"
+                  : isFloating
+                    ? "#F57C00"
+                    : "#6B7280",
+              }}
+            />
+            {v || "-"}
+          </span>
+        );
+      },
+    },
+
+    {
+      key: "portfolio",
+      label: "Portfolio",
+      render: (v) => {
+        const value = String(v || "").toLowerCase();
+
+        const isSecured = value === "secured liability";
+        const isUnsecured = value === "unsecured liability  ";
+
+        return (
+          <span
+            className="pill"
+            style={{
+              background: isSecured
+                ? "#E8F1FF"
+                : isUnsecured
+                  ? "#E0F7FA"
+                  : "#F3F4F6",
+              color: isSecured
+                ? "#1565C0"
+                : isUnsecured
+                  ? "#00ACC1"
+                  : "#374151",
+            }}
+          >
+            <span
+              className="dot"
+              style={{
+                background: isSecured
+                  ? "#1565C0"
+                  : isUnsecured
+                    ? "#00ACC1"
+                    : "#6B7280",
+              }}
+            />
+            {v || "-"}
+          </span>
+        );
+      },
+    },
+    {
+      key: "txnType",
+      label: "Txn Type",
+      render: (v) => {
+        const value = String(v || "").trim();
+
+        return (
+          <span
+            className="pill"
+            style={{
+              background:
+                value === "100"
+                  ? "#E8F1FF"
+                  : value === "200" || value === "210"
+                    ? "#E0F7FA"
+                    : value === "300"
+                      ? "#E8F5E9"
+                      : value === "350"
+                        ? "#FFF3E0"
+                        : "#F3F4F6",
+
+              color:
+                value === "100"
+                  ? "#1565C0"
+                  : value === "200" || value === "210"
+                    ? "#00ACC1"
+                    : value === "300"
+                      ? "#43A047"
+                      : value === "350"
+                        ? "#FB8C00"
+                        : "#374151",
+            }}
+          >
+            <span
+              className="dot"
+              style={{
+                background:
+                  value === "100"
+                    ? "#1565C0"
+                    : value === "200" || value === "210"
+                      ? "#00ACC1"
+                      : value === "300"
+                        ? "#43A047"
+                        : value === "350"
+                          ? "#FB8C00"
+                          : "#6B7280",
+              }}
+            />
+            {v || "-"}
+          </span>
+        );
+      },
+    },
     { key: "startDate", label: "Start Date" },
     { key: "endDate", label: "End Date" },
     { key: "days", label: "Days" },
     {
       key: "openingCr",
       label: "Opening",
-      render: (v) => fmt.cr(v),
+      render: (v) => fmt.n_cr(v),
     },
     {
       key: "additionCr",
       label: "Addition",
-      render: (v) => fmt.cr(v),
+      render: (v) => fmt.n_cr(v),
     },
   ];
 
@@ -148,7 +280,9 @@ export default function Transactions({ data }) {
       <div className="four-col">
         <KpiCard
           label="Total Records"
-          value={txnKpis.totalRecords || 0}
+          value={txnKpis.totalRecords?.title || 0}
+          sub={txnKpis.totalRecords?.subtitle}
+          footer={txnKpis.totalRecords?.footer}
           iconName="document"
           accent="c1"
           sparkPct={100}
@@ -161,7 +295,9 @@ export default function Transactions({ data }) {
 
         <KpiCard
           label="Total Closing Balance"
-          value={fmt.cr(txnKpis.totalClosingBal)}
+          value={fmt.cr(txnKpis.totalClosingBal?.title)}
+          sub={txnKpis.totalClosingBal?.subtitle}
+          footer={txnKpis.totalClosingBal?.footer}
           iconName="dollar"
           accent="c2"
           sparkPct={80}
@@ -174,7 +310,9 @@ export default function Transactions({ data }) {
 
         <KpiCard
           label="Total Accrual"
-          value={fmt.cr(txnKpis.totalAccrual)}
+          value={fmt.cr(txnKpis.totalAccrual?.title)}
+          sub={txnKpis.totalAccrual?.subtitle}
+          footer={txnKpis.totalAccrual?.footer}
           iconName="storage"
           accent="c3"
           sparkPct={60}
@@ -187,7 +325,9 @@ export default function Transactions({ data }) {
 
         <KpiCard
           label="Reporting Period"
-          value={txnKpis.reportingPeriod || "-"}
+          value={txnKpis.reportingPeriod?.title || "-"}
+          sub={txnKpis.reportingPeriod?.subtitle}
+          footer={txnKpis.reportingPeriod?.footer}
           iconName="graph"
           accent="c4"
           sparkPct={40}

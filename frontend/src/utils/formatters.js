@@ -5,32 +5,42 @@
 
 export const fmt = {
   /** ₹ 1,234.56 Bn  (raw value in INR) */
-  bn: (v, decimals = 2) =>
-    `₹${(v / 1e9).toFixed(decimals)} Bn`,
+  bn: (v, decimals = 2) => `₹${(v / 1e9).toFixed(decimals)} Bn`,
 
   /** ₹ 1,234.56 Cr  (raw value in INR) */
-cr: (v) => {
-  const val = Number(v || 0) / 1e7; // INR → Cr
+  cr: (v) => {
+    const val = Number(v || 0) / 1e7; // INR → Cr
 
-  // Very large values → Lakh Cr
-  if (val >= 100000) {
-    return `₹${Math.round(val / 100000).toLocaleString("en-IN")} L Cr`;
-  }
+    // Very large values → Lakh Cr
+    if (val >= 100000) {
+      return `₹${Math.round(val / 100000).toLocaleString("en-IN")} L Cr`;
+    }
 
-  // Normal values → Cr
-  return `₹${Math.round(val).toLocaleString("en-IN")} Cr`;
-},
+    // Normal values → Cr
+    return `₹${Math.round(val).toLocaleString("en-IN")} Cr`;
+  },
+
+  n_cr: (v) => {
+    const val = Number(v || 0) / 1e7; // INR → Cr
+
+    // Very large values → Lakh Cr
+    if (val >= 100000) {
+      return `₹${Math.round(val / 100000).toLocaleString("en-IN")} L Cr`;
+    }
+
+    // Normal values → Cr
+    return `₹${Math.round(val).toLocaleString("en-IN")}`;
+  },
 
   /** ₹ 1,234.56 Mn */
-  mn: (v, decimals = 2) =>
-    `₹${(v / 1e6).toFixed(decimals)} Mn`,
+  mn: (v, decimals = 2) => `₹${(v / 1e6).toFixed(decimals)} Mn`,
 
   /** Auto-pick Bn / Mn / raw */
   auto: (v) => {
-    const abs = Math.abs(v)
-    if (abs >= 1e9) return `₹${(v / 1e9).toFixed(2)} Bn`
-    if (abs >= 1e6) return `₹${(v / 1e6).toFixed(2)} Mn`
-    return `₹${v.toLocaleString('en-IN')}`
+    const abs = Math.abs(v);
+    if (abs >= 1e9) return `₹${(v / 1e9).toFixed(2)} Bn`;
+    if (abs >= 1e6) return `₹${(v / 1e6).toFixed(2)} Mn`;
+    return `₹${v.toLocaleString("en-IN")}`;
   },
 
   /** 8.25 → "8.25%" */
@@ -46,8 +56,30 @@ cr: (v) => {
   mnRaw: (v, decimals = 2) => `₹${parseFloat(v).toFixed(decimals)} Mn`,
 
   /** Integer with commas */
-  int: (v) => Number(v).toLocaleString('en-IN'),
+  int: (v) => Number(v).toLocaleString("en-IN"),
 
   /** Clamp a percentage 0–100 */
   spark: (v) => `${Math.min(100, Math.max(0, v)).toFixed(1)}%`,
-}
+};
+
+export const fullMonthMap = {
+  Jan: "January",
+  Feb: "February",
+  Mar: "March",
+  Apr: "April",
+  May: "May",
+  Jun: "June",
+  Jul: "July",
+  Aug: "August",
+  Sep: "September",
+  Oct: "October",
+  Nov: "November",
+  Dec: "December",
+};
+
+
+export const formatMonth = (val) => {
+  if (!val) return "";
+  const [mon, year] = val.split("-");
+  return `${fullMonthMap[mon] || mon} - ${year}`;
+};

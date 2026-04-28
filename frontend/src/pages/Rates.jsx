@@ -10,6 +10,8 @@ import KpiCard from "../components/ui/KpiCard";
 import DataTable from "../components/ui/DataTable";
 import { fmt } from "../utils/formatters";
 import { mapRateTrends } from "../mappers/rateTrendMapper";
+import {formatMonth} from "../utils/formatters";
+
 
 export default function Rates({ data }) {
   /*
@@ -42,31 +44,31 @@ export default function Rates({ data }) {
   */
 
   const formatDisplay = (v) => {
-    if (v === null || v === undefined || v === "") return "-";
+  if (v === null || v === undefined || v === "") return "-";
 
-    const str = String(v);
-    const num = parseFloat(str.replace(/₹|,|Cr|%|Bn|Mn/gi, ""));
+  const str = String(v);
+  const num = parseFloat(str.replace(/₹|,|Cr|%|Bn|Mn/gi, ""));
 
-    if (isNaN(num)) return v;
+  if (isNaN(num)) return v;
 
-    // keep decimals only for percentage values
-    if (str.includes("%")) {
-      return `${num.toFixed(2)} %`;
-    }
+  // percentage values
+  if (str.includes("%")) {
+    return `${num.toFixed(2)} %`;
+  }
 
-    // CR values → no decimals
-    if (str.toLowerCase().includes("cr")) {
-      return `₹${Math.round(num).toLocaleString("en-IN")} Cr`;
-    }
+  // CR values
+  if (str.toLowerCase().includes("cr")) {
+    return `₹${Math.round(num).toLocaleString("en-IN")} Cr`;
+  }
 
-    // BN values → convert to CR + no decimals
-    if (str.toLowerCase().includes("bn")) {
-      return `₹${Math.round(num * 100).toLocaleString("en-IN")} Cr`;
-    }
+  // BN values → convert to CR
+  if (str.toLowerCase().includes("bn")) {
+    return `₹${Math.round(num * 100).toLocaleString("en-IN")} Cr`;
+  }
 
-    // raw INR → convert to CR + no decimals
-    return `₹${Math.round(num / 10000000).toLocaleString("en-IN")} Cr`;
-  };
+  // already in Cr from API
+  return `₹${Math.round(num).toLocaleString("en-IN")} Cr`;
+};
 
   /*
    ========================================
@@ -78,6 +80,7 @@ export default function Rates({ data }) {
     {
       key: "period",
       label: "Period",
+      render: (v) => <strong>{v}</strong>,
     },
     {
       key: "avgEir",
@@ -94,17 +97,17 @@ export default function Rates({ data }) {
     {
       key: "fixedCr",
       label: "Fixed ₹ Cr",
-      render: (v) => fmt.cr(v),
+      render: (v) => fmt.n_cr(v),
     },
     {
       key: "floatingCr",
       label: "Floating ₹ Cr",
-      render: (v) => fmt.cr(v),
+      render: (v) => fmt.n_cr(v),
     },
     {
       key: "closingCr",
       label: "Closing ₹ Cr",
-      render: (v) => fmt.cr(v),
+      render: (v) => fmt.n_cr(v),
     },
   ];
 
@@ -126,7 +129,7 @@ export default function Rates({ data }) {
 
   return (
     <div>
-      <div className="section-label">Interest Rate & Tenor Analysis</div>
+      <div className="section-label">Rate Analysis — 12 Months Trend</div>
 
       {/* KPI CARDS */}
 

@@ -31,13 +31,19 @@ export function VerticalBar({
   barSize = 32,
   slantLabels = false,
   isCurrency = false,
+  yAxisLabel = "",
 }) {
   const maxValue = Math.max(...data.map((d) => d[dataKey] || 0));
   const step = Math.ceil(maxValue / 4);
   const ticks = Array.from({ length: 5 }, (_, i) => i * step);
   return (
     <ResponsiveContainer width="100%" height={height}>
-      <BarChart data={data} margin={{ top: 25, right: 8, left: 0, bottom: 80 }}>
+      <BarChart
+        data={data}
+        margin={{ top: 25, right: 8, left: 0, bottom: 80 }}
+        barCategoryGap="2%"
+        barGap={1}
+      >
         <CartesianGrid
           stroke="rgba(0,0,0,0.08)"
           horizontal={true}
@@ -101,7 +107,7 @@ export function VerticalBar({
             isCurrency ? Math.round(v / 1e7) : Math.round(v)
           }
           label={{
-            value: isCurrency ? "In ₹ Crs" : "",
+            value: yAxisLabel || (isCurrency ? "In ₹ Cr" : ""),
             angle: -90,
             position: "insideLeft",
             style: {
@@ -179,6 +185,7 @@ export function HorizontalBar({
   height,
   unit = "",
   formatter,
+  barSize = 36,
 }) {
   const h = height || Math.max(220, data.length * 28);
   return (
@@ -186,7 +193,8 @@ export function HorizontalBar({
       <BarChart
         data={data}
         layout="vertical"
-        barCategoryGap="25%"
+        barCategoryGap="8%"
+        barGap={2}
         margin={{ top: 20, right: 8, left: 0, bottom: 20 }}
       >
         <defs>
@@ -237,7 +245,7 @@ export function HorizontalBar({
           dataKey={dataKey}
           fill="url(#hbarBlueGrad)"
           radius={[0, 4, 4, 0]}
-          maxBarSize={18}
+          maxBarSize={barSize}
         >
           {/* <LabelList
             dataKey={dataKey}
@@ -326,7 +334,7 @@ export function GroupedBar({
           tickFormatter={(v) => `${Number(v).toFixed(2)}%`}
           padding={{ top: 1 }}
           label={{
-            value: "In ₹ Crs",
+            // value: "In ₹ Crs",
             angle: -90,
             position: "insideLeft",
             dx: -5,
@@ -527,7 +535,7 @@ export function VerticalBarWithLineOverview({ data, height = 320, viewMode }) {
           maxBarSize={32}
         />
 
-        <Area
+        {/* <Area
           yAxisId="right"
           type="monotone"
           dataKey="eir"
@@ -536,7 +544,7 @@ export function VerticalBarWithLineOverview({ data, height = 320, viewMode }) {
           tooltipType="none"
           fillOpacity={1}
           isAnimationActive={false}
-        />
+        /> */}
 
         {/* AVG EIR LINE */}
         <Line
@@ -1069,14 +1077,36 @@ export function StackedBarOnly({ data, height = 360 }) {
   );
 }
 
-export function AdditionVsRedemptionChart({ data, height = 320 }) {
+export function AdditionVsRedemptionChart({
+  data,
+  height = 320,
+  barSize = 36,
+}) {
   return (
     <ResponsiveContainer width="100%" height={height}>
       <BarChart
         data={data}
         margin={{ top: 20, right: 10, left: 10, bottom: 10 }}
-        barCategoryGap="30%"
+        barSize={barSize}
+        barCategoryGap="20%"
       >
+        <defs>
+          <linearGradient id="additionBlueGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#81B1E3" />
+            <stop offset="100%" stopColor="rgba(129, 177, 227, 0.18)" />
+          </linearGradient>
+
+          <linearGradient
+            id="redemptionPinkGradient"
+            x1="0"
+            y1="0"
+            x2="0"
+            y2="1"
+          >
+            <stop offset="0%" stopColor="#fac2c4" />
+            <stop offset="100%" stopColor="rgba(248, 225, 226, 0.18)" />
+          </linearGradient>
+        </defs>
         <CartesianGrid
           stroke="rgba(0,0,0,0.08)"
           vertical={true}
@@ -1115,14 +1145,14 @@ export function AdditionVsRedemptionChart({ data, height = 320 }) {
         <Bar
           dataKey="addition"
           name="Addition"
-          fill="rgba(111, 164, 221, 0.9)"
+          fill="url(#additionBlueGradient)"
           radius={[4, 4, 0, 0]}
         />
 
         <Bar
           dataKey="redemption"
           name="Redemption"
-          fill="rgba(255, 205, 210, 0.8)"
+          fill="url(#redemptionPinkGradient)"
           radius={[4, 4, 0, 0]}
         />
       </BarChart>
@@ -1303,53 +1333,40 @@ export function RateTrendMixedChart({ data = [], height = 360 }) {
 export function EirMonthlyMovementChart({ data = [], height = 320 }) {
   return (
     <ResponsiveContainer width="100%" height={height}>
-      <LineChart
+      <ComposedChart
         data={data}
-        margin={{
-          top: 20,
-          right: 20,
-          left: 10,
-          bottom: 10,
-        }}
+        margin={{ top: 20, right: 20, left: 10, bottom: 10 }}
       >
-        <CartesianGrid
-          stroke="rgba(0,0,0,0.08)"
-          horizontal={true}
-          vertical={false}
-        />
+        <defs>
+          <linearGradient id="eirAreaGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#00acc1" stopOpacity={0.35} />
+            <stop offset="100%" stopColor="#00acc1" stopOpacity={0.02} />
+          </linearGradient>
+        </defs>
+
+        <CartesianGrid stroke="rgba(0,0,0,0.08)" horizontal vertical={false} />
 
         <XAxis
           dataKey="name"
           axisLine={false}
           tickLine={false}
-          tick={{
-            fontSize: 10,
-            fill: "#6a9cbf",
-            fontFamily: "Inter",
-          }}
+          tick={{ fontSize: 10, fill: "#6a9cbf", fontFamily: "Inter" }}
         />
 
         <YAxis
           axisLine={false}
           tickLine={false}
-          tick={{
-            fontSize: 10,
-            fill: "#6a9cbf",
-          }}
-          domain={["auto", "auto"]}
+          tick={{ fontSize: 10, fill: "#6a9cbf" }}
+          domain={["dataMin - 0.05", "dataMax + 0.05"]}
           tickFormatter={(v) => `${Number(v).toFixed(2)}%`}
           label={{
             value: "Avg EIR Rate (%)",
             angle: -90,
             position: "insideLeft",
-            style: {
-              fontSize: 9,
-              fill: "#6a9cbf",
-            },
+            style: { fontSize: 9, fill: "#6a9cbf" },
           }}
         />
 
-        {/* SAME TOOLTIP AS OVERVIEW */}
         <Tooltip
           cursor={{ fill: "transparent" }}
           content={buildUnifiedTooltip({
@@ -1357,25 +1374,29 @@ export function EirMonthlyMovementChart({ data = [], height = 320 }) {
           })}
         />
 
+        {/* ✅ Area shade — baseValue="dataMin" anchors the fill to the lowest data point */}
+        <Area
+          type="monotone"
+          dataKey="value"
+          fill="url(#eirAreaGrad)"
+          stroke="none"
+          fillOpacity={1}
+          baseValue="dataMin"
+          isAnimationActive={false}
+        />
+
+        {/* Main Line drawn on top */}
         <Line
           type="monotone"
           dataKey="value"
           name="Avg EIR %"
           stroke="#00acc1"
           strokeWidth={2.5}
-          dot={{
-            r: 4,
-            stroke: "#fff",
-            strokeWidth: 2,
-            fill: "#00acc1",
-          }}
-          activeDot={{
-            r: 5,
-            fill: "#005ac1",
-          }}
+          dot={{ r: 4, stroke: "#fff", strokeWidth: 2, fill: "#00acc1" }}
+          activeDot={{ r: 5, fill: "#005ac1" }}
           isAnimationActive={false}
         />
-      </LineChart>
+      </ComposedChart>
     </ResponsiveContainer>
   );
 }
@@ -1546,7 +1567,7 @@ export default function MaturityProductTypeStackedBar({
           top: 20,
           right: 20,
           left: 10,
-          bottom: 80,
+          bottom: 20,
         }}
         barCategoryGap="24%" // SAME as MaturityClosingTrendChart
       >
@@ -1561,11 +1582,9 @@ export default function MaturityProductTypeStackedBar({
           axisLine={false}
           tickLine={false}
           interval={0}
-          angle={-35}
-          textAnchor="end"
-          height={80}
+          height={30}
           tick={{
-            fontSize: 10,
+            fontSize: 11,
             fill: "#6a9cbf",
             fontFamily: "Inter",
           }}
@@ -1751,44 +1770,149 @@ export function PortfolioProductTrendChart({
   data = [],
   selectedField = "opening",
   height = 420,
+  barSize = 28,
 }) {
-  const fieldMap = {
-    opening: {
-      debentures: "debenturesOpening",
-      commercialPaper: "commercialPaperOpening",
-      others: "othersOpening",
-      loans: "loansOpening",
-    },
+const fieldMap = {
+  opening: {
+    debentures: "debenturesOpening",
+    commercialPaper: "commercialPaperOpening",
+    others: "othersOpening",
+    loans: "loansOpening",
+  },
 
-    closing: {
-      debentures: "debenturesClosing",
-      commercialPaper: "commercialPaperClosing",
-      others: "othersClosing",
-      loans: "loansClosing",
-    },
+  closing: {
+    debentures: "debenturesClosing",
+    commercialPaper: "commercialPaperClosing",
+    others: "othersClosing",
+    loans: "loansClosing",
+  },
 
-    redemption: {
-      debentures: "debenturesRedemption",
-      commercialPaper: "commercialPaperRedemption",
-      others: "othersRedemption",
-      loans: "loansRedemption",
-    },
+  redemption: {
+    debentures: "debenturesRedemption",
+    commercialPaper: "commercialPaperRedemption",
+    others: "othersRedemption",
+    loans: "loansRedemption",
+  },
 
-    addition: {
-      debentures: "debenturesAddition",
-      commercialPaper: "commercialPaperAddition",
-      others: "othersAddition",
-      loans: "loansAddition",
-    },
+  addition: {
+    debentures: "debenturesAddition",
+    commercialPaper: "commercialPaperAddition",
+    others: "othersAddition",
+    loans: "loansAddition",
+  },
 
-    avg_eir: {
-      debentures: "debenturesEir",
-      commercialPaper: "commercialPaperEir",
-      others: "othersEir",
-      loans: "loansEir",
-    },
-  };
+  avg_eir: {
+    debentures: "debenturesEir",
+    commercialPaper: "commercialPaperEir",
+    others: "othersEir",
+    loans: "loansEir",
+  },
 
+  wt_avg_amt: {
+    debentures: "debenturesWtAvgAmt",
+    commercialPaper: "commercialPaperWtAvgAmt",
+    others: "othersWtAvgAmt",
+    loans: "loansWtAvgAmt",
+  },
+
+  avg_funds: {
+    debentures: "debenturesAvgFunds",
+    commercialPaper: "commercialPaperAvgFunds",
+    others: "othersAvgFunds",
+    loans: "loansAvgFunds",
+  },
+
+  open_eir: {
+    debentures: "debenturesOpenEir",
+    commercialPaper: "commercialPaperOpenEir",
+    others: "othersOpenEir",
+    loans: "loansOpenEir",
+  },
+
+  exit_eir: {
+    debentures: "debenturesExitEir",
+    commercialPaper: "commercialPaperExitEir",
+    others: "othersExitEir",
+    loans: "loansExitEir",
+  },
+
+  wt_int_amt_eir: {
+    debentures: "debenturesWtIntAmtEir",
+    commercialPaper: "commercialPaperWtIntAmtEir",
+    others: "othersWtIntAmtEir",
+    loans: "loansWtIntAmtEir",
+  },
+
+  avg_rate_eir: {
+    debentures: "debenturesAvgRateEir",
+    commercialPaper: "commercialPaperAvgRateEir",
+    others: "othersAvgRateEir",
+    loans: "loansAvgRateEir",
+  },
+
+  avg_rate_eir_papm: {
+    debentures: "debenturesAvgRateEirPapm",
+    commercialPaper: "commercialPaperAvgRateEirPapm",
+    others: "othersAvgRateEirPapm",
+    loans: "loansAvgRateEirPapm",
+  },
+
+  exit_rate: {
+    debentures: "debenturesExitRate",
+    commercialPaper: "commercialPaperExitRate",
+    others: "othersExitRate",
+    loans: "loansExitRate",
+  },
+
+  exit_spread: {
+    debentures: "debenturesExitSpread",
+    commercialPaper: "commercialPaperExitSpread",
+    others: "othersExitSpread",
+    loans: "loansExitSpread",
+  },
+
+  exit_final_rate: {
+    debentures: "debenturesExitFinalRate",
+    commercialPaper: "commercialPaperExitFinalRate",
+    others: "othersExitFinalRate",
+    loans: "loansExitFinalRate",
+  },
+
+  exit_final_rate_papm: {
+    debentures: "debenturesExitFinalRatePapm",
+    commercialPaper: "commercialPaperExitFinalRatePapm",
+    others: "othersExitFinalRatePapm",
+    loans: "loansExitFinalRatePapm",
+  },
+
+  avg_rate_yield: {
+    debentures: "debenturesAvgRateYield",
+    commercialPaper: "commercialPaperAvgRateYield",
+    others: "othersAvgRateYield",
+    loans: "loansAvgRateYield",
+  },
+
+  avg_rate_yield_papm: {
+    debentures: "debenturesAvgRateYieldPapm",
+    commercialPaper: "commercialPaperAvgRateYieldPapm",
+    others: "othersAvgRateYieldPapm",
+    loans: "loansAvgRateYieldPapm",
+  },
+
+  wt_int_amt_coupon_yield: {
+    debentures: "debenturesWtIntAmtCouponYield",
+    commercialPaper: "commercialPaperWtIntAmtCouponYield",
+    others: "othersWtIntAmtCouponYield",
+    loans: "loansWtIntAmtCouponYield",
+  },
+
+  wt_amt_coupon_yield: {
+    debentures: "debenturesWtAmtCouponYield",
+    commercialPaper: "commercialPaperWtAmtCouponYield",
+    others: "othersWtAmtCouponYield",
+    loans: "loansWtAmtCouponYield",
+  },
+};
   const isOnlyLine = selectedField === "avg_eir";
 
   return (
@@ -1801,8 +1925,58 @@ export function PortfolioProductTrendChart({
           left: 20,
           bottom: 20,
         }}
-        barCategoryGap="22%"
+        barCategoryGap="2%"
+        barGap={2}
       >
+        <defs>
+          {/* Debentures */}
+          <linearGradient
+            id="portfolioBlueGradient"
+            x1="0"
+            y1="0"
+            x2="0"
+            y2="1"
+          >
+            <stop offset="0%" stopColor="#619AD8" />
+            <stop offset="100%" stopColor="rgba(159, 197, 236, 0.18)" />
+          </linearGradient>
+
+          {/* Commercial Paper */}
+          <linearGradient
+            id="portfolioCyanGradient"
+            x1="0"
+            y1="0"
+            x2="0"
+            y2="1"
+          >
+            <stop offset="0%" stopColor="#359FA9" />
+            <stop offset="100%" stopColor="rgba(212, 241, 245, 0.18)" />
+          </linearGradient>
+
+          {/* Others */}
+          <linearGradient
+            id="portfolioWhiteGradient"
+            x1="0"
+            y1="0"
+            x2="0"
+            y2="1"
+          >
+            <stop offset="0%" stopColor="#A16CBF" />
+            <stop offset="100%" stopColor="rgba(252, 253, 255, 0.18)" />
+          </linearGradient>
+
+          {/* Loans */}
+          <linearGradient
+            id="portfolioOrangeGradient"
+            x1="0"
+            y1="0"
+            x2="0"
+            y2="1"
+          >
+            <stop offset="0%" stopColor="#EF955C" />
+            <stop offset="100%" stopColor="rgba(251, 233, 212, 0.18)" />
+          </linearGradient>
+        </defs>
         <CartesianGrid stroke="rgba(0,0,0,0.08)" vertical horizontal />
 
         <XAxis
@@ -1836,12 +2010,38 @@ export function PortfolioProductTrendChart({
             );
           }}
           label={{
-            value: isOnlyLine ? "Avg EIR %" : "Amount (₹ Cr)",
+            value: "Amount (₹ Cr)",
             angle: -90,
             position: "insideLeft",
+            dx: -18,
+            style: {
+              fontSize: 11,
+              fill: "#5f7ea3",
+              fontFamily: "Inter",
+              fontWeight: 500,
+            },
+          }}
+        />
+
+        <YAxis
+          yAxisId="right"
+          orientation="right"
+          axisLine={false}
+          tickLine={false}
+          domain={[0, 10]}
+          tickFormatter={(v) => `${Number(v || 0).toFixed(1)}%`}
+          tick={{
+            fontSize: 11,
+            fill: "#E27D00",
+            fontFamily: "Inter",
+          }}
+          label={{
+            value: "Avg EIR %",
+            angle: 90,
+            position: "insideRight",
             style: {
               fontSize: 10,
-              fill: "#5f7ea3",
+              fill: "#E27D00",
             },
           }}
         />
@@ -1849,12 +2049,13 @@ export function PortfolioProductTrendChart({
         <Tooltip
           cursor={{ fill: "transparent" }}
           content={buildUnifiedTooltip({
-            valueFormatter: (value) => {
-              if (isOnlyLine) {
+            valueFormatter: (value, name) => {
+              // specifically for Avg EIR line
+              if (String(name).includes("EIR")) {
                 return `${Number(value || 0).toFixed(2)}%`;
               }
 
-              // convert to Cr
+              // amount values → convert to Cr
               const valueInCr = Number(value || 0) / 10000000;
 
               return `₹${Math.round(valueInCr).toLocaleString("en-IN")} Cr`;
@@ -1868,10 +2069,22 @@ export function PortfolioProductTrendChart({
           iconType="circle"
           iconSize={10}
           wrapperStyle={{
-            fontSize: 12,
             paddingBottom: 20,
+            marginTop: -20,
             fontFamily: "Inter",
+            fontSize: 13,
           }}
+          formatter={(value) => (
+            <span
+              style={{
+                color: "#1F2937", // dark readable text
+                fontWeight: 600,
+                fontSize: 13,
+              }}
+            >
+              {value}
+            </span>
+          )}
         />
 
         {/* BARS → only when not avg_eir */}
@@ -1881,43 +2094,43 @@ export function PortfolioProductTrendChart({
               yAxisId="left"
               dataKey={fieldMap[selectedField].debentures}
               name="Debentures"
-              fill="#77A9E0"
+              fill="url(#portfolioBlueGradient)"
               radius={[4, 4, 0, 0]}
-              barSize={20}
+              barSize={barSize}
             />
 
             <Bar
               yAxisId="left"
               dataKey={fieldMap[selectedField].commercialPaper}
               name="Commercial Paper"
-              fill="#D6F2F6"
+              fill="url(#portfolioCyanGradient)"
               radius={[4, 4, 0, 0]}
-              barSize={20}
+              barSize={barSize}
             />
 
             <Bar
               yAxisId="left"
               dataKey={fieldMap[selectedField].others}
               name="Others"
-              fill="#E2CCEB"
+              fill="url(#portfolioWhiteGradient)"
               radius={[4, 4, 0, 0]}
-              barSize={20}
+              barSize={barSize}
             />
 
             <Bar
               yAxisId="left"
               dataKey={fieldMap[selectedField].loans}
               name="Loans"
-              fill="#FCEEDC"
+              fill="url(#portfolioOrangeGradient)"
               radius={[4, 4, 0, 0]}
-              barSize={20}
+              barSize={barSize}
             />
           </>
         )}
 
         {/* LINE GRAPH */}
         <Line
-          yAxisId="left"
+          yAxisId="right"
           type="monotone"
           dataKey="debenturesEir"
           name="Avg EIR %"
@@ -1931,6 +2144,86 @@ export function PortfolioProductTrendChart({
           activeDot={{
             r: 5,
           }}
+        />
+      </ComposedChart>
+    </ResponsiveContainer>
+  );
+}
+
+export function AnnualMaturityLineChart({ data = [], height = 420 }) {
+  // Combine fixed + floating into total for the line
+  const lineData = data.map((d) => ({
+    name: d.name,
+    total: (Number(d.fixed) || 0) + (Number(d.floating) || 0),
+  }));
+
+  return (
+    <ResponsiveContainer width="100%" height={height}>
+      <ComposedChart
+        data={lineData}
+        margin={{ top: 20, right: 20, left: 10, bottom: 10 }}
+      >
+        <defs>
+          <linearGradient id="maturityLineGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#1565C0" stopOpacity={0.18} />
+            <stop offset="100%" stopColor="#1565C0" stopOpacity={0.02} />
+          </linearGradient>
+        </defs>
+
+        <CartesianGrid stroke="rgba(0,0,0,0.08)" horizontal vertical={false} />
+
+        <XAxis
+          dataKey="name"
+          axisLine={false}
+          tickLine={false}
+          tick={{ fontSize: 10, fill: "#6a9cbf", fontFamily: "Inter" }}
+        />
+
+        <YAxis
+          axisLine={false}
+          tickLine={false}
+          tick={{ fontSize: 10, fill: "#6a9cbf" }}
+          tickFormatter={(v) =>
+            Math.round(v / 10000000).toLocaleString("en-IN")
+          }
+          label={{
+            value: "₹ Crores",
+            angle: -90,
+            position: "insideLeft",
+            style: { fontSize: 9, fill: "#6a9cbf" },
+          }}
+          domain={[0, "dataMax + 5000000"]}
+        />
+
+        <Tooltip
+          cursor={{ fill: "transparent" }}
+          content={buildUnifiedTooltip({
+            valueFormatter: (value) =>
+              `₹${Math.round(Number(value || 0) / 10000000).toLocaleString("en-IN")} Cr`,
+          })}
+        />
+
+        {/* Shade below line */}
+        <Area
+          type="monotone"
+          dataKey="total"
+          fill="url(#maturityLineGrad)"
+          stroke="none"
+          fillOpacity={1}
+          baseValue={0}
+          isAnimationActive={false}
+        />
+
+        {/* Line on top */}
+        <Line
+          type="monotone"
+          dataKey="total"
+          name="Maturing Amount"
+          stroke="#1565C0"
+          strokeWidth={2.5}
+          dot={{ r: 4, stroke: "#fff", strokeWidth: 2, fill: "#1565C0" }}
+          activeDot={{ r: 5, fill: "#005ac1" }}
+          isAnimationActive={false}
         />
       </ComposedChart>
     </ResponsiveContainer>

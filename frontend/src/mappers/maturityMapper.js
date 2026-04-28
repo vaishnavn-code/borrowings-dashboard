@@ -118,30 +118,45 @@ export function mapMaturityAnalysis(rawData) {
     bucketTotals.gt5 += Number(buckets?.[">5Y"]?.closing_amt || 0);
   });
 
+  const totalMaturityValue =
+    Number(bucketTotals.matured || 0) +
+    Number(bucketTotals.lt1 || 0) +
+    Number(bucketTotals.y1to3 || 0) +
+    Number(bucketTotals.y3to5 || 0) +
+    Number(bucketTotals.gt5 || 0);
+
+  const getPercent = (value) =>
+    totalMaturityValue ? (Number(value || 0) / totalMaturityValue) * 100 : 0;
+
   const maturityBucketDistributionData = [
     {
       name: "Matured",
       value: bucketTotals.matured,
+      percent: getPercent(bucketTotals.matured),
       color: "#90CAF9",
     },
     {
       name: "< 1 Year",
       value: bucketTotals.lt1,
+      percent: getPercent(bucketTotals.lt1),
       color: "#1565C0",
     },
     {
       name: "1 - 3 Years",
       value: bucketTotals.y1to3,
+      percent: getPercent(bucketTotals.y1to3),
       color: "#1E88E5",
     },
     {
       name: "3 - 5 Years",
       value: bucketTotals.y3to5,
+      percent: getPercent(bucketTotals.y3to5),
       color: "#42A5F5",
     },
     {
       name: "> 5 Years",
       value: bucketTotals.gt5,
+      percent: getPercent(bucketTotals.gt5),
       color: "#0288D1",
     },
   ];
@@ -162,15 +177,18 @@ export function mapMaturityAnalysis(rawData) {
     floating: Number(rateTypeRaw?.[bucket]?.Floating || 0),
   }));
 
-  const annualMaturityRaw = charts?.["Annual Maturity Profile"]?.values || {};
+  const annualMaturityRaw =
+  charts?.["Annual Maturity Profile"]?.values || {};
 
-  const annualMaturityProfileData = Object.entries(annualMaturityRaw).map(
-    ([year, value]) => ({
-      name: year,
-      fixed: Number(value || 0), // using existing chart key
-      floating: 0, // keep 0 since we reuse same stacked bar component
-    }),
-  );
+const annualMaturityProfileData = Object.entries(annualMaturityRaw).map(
+  ([year, value]) => ({
+    name: year,
+
+    // using same reusable chart structure
+    fixed: Number(value || 0),
+    floating: 0,
+  })
+);
 
   return {
     kpis: mappedKpis,

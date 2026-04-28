@@ -19,11 +19,29 @@ export function mapTransactions(rawData) {
       selectedPeriod,
 
       kpis: {
-        totalRecords: kpi?.Total_Records?.Title || 0,
-        totalClosingBal: kpi?.Total_Closing_Bal?.Title || 0,
-        totalAccrual: kpi?.Total_Accrual?.Title || 0,
-        reportingPeriod:
-          kpi?.Reporting_Period?.Title || selectedPeriod,
+        totalRecords: {
+          title: kpi?.Total_Records?.Title || 0,
+          subtitle: kpi?.Total_Records?.Subtitle || "",
+          footer: kpi?.Total_Records?.Footer || "",
+        },
+
+        totalClosingBal: {
+          title: kpi?.Total_Closing_Bal?.Title || 0,
+          subtitle: kpi?.Total_Closing_Bal?.Subtitle || "",
+          footer: kpi?.Total_Closing_Bal?.Footer || "",
+        },
+
+        totalAccrual: {
+          title: kpi?.Total_Accrual?.Title || 0,
+          subtitle: kpi?.Total_Accrual?.Subtitle || "",
+          footer: kpi?.Total_Accrual?.Footer || "",
+        },
+
+        reportingPeriod: {
+          title: kpi?.Reporting_Period?.Title || selectedPeriod,
+          subtitle: kpi?.Reporting_Period?.Subtitle || "",
+          footer: kpi?.Reporting_Period?.Footer || "",
+        },
       },
 
       tableData: table.map((item, index) => ({

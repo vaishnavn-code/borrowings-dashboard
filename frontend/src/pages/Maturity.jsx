@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react";
 import MaturityProductTypeStackedBar, {
+  AnnualMaturityLineChart,
   HorizontalBar,
   MaturityClosingTrendChart,
   RateTypeMaturityStackedBar,
@@ -15,6 +16,7 @@ import KpiCard from "../components/ui/KpiCard";
 import { mapMaturityAnalysis } from "../mappers/maturityMapper";
 import DonutChart from "../components/charts/DonutChart";
 import DonutLegend from "../components/charts/DonutLegend";
+import { formatMonth } from "../utils/formatters";
 
 const COLUMNS = [
   { key: "customer", label: "Customer" },
@@ -101,6 +103,8 @@ export default function Maturity({ data }) {
 
   const uniqueGroups = new Set(borrowersTable.map((b) => b.group)).size;
 
+  const [maturityChartType, setMaturityChartType] = useState("bar"); // add this
+
   const topCustomer = borrowersTable.reduce(
     (max, b) => (b.outstanding > max ? b.outstanding : max),
     0,
@@ -169,11 +173,17 @@ FORMATTER
   const formatDisplay = (v) => {
     if (v === null || v === undefined || v === "") return "-";
 
-    return fmt.cr(Number(v || 0));
+    const num = Number(v);
+
+    if (isNaN(num)) return "-";
+
+    return `₹${Math.round(num).toLocaleString("en-IN")} Cr`;
   };
   return (
     <div>
-      <div className="section-label">Borrower / Customer View</div>
+      <div className="section-label">
+        Maturity Analysis — {formatMonth(data.curr_month)} · ₹ Crores
+      </div>
 
       {/* KPI CARDS */}
 
@@ -399,7 +409,8 @@ FORMATTER
             dataKey="value"
             nameKey="name"
             height={420}
-            barSize={18}
+            barSize={36}
+            formatter={(v) => fmt.cr(v)}
           />
         </div>
       </div>
@@ -409,11 +420,11 @@ FORMATTER
           {" "}
           <div className="chart-title">
             {" "}
-            Product Type vs Maturity Bucket{" "}
+            Product Group vs Maturity Bucket{" "}
           </div>{" "}
           <div className="chart-subtitle">
             {" "}
-            STACKED BAR BY PRODUCT TYPE · NO LINE{" "}
+            STACKED BAR BY PRODUCT Group · NO LINE{" "}
           </div>{" "}
           {/* CUSTOM LEGEND */}{" "}
           <div
@@ -458,7 +469,7 @@ FORMATTER
           <MaturityProductTypeStackedBar
             data={productTypeMaturityBucketData}
             nameKey="name"
-            height={520}
+            height={420}
             stacked={true}
             series={[
               { key: "matured", label: "Matured", color: "#90CAF9" },
@@ -528,7 +539,7 @@ FORMATTER
           </div>
 
           <RateTypeMaturityStackedBar
-            data={rateTypeByMaturityBucketData}
+            data={annualMaturityProfileData}
             height={420}
             formatter={(v) =>
               `₹${(Number(v || 0) / 10000000).toLocaleString("en-IN")} Cr`
@@ -537,22 +548,120 @@ FORMATTER
         </div>
       </div>
 
-      <div className="chart-card" style={{ marginTop: "20px" }}>
-        <div className="chart-title">Annual Maturity Profile</div>
+      {/* Annual Maturity Profile */}
+      <div className="chart-card" style={{ marginBottom: "20px" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
+          }}
+        >
+          <div>
+            <div className="chart-title">Annual Maturity Profile</div>
+            <div className="chart-subtitle">
+              MATURING AMOUNT BY CALENDAR YEAR | ₹ CRORES | 2026–2036
+            </div>
+          </div>
 
-        <div className="chart-subtitle">
-          MATURING AMOUNT BY CALENDAR YEAR | ₹ CRORES | 2026–2036
+          {/* BAR / LINE TOGGLE */}
+          <div
+            style={{
+              display: "flex",
+              borderRadius: "8px",
+              overflow: "hidden",
+              border: "1px solid #cde0f5",
+              fontSize: "13px",
+              fontWeight: 600,
+            }}
+          >
+            <button
+              onClick={() => setMaturityChartType("bar")}
+              style={{
+                padding: "6px 18px",
+                background: maturityChartType === "bar" ? "#1565C0" : "#fff",
+                color: maturityChartType === "bar" ? "#fff" : "#1565C0",
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
+              BAR
+            </button>
+
+            <button
+              onClick={() => setMaturityChartType("line")}
+              style={{
+                padding: "6px 18px",
+                background: maturityChartType === "line" ? "#1565C0" : "#fff",
+                color: maturityChartType === "line" ? "#fff" : "#1565C0",
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
+              LINE
+            </button>
+          </div>
         </div>
 
-        <RateTypeMaturityStackedBar
-          data={annualMaturityProfileData}
-          height={420}
-          formatter={(v) =>
-            `₹${Math.round(Number(v || 0) / 10000000).toLocaleString(
-              "en-IN",
-            )} Cr`
-          }
-        />
+        {/* BAR LEGEND */}
+        {maturityChartType === "bar" && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "22px",
+              flexWrap: "wrap",
+              marginTop: "14px",
+              marginBottom: "10px",
+              fontSize: "13px",
+              fontWeight: 500,
+              color: "#3b5f86",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <span
+                style={{
+                  width: "12px",
+                  height: "12px",
+                  borderRadius: "3px",
+                  background: "#1565C0",
+                  display: "inline-block",
+                }}
+              />
+              Fixed
+            </div>
+
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <span
+                style={{
+                  width: "12px",
+                  height: "12px",
+                  borderRadius: "3px",
+                  background: "#90CAF9",
+                  display: "inline-block",
+                }}
+              />
+              Floating
+            </div>
+          </div>
+        )}
+
+        {maturityChartType === "bar" ? (
+          <RateTypeMaturityStackedBar
+            data={annualMaturityProfileData}
+            height={420}
+            formatter={(v) =>
+              `₹${Math.round(Number(v || 0) / 10000000).toLocaleString(
+                "en-IN",
+              )} Cr`
+            }
+          />
+        ) : (
+          <AnnualMaturityLineChart
+            data={annualMaturityProfileData}
+            height={420}
+          />
+        )}
       </div>
     </div>
   );

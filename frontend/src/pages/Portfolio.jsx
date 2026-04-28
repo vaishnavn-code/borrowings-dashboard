@@ -11,27 +11,28 @@ import {
 } from "../components/charts/BarCharts";
 import DonutChart from "../components/charts/DonutChart";
 import DonutLegend from "../components/charts/DonutLegend";
+import {formatMonth} from "../utils/formatters";
 
 export default function Portfolio({ data }) {
   const COLUMNS = [
     {
       key: "productType",
-      label: "Product Type",
+      label: "Product Group",
     },
     {
       key: "closingBalance",
       label: "Closing Balance (₹ Cr)",
-      render: (v) => fmt.cr(v),
+      render: (v) => fmt.n_cr(v),
     },
     {
       key: "accrual",
       label: "Accrual (₹ Cr)",
-      render: (v) => fmt.cr(v),
+      render: (v) => fmt.n_cr(v),
     },
     {
       key: "eirInterest",
       label: "EIR Interest (₹ Cr)",
-      render: (v) => fmt.cr(v),
+      render: (v) => fmt.n_cr(v),
     },
     {
       key: "transactions",
@@ -69,7 +70,7 @@ export default function Portfolio({ data }) {
 
   return (
     <div>
-      <div className="section-label">Portfolio Mix — Product Breakdown</div>
+      <div className="section-label">Portfolio Mix — {formatMonth(data.curr_month)} Product Breakdown</div>
 
       {/* KPI CARDS */}
 
@@ -141,7 +142,7 @@ export default function Portfolio({ data }) {
 
       <div className="two-col">
         <div className="chart-card">
-          <div className="chart-title">Closing Balance by Product Type</div>
+          <div className="chart-title">Closing Balance by Product Group</div>
 
           <div className="chart-subtitle">₹ CRORES — APR 2026</div>
 
@@ -150,11 +151,13 @@ export default function Portfolio({ data }) {
             dataKey="value"
             nameKey="name"
             height={360}
-            barSize={18}
+            formatter={(v) =>
+              `₹${(Number(v || 0) / 1e7).toLocaleString("en-IN")} Cr`
+            }
           />
         </div>
         <div className="chart-card">
-          <div className="chart-title">Accrual by Product Type</div>
+          <div className="chart-title">Accrual by Product Grouo</div>
 
           <div className="chart-subtitle">₹ CRORES — APR 2026</div>
 
@@ -163,7 +166,6 @@ export default function Portfolio({ data }) {
             dataKey="value"
             nameKey="name"
             height={360}
-            barSize={18}
             formatter={(v) =>
               `₹${(Number(v || 0) / 1e7).toLocaleString("en-IN")} Cr`
             }
@@ -224,7 +226,25 @@ export default function Portfolio({ data }) {
               <option value="closing">Closing Amount</option>
               <option value="redemption">Redemption Amount</option>
               <option value="addition">Addition Amount</option>
-              <option value="avg_eir">Avg EIR %</option>
+              <option value="wt_avg_amt">WT AVG AMT</option>
+              <option value="avg_funds">AVG FUNDS</option>
+              <option value="open_eir">OPEN EIR</option>
+              <option value="exit_eir">EXIT EIR</option>
+              <option value="wt_int_amt_eir">WT INT AMT EIR</option>
+              <option value="avg_rate_eir">AVG RATE EIR</option>
+              <option value="avg_rate_eir_papm">AVG RATE EIR PAPM</option>
+              <option value="exit_rate">EXIT RATE</option>
+              <option value="exit_spread">EXIT SPREAD</option>
+              <option value="exit_final_rate">EXIT FINAL RATE</option>
+              <option value="exit_final_rate_papm">EXIT FINAL RATE PAPM</option>
+              <option value="avg_rate_yield">AVG RATE YIELD</option>
+              <option value="avg_rate_yield_papm">AVG RATE YIELD PAPM</option>
+              <option value="wt_int_amt_coupon_yield">
+                WT INT AMT COUPON YIELD
+              </option>
+              <option value="wt_amt_coupon_yield">
+                WT AMT COUPON YIELD
+              </option>
             </select>
           </div>
         </div>
@@ -233,6 +253,7 @@ export default function Portfolio({ data }) {
           data={portfolioTrendData}
           height={420}
           selectedField={amountField}
+          barSize={40}
         />
       </div>
 
@@ -244,7 +265,7 @@ export default function Portfolio({ data }) {
 
           <div className="chart-subtitle">MONTHLY FLOW ₹ CR</div>
 
-          <AdditionVsRedemptionChart data={additionData} height={560} />
+          <AdditionVsRedemptionChart data={additionData} height={360} barSize={36} />
         </div>
 
         <div className="chart-card" style={{ marginTop: "20px" }}>
