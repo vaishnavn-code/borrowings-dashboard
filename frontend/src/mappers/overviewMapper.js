@@ -80,21 +80,26 @@ export const mapOverviewData = (apiData) => {
   const borrowingBookRaw =
     charts?.["Borrowing Book by Product Type"]?.Month || {};
 
-  const latestMonth =
-    Object.keys(borrowingBookRaw).sort((a, b) => Number(b) - Number(a))[0] ||
-    null;
+  const borrowingBookMonths = Object.keys(borrowingBookRaw).sort(
+    (a, b) => Number(a) - Number(b),
+  );
 
-  const borrowingBookByProduct = latestMonth
-    ? Object.entries(borrowingBookRaw[latestMonth] || {}).map(
-        ([label, value]) => ({
-          label,
-          count: toCr(value?.book || 0),
-          accrual: toCr(value?.accural || 0),
-          eir: +Number(value?.eir || 0).toFixed(2),
-          rawCount: value?.count || 0,
-        }),
-      )
-    : [];
+  const latestMonth =
+    borrowingBookMonths[borrowingBookMonths.length - 1] || null;
+
+  const borrowingBookByMonth = {};
+
+  borrowingBookMonths.forEach((month) => {
+    borrowingBookByMonth[month] = Object.entries(
+      borrowingBookRaw[month] || {},
+    ).map(([label, value]) => ({
+      label,
+      count: toCr(value?.book || 0),
+      accrual: toCr(value?.accural || 0),
+      eir: +Number(value?.eir || 0).toFixed(2),
+      rawCount: value?.count || 0,
+    }));
+  });
 
   /*
   =====================================================
@@ -144,19 +149,37 @@ export const mapOverviewData = (apiData) => {
   const portfolioSplitRaw =
     charts?.["Portfolio & Rate Type Split"]?.Portfolio || {};
 
+  const totalPortfolioValue = Object.values(portfolioSplitRaw).reduce(
+    (sum, value) => sum + Number(value || 0),
+    0,
+  );
+
   const portfolioSplitData = Object.entries(portfolioSplitRaw).map(
     ([label, value]) => ({
       label,
       count: toCr(value),
+      percent:
+        totalPortfolioValue > 0
+          ? +((Number(value || 0) / totalPortfolioValue) * 100).toFixed(1)
+          : 0,
     }),
   );
 
   const rateTypeRaw =
     charts?.["Portfolio & Rate Type Split"]?.["Rate Type"] || {};
 
+  const totalRateTypeValue = Object.values(rateTypeRaw).reduce(
+    (sum, value) => sum + Number(value || 0),
+    0,
+  );
+
   const rateTypeData = Object.entries(rateTypeRaw).map(([label, value]) => ({
     label,
     count: toCr(value),
+    percent:
+      totalRateTypeValue > 0
+        ? +((Number(value || 0) / totalRateTypeValue) * 100).toFixed(1)
+        : 0,
   }));
 
   /*
@@ -187,8 +210,11 @@ export const mapOverviewData = (apiData) => {
   return {
     kpis: mappedKpis,
     monthlyTrend,
-    borrowingBookByProduct,
+
+    borrowingBookByMonth,
+    borrowingBookMonths,
     latestBorrowingBookMonth: latestMonth,
+
     productMix,
     summaryMetrics,
     rateMixSnapshot,

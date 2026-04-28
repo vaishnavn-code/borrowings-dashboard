@@ -244,7 +244,9 @@ export default function CostAnalysis({ data }) {
             data={productDonut}
             colors={["#1565c0", "#00acc1"]}
             height={320}
-            formatter={(v) => `₹${(v || 0).toFixed(2)} Cr`}
+            formatter={(v) =>
+              `₹${Math.round(Number(v || 0)).toLocaleString("en-IN")} Cr`
+            }
           />
 
           <DonutLegend
@@ -252,7 +254,9 @@ export default function CostAnalysis({ data }) {
             colors={["#1565c0", "#00acc1"]}
             showPercent={true}
             showValue={true}
-            valueFormatter={(v) => `₹${Math.round(v || 0)} Cr`}
+            valueFormatter={(v) =>
+              `₹${Math.round(Number(v || 0)).toLocaleString("en-IN")} Cr`
+            }
           />
         </div>
       </div>

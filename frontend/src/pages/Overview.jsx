@@ -143,7 +143,12 @@ export default function Overview({ data }) {
 
   const fixedFloatingData = mappedData.rateTypeData;
 
-  const topGroupsOutstanding = mappedData.borrowingBookByProduct;
+  const [selectedBBMonth, setSelectedBBMonth] = useState(
+    mappedData.latestBorrowingBookMonth,
+  );
+
+  const topGroupsOutstanding =
+    mappedData.borrowingBookByMonth?.[selectedBBMonth] || [];
 
   const topGroupsDual = useMemo(() => {
     const groupChart =
@@ -555,6 +560,8 @@ export default function Overview({ data }) {
 
               <select
                 id="bbMonthSel"
+                value={selectedBBMonth}
+                onChange={(e) => setSelectedBBMonth(e.target.value)}
                 style={{
                   fontFamily: "var(--font)",
                   fontSize: "11px",
@@ -568,10 +575,11 @@ export default function Overview({ data }) {
                   cursor: "pointer",
                 }}
               >
-                {/* Example Options */}
-                <option>Jan 2025</option>
-                <option>Feb 2025</option>
-                <option>Mar 2025</option>
+                {mappedData.borrowingBookMonths.map((month) => (
+                  <option key={month} value={month}>
+                    {month}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -611,12 +619,22 @@ export default function Overview({ data }) {
 
           <VerticalBar
             data={topGroupsOutstanding}
-            dataKey="count"
+            dataKey={
+              bbToggle === "book"
+                ? "count"
+                : bbToggle === "accrual"
+                  ? "accrual"
+                  : "eir"
+            }
             nameKey="label"
             height={520}
             barSize={20}
             slantLabels={true}
-            formatter={(v) => `₹${v.toLocaleString("en-IN")} Cr`}
+            formatter={(v) =>
+              bbToggle === "eir"
+                ? `${Number(v || 0).toFixed(2)}%`
+                : `₹${Math.round(Number(v || 0)).toLocaleString("en-IN")} Cr`
+            }
           />
         </div>
         <div className="chart-card equal-height-card">
@@ -626,14 +644,12 @@ export default function Overview({ data }) {
             data={productDonut}
             colors={["#1565c0", "#00acc1"]}
             height={320}
-            formatter={(v) => `₹${(v || 0).toFixed(2)} Cr`}
           />
           <DonutLegend
             data={productDonut}
             colors={["#1565c0", "#00acc1"]}
             showPercent={true}
             showValue={true}
-            valueFormatter={(v) => `₹${Math.round(v || 0)} Cr`}
           />
         </div>
       </div>
@@ -650,6 +666,7 @@ export default function Overview({ data }) {
             data={portfolioSplitData.map((item) => ({
               name: item.label,
               value: Number(item.count || 0),
+              percent: item.percent,
             }))}
             colors={["#1565c0", "#00acc1", "#90caf9", "#42a5f5"]}
             height={320}
@@ -659,6 +676,7 @@ export default function Overview({ data }) {
             data={portfolioSplitData.map((item) => ({
               name: item.label,
               value: Number(item.count || 0),
+              percent: item.percent,
             }))}
             colors={["#1565c0", "#00acc1", "#90caf9", "#42a5f5"]}
             showPercent={true}
@@ -676,6 +694,7 @@ export default function Overview({ data }) {
             data={rateTypeData.map((item) => ({
               name: item.label,
               value: Number(item.count || 0),
+              percent: item.percent,
             }))}
             colors={["#1565c0", "#00acc1"]}
             height={320}
@@ -686,13 +705,11 @@ export default function Overview({ data }) {
             data={rateTypeData.map((item) => ({
               name: item.label,
               value: Number(item.count || 0),
+              percent: item.percent,
             }))}
             colors={["#1565c0", "#00acc1"]}
             showPercent={true}
             showValue={true}
-            valueFormatter={(v) =>
-              `₹${Number(v || 0).toLocaleString("en-IN")} Cr`
-            }
           />
         </div>
       </div>

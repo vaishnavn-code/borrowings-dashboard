@@ -43,9 +43,8 @@ export function mapCostAnalysis(rawData) {
   */
 
   const trendRaw =
-    charts?.[
-      "Accrual Cost & EIR Interest vs Closing Balance Trend"
-    ]?.values?.Months || {};
+    charts?.["Accrual Cost & EIR Interest vs Closing Balance Trend"]?.values
+      ?.Months || {};
 
   const trendChart = Object.entries(trendRaw).map(([month, item]) => ({
     name: month,
@@ -78,14 +77,30 @@ export function mapCostAnalysis(rawData) {
    =========================
   */
 
-  const productSplitRaw =
-    charts?.["Product Type Split"]?.values || {};
+  const productSplitRaw = charts?.["Product Type Split"]?.values || {};
+
+  const totalAccrual = Object.values(productSplitRaw).reduce(
+    (sum, item) => sum + Number(item?.Accrual || 0),
+    0,
+  );
 
   const productDonut = Object.entries(productSplitRaw)
-    .map(([name, item]) => ({
-      name,
-      value: Number(item?.Accrual || 0),
-    }))
+    .map(([name, item]) => {
+      const rawValue = Number(item?.Accrual || 0);
+
+      return {
+        name,
+
+        // convert to Cr for readable legend + tooltip
+        value: Math.round(rawValue / 10000000),
+
+        // proper percentage calculation
+        percent:
+          totalAccrual > 0
+            ? Number(((rawValue / totalAccrual) * 100).toFixed(1))
+            : 0,
+      };
+    })
     .filter((x) => x.value > 0);
 
   /*
@@ -107,14 +122,11 @@ export function mapCostAnalysis(rawData) {
 
   const accrualAmountChart = mapHorizontalMetric("Accrual");
 
-  const wtAvgAmountChart =
-    mapHorizontalMetric("Wt_Avg_Amount");
+  const wtAvgAmountChart = mapHorizontalMetric("Wt_Avg_Amount");
 
-  const avgFundsChart =
-    mapHorizontalMetric("Avg_Funds");
+  const avgFundsChart = mapHorizontalMetric("Avg_Funds");
 
-  const intAmtEirChart =
-    mapHorizontalMetric("Int_Amt_Eir");
+  const intAmtEirChart = mapHorizontalMetric("Int_Amt_Eir");
 
   return {
     kpis: mappedKpis,
