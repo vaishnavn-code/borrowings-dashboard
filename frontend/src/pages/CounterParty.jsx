@@ -26,7 +26,7 @@ const COLUMNS = [
   {
     key: "closingAmt",
     label: "Closing Amount (₹ Cr)",
-    render: (v) => fmt.cr(v),
+    render: (v) => fmt.n_cr(v),
   },
 
   {
@@ -37,7 +37,7 @@ const COLUMNS = [
   {
     key: "accrualAmt",
     label: "Accrual Amount (₹ Cr)",
-    render: (v) => fmt.cr(v),
+    render: (v) => fmt.n_cr(v)
   },
 
   {

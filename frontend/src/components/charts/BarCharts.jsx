@@ -31,6 +31,7 @@ export function VerticalBar({
   barSize = 32,
   slantLabels = false,
   isCurrency = false,
+  yAxisLabel = "",
 }) {
   const maxValue = Math.max(...data.map((d) => d[dataKey] || 0));
   const step = Math.ceil(maxValue / 4);
@@ -106,7 +107,7 @@ export function VerticalBar({
             isCurrency ? Math.round(v / 1e7) : Math.round(v)
           }
           label={{
-            value: isCurrency ? "In ₹ Crs" : "",
+            value: yAxisLabel || (isCurrency ? "In ₹ Cr" : ""),
             angle: -90,
             position: "insideLeft",
             style: {
@@ -333,7 +334,7 @@ export function GroupedBar({
           tickFormatter={(v) => `${Number(v).toFixed(2)}%`}
           padding={{ top: 1 }}
           label={{
-            value: "In ₹ Crs",
+            // value: "In ₹ Crs",
             angle: -90,
             position: "insideLeft",
             dx: -5,
@@ -1102,7 +1103,7 @@ export function AdditionVsRedemptionChart({
             x2="0"
             y2="1"
           >
-            <stop offset="0%" stopColor="#F8E1E2" />
+            <stop offset="0%" stopColor="#fac2c4" />
             <stop offset="100%" stopColor="rgba(248, 225, 226, 0.18)" />
           </linearGradient>
         </defs>
@@ -2039,6 +2040,86 @@ export function PortfolioProductTrendChart({
           activeDot={{
             r: 5,
           }}
+        />
+      </ComposedChart>
+    </ResponsiveContainer>
+  );
+}
+
+export function AnnualMaturityLineChart({ data = [], height = 420 }) {
+  // Combine fixed + floating into total for the line
+  const lineData = data.map((d) => ({
+    name: d.name,
+    total: (Number(d.fixed) || 0) + (Number(d.floating) || 0),
+  }));
+
+  return (
+    <ResponsiveContainer width="100%" height={height}>
+      <ComposedChart
+        data={lineData}
+        margin={{ top: 20, right: 20, left: 10, bottom: 10 }}
+      >
+        <defs>
+          <linearGradient id="maturityLineGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#1565C0" stopOpacity={0.18} />
+            <stop offset="100%" stopColor="#1565C0" stopOpacity={0.02} />
+          </linearGradient>
+        </defs>
+
+        <CartesianGrid stroke="rgba(0,0,0,0.08)" horizontal vertical={false} />
+
+        <XAxis
+          dataKey="name"
+          axisLine={false}
+          tickLine={false}
+          tick={{ fontSize: 10, fill: "#6a9cbf", fontFamily: "Inter" }}
+        />
+
+        <YAxis
+          axisLine={false}
+          tickLine={false}
+          tick={{ fontSize: 10, fill: "#6a9cbf" }}
+          tickFormatter={(v) =>
+            Math.round(v / 10000000).toLocaleString("en-IN")
+          }
+          label={{
+            value: "₹ Crores",
+            angle: -90,
+            position: "insideLeft",
+            style: { fontSize: 9, fill: "#6a9cbf" },
+          }}
+          domain={[0, "dataMax + 5000000"]}
+        />
+
+        <Tooltip
+          cursor={{ fill: "transparent" }}
+          content={buildUnifiedTooltip({
+            valueFormatter: (value) =>
+              `₹${Math.round(Number(value || 0) / 10000000).toLocaleString("en-IN")} Cr`,
+          })}
+        />
+
+        {/* Shade below line */}
+        <Area
+          type="monotone"
+          dataKey="total"
+          fill="url(#maturityLineGrad)"
+          stroke="none"
+          fillOpacity={1}
+          baseValue={0}
+          isAnimationActive={false}
+        />
+
+        {/* Line on top */}
+        <Line
+          type="monotone"
+          dataKey="total"
+          name="Maturing Amount"
+          stroke="#1565C0"
+          strokeWidth={2.5}
+          dot={{ r: 4, stroke: "#fff", strokeWidth: 2, fill: "#1565C0" }}
+          activeDot={{ r: 5, fill: "#005ac1" }}
+          isAnimationActive={false}
         />
       </ComposedChart>
     </ResponsiveContainer>

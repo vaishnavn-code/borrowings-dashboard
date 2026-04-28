@@ -207,6 +207,11 @@ export function mapPortfolioMix(rawData) {
     })
     .slice(-13);
 
+  const firstMonth = Object.values(portfolioTrendRaw || {})[0] || {};
+  const firstProduct = Object.values(firstMonth)[0] || {};
+
+  const portfolioFieldOptions = Object.keys(firstProduct);
+
   /*
    ==================================================
    FINAL RETURN
@@ -221,5 +226,6 @@ export function mapPortfolioMix(rawData) {
     closingBalanceChart,
     productShareDonut,
     portfolioTrendData,
+    portfolioFieldOptions
   };
 }

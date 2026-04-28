@@ -20,6 +20,18 @@ export const fmt = {
     return `₹${Math.round(val).toLocaleString("en-IN")} Cr`;
   },
 
+  n_cr: (v) => {
+    const val = Number(v || 0) / 1e7; // INR → Cr
+
+    // Very large values → Lakh Cr
+    if (val >= 100000) {
+      return `₹${Math.round(val / 100000).toLocaleString("en-IN")} L Cr`;
+    }
+
+    // Normal values → Cr
+    return `₹${Math.round(val).toLocaleString("en-IN")}`;
+  },
+
   /** ₹ 1,234.56 Mn */
   mn: (v, decimals = 2) => `₹${(v / 1e6).toFixed(decimals)} Mn`,
 

@@ -2720,6 +2720,38 @@ header {
   white-space: nowrap;
 }
 
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #E3F2FD;
+  color: #1d4ed8;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Dot base */
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+/* Variants */
+.dot-rate {
+  background: #1d4ed8;
+}
+
+.dot-portfolio {
+  background: #1d4ed8;
+}
+
+.dot-txn {
+  background: #1d4ed8;
+}
+
 @media (max-width: 900px) {
   .summary-monthly-title {
     font-size: 1.25rem;

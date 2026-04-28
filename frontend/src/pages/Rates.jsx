@@ -80,6 +80,7 @@ export default function Rates({ data }) {
     {
       key: "period",
       label: "Period",
+      render: (v) => <strong>{v}</strong>,
     },
     {
       key: "avgEir",

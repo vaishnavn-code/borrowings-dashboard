@@ -671,6 +671,13 @@ export default function Overview({ data }) {
             height={360}
             barSize={36}
             slantLabels={false}
+            yAxisLabel={
+              bbToggle === "book"
+                ? "Closing Balance (₹ Cr)"
+                : bbToggle === "accrual"
+                  ? "Accrual (₹ Cr)"
+                  : "Avg EIR Rate (%)"
+            }
             formatter={(v) =>
               bbToggle === "eir"
                 ? `${Number(v || 0).toFixed(2)}%`

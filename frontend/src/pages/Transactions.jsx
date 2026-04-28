@@ -3,8 +3,7 @@ import DataTable from "../components/ui/DataTable";
 import KpiCard from "../components/ui/KpiCard";
 import { mapTransactions } from "../mappers/transactionMapper";
 import { fmt } from "../utils/formatters";
-import {formatMonth} from "../utils/formatters";
-
+import { formatMonth } from "../utils/formatters";
 
 export default function Transactions({ data }) {
   const mappedTxn = mapTransactions(data);
@@ -49,23 +48,54 @@ export default function Transactions({ data }) {
   };
 
   const TXN_COLUMNS = [
-    { key: "counterParty", label: "Counter Party" },
+    {
+      key: "counterParty",
+      label: "Counter Party",
+      render: (v) => <strong>{v || "-"}</strong>,
+    },
     { key: "productType", label: "Product Group" },
-    { key: "rateType", label: "Rate Type" },
-    { key: "portfolio", label: "Portfolio" },
-    { key: "txnType", label: "Txn Type" },
+    {
+      key: "rateType",
+      label: "Rate Type",
+      render: (v) => (
+        <span className="pill">
+          <span className="dot dot-rate" />
+          {v || "-"}
+        </span>
+      ),
+    },
+    {
+      key: "portfolio",
+      label: "Portfolio",
+      render: (v) => (
+        <span className="pill">
+          <span className="dot dot-portfolio" />
+          {v || "-"}
+        </span>
+      ),
+    },
+    {
+      key: "txnType",
+      label: "Txn Type",
+      render: (v) => (
+        <span className="pill">
+          <span className="dot dot-txn" />
+          {v || "-"}
+        </span>
+      ),
+    },
     { key: "startDate", label: "Start Date" },
     { key: "endDate", label: "End Date" },
     { key: "days", label: "Days" },
     {
       key: "openingCr",
       label: "Opening",
-      render: (v) => fmt.cr(v),
+      render: (v) => fmt.n_cr(v),
     },
     {
       key: "additionCr",
       label: "Addition",
-      render: (v) => fmt.cr(v),
+      render: (v) => fmt.n_cr(v),
     },
   ];
 

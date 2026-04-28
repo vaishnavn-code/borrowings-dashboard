@@ -22,17 +22,17 @@ export default function Portfolio({ data }) {
     {
       key: "closingBalance",
       label: "Closing Balance (₹ Cr)",
-      render: (v) => fmt.cr(v),
+      render: (v) => fmt.n_cr(v),
     },
     {
       key: "accrual",
       label: "Accrual (₹ Cr)",
-      render: (v) => fmt.cr(v),
+      render: (v) => fmt.n_cr(v),
     },
     {
       key: "eirInterest",
       label: "EIR Interest (₹ Cr)",
-      render: (v) => fmt.cr(v),
+      render: (v) => fmt.n_cr(v),
     },
     {
       key: "transactions",
@@ -151,6 +151,9 @@ export default function Portfolio({ data }) {
             dataKey="value"
             nameKey="name"
             height={360}
+            formatter={(v) =>
+              `₹${(Number(v || 0) / 1e7).toLocaleString("en-IN")} Cr`
+            }
           />
         </div>
         <div className="chart-card">
