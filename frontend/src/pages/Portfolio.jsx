@@ -163,7 +163,6 @@ export default function Portfolio({ data }) {
             dataKey="value"
             nameKey="name"
             height={360}
-            barSize={18}
             formatter={(v) =>
               `₹${(Number(v || 0) / 1e7).toLocaleString("en-IN")} Cr`
             }
