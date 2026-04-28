@@ -96,10 +96,16 @@ export default function CounterParty({ data }) {
   const tableData = cpData?.table || [];
 
   const uniqueCustomers = kpi?.Unique_CPs?.Title || 0;
+  const uniqueCustomersSub = kpi?.Unique_CPs?.Subtitle || "";
+  const uniqueCustomersFooter = kpi?.Unique_CPs?.Footer || "";
+
   const topCustomer = kpi?.Top_Counterparty?.Subtitle || "-";
   const topCustomerValue = kpi?.Top_Counterparty?.Title || 0;
   const topCustomerShare = kpi?.Top_Counterparty?.Footer || "";
+
   const totalPortfolio = kpi?.Total_portfolio?.Title || 0;
+  const totalPortfolioSub = kpi?.Total_portfolio?.Subtitle || "";
+  const totalPortfolioFooter = kpi?.Total_portfolio?.Footer || "";
 
   const topConcentration = kpi?.Top_concentration?.Title || "-";
 
@@ -108,12 +114,38 @@ export default function CounterParty({ data }) {
   const topConcentrationFooter = kpi?.Top_concentration?.Footer || "";
 
   const formatDisplay = (v) => {
-    if (!v) return "-";
+  if (v === null || v === undefined || v === "") return "-";
 
-    return `₹${(Number(v) / 1e7).toLocaleString("en-IN", {
-      maximumFractionDigits: 2,
-    })} Cr`;
-  };
+  const str = String(v);
+
+  // extract first numeric value from:
+  // 121491.57
+  // 187662500000
+  // "Top 5: ₹210086154133.32 Cr"
+  const match = str.match(/[\d,]+(\.\d+)?/);
+
+  if (!match) return v;
+
+  const num = Number(match[0].replace(/,/g, ""));
+
+  if (isNaN(num)) return v;
+
+  // large values = raw rupees → convert to Cr
+  const valueInCr = num > 1000000 ? num / 10000000 : num;
+
+  const formattedValue = `₹${Math.round(valueInCr).toLocaleString("en-IN")} Cr`;
+
+  // if full string is just number → return formatted directly
+  if (str === match[0]) {
+    return formattedValue;
+  }
+
+  // if text exists → replace only numeric part
+  return str.replace(
+    /₹?[\d,]+(\.\d+)?\s*Cr?/,
+    formattedValue
+  );
+};
 
   const hBarData = useMemo(() => {
     const rawChart = charts?.["Counterparties by Closing Balance"] || {};
@@ -181,6 +213,8 @@ export default function CounterParty({ data }) {
         <KpiCard
           label="Unique Counterparties"
           value={uniqueCustomers}
+          sub={uniqueCustomersSub}
+          footer={uniqueCustomersFooter}
           sparkPct={100}
           accent="c1"
           iconName="dollar"
@@ -210,7 +244,7 @@ export default function CounterParty({ data }) {
           label="Top Concentration"
           value={topConcentration || "-"}
           sub={topConcentrationSub}
-          footer={topConcentrationFooter}
+          footer={formatDisplay(topConcentrationFooter)}
           sparkPct={60}
           accent="c3"
           iconName="trending"
@@ -224,6 +258,8 @@ export default function CounterParty({ data }) {
         <KpiCard
           label="Total Portfolio"
           value={formatDisplay(totalPortfolio)}
+          sub={totalPortfolioSub}
+          footer={formatDisplay(totalPortfolioFooter)}
           sparkPct={90}
           accent="c4"
           iconName="personFolder"
@@ -236,10 +272,13 @@ export default function CounterParty({ data }) {
       </div>
 
       <div className="two-col">
-        <div className="chart-card" style={{
-    display: "flex",
-    flexDirection: "column",
-  }}>
+        <div
+          className="chart-card"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
           <div className="chart-title">Counterparty by Closing Balance</div>
 
           <div className="chart-subtitle">
