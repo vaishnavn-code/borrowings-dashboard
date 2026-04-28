@@ -37,7 +37,12 @@ export function VerticalBar({
   const ticks = Array.from({ length: 5 }, (_, i) => i * step);
   return (
     <ResponsiveContainer width="100%" height={height}>
-      <BarChart data={data} margin={{ top: 25, right: 8, left: 0, bottom: 80 }}>
+      <BarChart
+        data={data}
+        margin={{ top: 25, right: 8, left: 0, bottom: 80 }}
+        barCategoryGap="2%"
+        barGap={1}
+      >
         <CartesianGrid
           stroke="rgba(0,0,0,0.08)"
           horizontal={true}
@@ -179,6 +184,7 @@ export function HorizontalBar({
   height,
   unit = "",
   formatter,
+  barSize = 36,
 }) {
   const h = height || Math.max(220, data.length * 28);
   return (
@@ -186,7 +192,8 @@ export function HorizontalBar({
       <BarChart
         data={data}
         layout="vertical"
-        barCategoryGap="25%"
+        barCategoryGap="8%"
+        barGap={2}
         margin={{ top: 20, right: 8, left: 0, bottom: 20 }}
       >
         <defs>
@@ -237,7 +244,7 @@ export function HorizontalBar({
           dataKey={dataKey}
           fill="url(#hbarBlueGrad)"
           radius={[0, 4, 4, 0]}
-          maxBarSize={18}
+          maxBarSize={barSize}
         >
           {/* <LabelList
             dataKey={dataKey}
@@ -1069,14 +1076,36 @@ export function StackedBarOnly({ data, height = 360 }) {
   );
 }
 
-export function AdditionVsRedemptionChart({ data, height = 320 }) {
+export function AdditionVsRedemptionChart({
+  data,
+  height = 320,
+  barSize = 36,
+}) {
   return (
     <ResponsiveContainer width="100%" height={height}>
       <BarChart
         data={data}
         margin={{ top: 20, right: 10, left: 10, bottom: 10 }}
-        barCategoryGap="30%"
+        barSize={barSize}
+        barCategoryGap="20%"
       >
+        <defs>
+          <linearGradient id="additionBlueGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#81B1E3" />
+            <stop offset="100%" stopColor="rgba(129, 177, 227, 0.18)" />
+          </linearGradient>
+
+          <linearGradient
+            id="redemptionPinkGradient"
+            x1="0"
+            y1="0"
+            x2="0"
+            y2="1"
+          >
+            <stop offset="0%" stopColor="#F8E1E2" />
+            <stop offset="100%" stopColor="rgba(248, 225, 226, 0.18)" />
+          </linearGradient>
+        </defs>
         <CartesianGrid
           stroke="rgba(0,0,0,0.08)"
           vertical={true}
@@ -1115,14 +1144,14 @@ export function AdditionVsRedemptionChart({ data, height = 320 }) {
         <Bar
           dataKey="addition"
           name="Addition"
-          fill="rgba(111, 164, 221, 0.9)"
+          fill="url(#additionBlueGradient)"
           radius={[4, 4, 0, 0]}
         />
 
         <Bar
           dataKey="redemption"
           name="Redemption"
-          fill="rgba(255, 205, 210, 0.8)"
+          fill="url(#redemptionPinkGradient)"
           radius={[4, 4, 0, 0]}
         />
       </BarChart>
@@ -1546,7 +1575,7 @@ export default function MaturityProductTypeStackedBar({
           top: 20,
           right: 20,
           left: 10,
-          bottom: 80,
+          bottom: 20,
         }}
         barCategoryGap="24%" // SAME as MaturityClosingTrendChart
       >
@@ -1561,11 +1590,9 @@ export default function MaturityProductTypeStackedBar({
           axisLine={false}
           tickLine={false}
           interval={0}
-          angle={-35}
-          textAnchor="end"
-          height={80}
+          height={30}
           tick={{
-            fontSize: 10,
+            fontSize: 11,
             fill: "#6a9cbf",
             fontFamily: "Inter",
           }}
@@ -1751,6 +1778,7 @@ export function PortfolioProductTrendChart({
   data = [],
   selectedField = "opening",
   height = 420,
+  barSize = 28,
 }) {
   const fieldMap = {
     opening: {
@@ -1801,8 +1829,58 @@ export function PortfolioProductTrendChart({
           left: 20,
           bottom: 20,
         }}
-        barCategoryGap="22%"
+        barCategoryGap="2%"
+        barGap={2}
       >
+        <defs>
+          {/* Debentures */}
+          <linearGradient
+            id="portfolioBlueGradient"
+            x1="0"
+            y1="0"
+            x2="0"
+            y2="1"
+          >
+            <stop offset="0%" stopColor="#9FC5EC" />
+            <stop offset="100%" stopColor="rgba(159, 197, 236, 0.18)" />
+          </linearGradient>
+
+          {/* Commercial Paper */}
+          <linearGradient
+            id="portfolioCyanGradient"
+            x1="0"
+            y1="0"
+            x2="0"
+            y2="1"
+          >
+            <stop offset="0%" stopColor="#D4F1F5" />
+            <stop offset="100%" stopColor="rgba(212, 241, 245, 0.18)" />
+          </linearGradient>
+
+          {/* Others */}
+          <linearGradient
+            id="portfolioWhiteGradient"
+            x1="0"
+            y1="0"
+            x2="0"
+            y2="1"
+          >
+            <stop offset="0%" stopColor="#FCFDFF" />
+            <stop offset="100%" stopColor="rgba(252, 253, 255, 0.18)" />
+          </linearGradient>
+
+          {/* Loans */}
+          <linearGradient
+            id="portfolioOrangeGradient"
+            x1="0"
+            y1="0"
+            x2="0"
+            y2="1"
+          >
+            <stop offset="0%" stopColor="#FBE9D4" />
+            <stop offset="100%" stopColor="rgba(251, 233, 212, 0.18)" />
+          </linearGradient>
+        </defs>
         <CartesianGrid stroke="rgba(0,0,0,0.08)" vertical horizontal />
 
         <XAxis
@@ -1920,36 +1998,36 @@ export function PortfolioProductTrendChart({
               yAxisId="left"
               dataKey={fieldMap[selectedField].debentures}
               name="Debentures"
-              fill="#77A9E0"
+              fill="url(#portfolioBlueGradient)"
               radius={[4, 4, 0, 0]}
-              barSize={20}
+              barSize={barSize}
             />
 
             <Bar
               yAxisId="left"
               dataKey={fieldMap[selectedField].commercialPaper}
               name="Commercial Paper"
-              fill="#D6F2F6"
+              fill="url(#portfolioCyanGradient)"
               radius={[4, 4, 0, 0]}
-              barSize={20}
+              barSize={barSize}
             />
 
             <Bar
               yAxisId="left"
               dataKey={fieldMap[selectedField].others}
               name="Others"
-              fill="#E2CCEB"
+              fill="url(#portfolioWhiteGradient)"
               radius={[4, 4, 0, 0]}
-              barSize={20}
+              barSize={barSize}
             />
 
             <Bar
               yAxisId="left"
               dataKey={fieldMap[selectedField].loans}
               name="Loans"
-              fill="#FCEEDC"
+              fill="url(#portfolioOrangeGradient)"
               radius={[4, 4, 0, 0]}
-              barSize={20}
+              barSize={barSize}
             />
           </>
         )}

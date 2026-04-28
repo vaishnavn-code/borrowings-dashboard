@@ -400,7 +400,7 @@ FORMATTER
             dataKey="value"
             nameKey="name"
             height={420}
-            barSize={18}
+            barSize={36}
           />
         </div>
       </div>
@@ -459,7 +459,7 @@ FORMATTER
           <MaturityProductTypeStackedBar
             data={productTypeMaturityBucketData}
             nameKey="name"
-            height={520}
+            height={420}
             stacked={true}
             series={[
               { key: "matured", label: "Matured", color: "#90CAF9" },

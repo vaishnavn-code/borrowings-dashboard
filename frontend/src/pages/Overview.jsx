@@ -12,10 +12,12 @@ import { useInsights } from "../hooks/useDashboardData";
 import DonutLegend from "../components/charts/DonutLegend";
 import React from "react";
 import MonthlySummaryTable from "../components/ui/MonthlySummaryTable";
-import {formatMonth} from "../utils/formatters";
+import { formatMonth } from "../utils/formatters";
+import { formatMonthLabel } from "../utils/formatters";
 
 export default function Overview({ data }) {
   const mappedData = useMemo(() => mapOverviewData(data), [data]);
+  const monthOptions = [...mappedData.borrowingBookMonths].slice(0, 12);
 
   console.log("monthlyTrend", mappedData.monthlyTrend);
   const {
@@ -616,9 +618,9 @@ export default function Overview({ data }) {
                   cursor: "pointer",
                 }}
               >
-                {mappedData.borrowingBookMonths.map((month) => (
+                {monthOptions.map((month) => (
                   <option key={month} value={month}>
-                    {month}
+                    {formatMonthLabel(month)}
                   </option>
                 ))}
               </select>
@@ -668,8 +670,8 @@ export default function Overview({ data }) {
                   : "eir"
             }
             nameKey="label"
-            height={520}
-            barSize={20}
+            height={360}
+            barSize={36}
             slantLabels={true}
             formatter={(v) =>
               bbToggle === "eir"
@@ -683,7 +685,7 @@ export default function Overview({ data }) {
           <div className="chart-subtitle">CLOSING BALANCE ₹ CR</div>
           <DonutChart
             data={productDonut}
-            colors={["#1565c0", "#00acc1", "#42a5f5",  "#5c6bc0",]}
+            colors={["#1565c0", "#00acc1", "#42a5f5", "#5c6bc0"]}
             height={320}
           />
           <DonutLegend
@@ -847,7 +849,9 @@ export default function Overview({ data }) {
               </tr>
               <tr>
                 <td>Wtd Avg EIR</td>
-                <td>{Number(selectedSummaryData["Wtd Avg EIR"] || 0).toFixed(4)} %</td>
+                <td>
+                  {Number(selectedSummaryData["Wtd Avg EIR"] || 0).toFixed(4)} %
+                </td>
               </tr>
               <tr>
                 <td>Total Accrual</td>

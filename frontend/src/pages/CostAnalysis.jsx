@@ -228,8 +228,8 @@ export default function CostAnalysis({ data }) {
             data={hBarData}
             dataKey="value"
             nameKey="name"
-            height={620}
-            barSize={18}
+            height={360}
+            barSize={36}
             formatter={(v) =>
               `₹${(Number(v || 0) / 1e7).toLocaleString("en-IN")} Cr`
             }

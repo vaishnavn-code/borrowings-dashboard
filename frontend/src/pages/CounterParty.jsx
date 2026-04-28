@@ -4,7 +4,7 @@ import DataTable from "../components/ui/DataTable";
 import { fmt } from "../utils/formatters";
 import KpiCard from "../components/ui/KpiCard";
 import DonutChart from "../components/charts/DonutChart";
-import {formatMonth} from "../utils/formatters";
+import { formatMonth } from "../utils/formatters";
 import DonutLegend from "../components/charts/DonutLegend";
 
 const COLUMNS = [
@@ -156,12 +156,9 @@ export default function CounterParty({ data }) {
     return mappedTableRows.filter((row) => {
       const matchSearch =
         !search ||
-        row.counterparty
-          ?.toLowerCase()
-          .includes(search.toLowerCase());
+        row.counterparty?.toLowerCase().includes(search.toLowerCase());
 
-      const matchRateType =
-        !rateType || row.rateType === rateType;
+      const matchRateType = !rateType || row.rateType === rateType;
 
       return matchSearch && matchRateType;
     });
@@ -176,7 +173,9 @@ export default function CounterParty({ data }) {
 
   return (
     <div>
-      <div className="section-label">Counterparty Analysis — {formatMonth(data.curr_month)} · ₹ Crores</div>
+      <div className="section-label">
+        Counterparty Analysis — {formatMonth(data.curr_month)} · ₹ Crores
+      </div>
 
       <div className="four-col">
         <KpiCard
@@ -237,31 +236,38 @@ export default function CounterParty({ data }) {
       </div>
 
       <div className="two-col">
-        <div className="chart-card">
-          <div className="chart-title">
-            Counterparty by Closing Balance
-          </div>
+        <div className="chart-card" style={{
+    display: "flex",
+    flexDirection: "column",
+  }}>
+          <div className="chart-title">Counterparty by Closing Balance</div>
 
           <div className="chart-subtitle">
             Top counterparties by portfolio exposure
           </div>
 
-          <HorizontalBar
-            data={hBarData}
-            dataKey="value"
-            nameKey="name"
-            height={420}
-            barSize={18}
-            formatter={(v) =>
-              `₹${(Number(v || 0) / 1e7).toLocaleString("en-IN")} Cr`
-            }
-          />
+          <div
+            style={{
+              flex: 1,
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <HorizontalBar
+              data={hBarData}
+              dataKey="value"
+              nameKey="name"
+              barSize={36}
+              height={540}
+              formatter={(v) =>
+                `₹${(Number(v || 0) / 1e7).toLocaleString("en-IN")} Cr`
+              }
+            />
+          </div>
         </div>
 
         <div className="chart-card">
-          <div className="chart-title">
-            Counterparty Concentration
-          </div>
+          <div className="chart-title">Counterparty Concentration</div>
 
           <div className="chart-subtitle">
             Top counterparties by portfolio share (%)
@@ -293,9 +299,7 @@ export default function CounterParty({ data }) {
             ]}
             showPercent={false}
             showValue={true}
-            valueFormatter={(v) =>
-              `${Number(v || 0).toFixed(2)}%`
-            }
+            valueFormatter={(v) => `${Number(v || 0).toFixed(2)}%`}
           />
         </div>
       </div>
@@ -303,9 +307,7 @@ export default function CounterParty({ data }) {
       <div className="card" style={{ marginTop: "20px" }}>
         <div className="card-title">
           Counterparty Register
-          <span className="card-badge">
-            {filteredRows.length} RECORDS
-          </span>
+          <span className="card-badge">{filteredRows.length} RECORDS</span>
         </div>
 
         <div className="txn-toolbar">

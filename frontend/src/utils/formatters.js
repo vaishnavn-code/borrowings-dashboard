@@ -65,6 +65,41 @@ export const fullMonthMap = {
   Dec: "December",
 };
 
+export const formatMonthLabel = (value) => {
+  if (!value) return "-";
+
+  const monthMap = {
+    "01": "Jan",
+    "02": "Feb",
+    "03": "Mar",
+    "04": "Apr",
+    "05": "May",
+    "06": "Jun",
+    "07": "Jul",
+    "08": "Aug",
+    "09": "Sep",
+    "10": "Oct",
+    "11": "Nov",
+    "12": "Dec",
+  };
+
+  // convert to number first
+  let monthNum = Number(value);
+
+  // keep only 1 → 12 cycle
+  // example:
+  // 13 → 1 (Jan)
+  // 14 → 2 (Feb)
+  // 26 → 2 (Feb)
+  // 31 → 7 (Jul)
+
+  monthNum = ((monthNum - 1) % 12) + 1;
+
+  const key = String(monthNum).padStart(2, "0");
+
+  return monthMap[key] || "-";
+};
+
 export const formatMonth = (val) => {
   if (!val) return "";
   const [mon, year] = val.split("-");

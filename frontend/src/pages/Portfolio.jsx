@@ -151,7 +151,6 @@ export default function Portfolio({ data }) {
             dataKey="value"
             nameKey="name"
             height={360}
-            barSize={18}
           />
         </div>
         <div className="chart-card">
@@ -233,6 +232,7 @@ export default function Portfolio({ data }) {
           data={portfolioTrendData}
           height={420}
           selectedField={amountField}
+          barSize={40}
         />
       </div>
 
@@ -244,7 +244,7 @@ export default function Portfolio({ data }) {
 
           <div className="chart-subtitle">MONTHLY FLOW ₹ CR</div>
 
-          <AdditionVsRedemptionChart data={additionData} height={560} />
+          <AdditionVsRedemptionChart data={additionData} height={360} barSize={36} />
         </div>
 
         <div className="chart-card" style={{ marginTop: "20px" }}>
