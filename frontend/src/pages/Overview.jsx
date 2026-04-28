@@ -471,7 +471,7 @@ export default function Overview({ data }) {
                 letterSpacing: "0.06em",
               }}
             >
-              13 Months
+              12 Months
             </span>
           </div>
         </div>
