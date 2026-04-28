@@ -50,7 +50,7 @@ export default function Transactions({ data }) {
 
   const TXN_COLUMNS = [
     { key: "counterParty", label: "Counter Party" },
-    { key: "productType", label: "Product Type" },
+    { key: "productType", label: "Product Group" },
     { key: "rateType", label: "Rate Type" },
     { key: "portfolio", label: "Portfolio" },
     { key: "txnType", label: "Txn Type" },

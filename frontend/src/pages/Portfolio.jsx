@@ -17,7 +17,7 @@ export default function Portfolio({ data }) {
   const COLUMNS = [
     {
       key: "productType",
-      label: "Product Type",
+      label: "Product Group",
     },
     {
       key: "closingBalance",
@@ -142,7 +142,7 @@ export default function Portfolio({ data }) {
 
       <div className="two-col">
         <div className="chart-card">
-          <div className="chart-title">Closing Balance by Product Type</div>
+          <div className="chart-title">Closing Balance by Product Group</div>
 
           <div className="chart-subtitle">₹ CRORES — APR 2026</div>
 
@@ -154,7 +154,7 @@ export default function Portfolio({ data }) {
           />
         </div>
         <div className="chart-card">
-          <div className="chart-title">Accrual by Product Type</div>
+          <div className="chart-title">Accrual by Product Grouo</div>
 
           <div className="chart-subtitle">₹ CRORES — APR 2026</div>
 

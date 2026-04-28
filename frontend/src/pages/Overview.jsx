@@ -564,7 +564,7 @@ export default function Overview({ data }) {
       <div className="two-col">
         <div className="chart-card equal-height-card">
           <div className="chart-title" style={{ marginBottom: "6px" }}>
-            Borrowing Book by Product Type
+            Borrowing Book by Product Group
           </div>
           <div className="chart-subtitle" style={{ marginBottom: "6px" }}>
             TOGGLE: CLOSING BALANCE · ACCRUAL · EIR RATE — Apr 2026
@@ -679,7 +679,7 @@ export default function Overview({ data }) {
           />
         </div>
         <div className="chart-card equal-height-card">
-          <div className="chart-title">Product Type Mix — Apr 2026</div>
+          <div className="chart-title">Product Group Mix — Apr 2026</div>
           <div className="chart-subtitle">CLOSING BALANCE ₹ CR</div>
           <DonutChart
             data={productDonut}

@@ -416,11 +416,11 @@ FORMATTER
           {" "}
           <div className="chart-title">
             {" "}
-            Product Type vs Maturity Bucket{" "}
+            Product Group vs Maturity Bucket{" "}
           </div>{" "}
           <div className="chart-subtitle">
             {" "}
-            STACKED BAR BY PRODUCT TYPE · NO LINE{" "}
+            STACKED BAR BY PRODUCT Group · NO LINE{" "}
           </div>{" "}
           {/* CUSTOM LEGEND */}{" "}
           <div

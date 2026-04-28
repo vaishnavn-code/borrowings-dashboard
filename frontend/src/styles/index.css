@@ -222,11 +222,12 @@ body {
 }
 .kpi-footer {
   font-size: 0.66rem;
-  color: var(--text-sub);
+  color: #000000b8 !important;
   display: flex;
   align-items: center;
   gap: 6px;
   margin-top: 6px;
+  font-weight: 700 !important;
 }
 .kpi-footer-dot {
   width: 6px;

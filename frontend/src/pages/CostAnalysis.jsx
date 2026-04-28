@@ -220,7 +220,7 @@ export default function CostAnalysis({ data }) {
 
       <div className="two-col" style={{ marginTop: "20px" }}>
         <div className="chart-card">
-          <div className="chart-title">Accrual by Product Type — Apr 2026</div>
+          <div className="chart-title">Accrual by Product Group — Apr 2026</div>
 
           <div className="chart-subtitle">₹ CRORES</div>
 

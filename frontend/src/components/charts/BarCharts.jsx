@@ -1332,57 +1332,37 @@ export function RateTrendMixedChart({ data = [], height = 360 }) {
 export function EirMonthlyMovementChart({ data = [], height = 320 }) {
   return (
     <ResponsiveContainer width="100%" height={height}>
-      <LineChart
+      <ComposedChart
         data={data}
-        margin={{
-          top: 20,
-          right: 20,
-          left: 10,
-          bottom: 10,
-        }}
+        margin={{ top: 20, right: 20, left: 10, bottom: 10 }}
       >
-        {/* Gradient Shade */}
         <defs>
           <linearGradient id="eirAreaGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#00acc1" stopOpacity={0.45} />
-            <stop offset="100%" stopColor="#00acc1" stopOpacity={0.08} />
+            <stop offset="0%" stopColor="#00acc1" stopOpacity={0.35} />
+            <stop offset="100%" stopColor="#00acc1" stopOpacity={0.02} />
           </linearGradient>
         </defs>
 
-        <CartesianGrid
-          stroke="rgba(0,0,0,0.08)"
-          horizontal={true}
-          vertical={false}
-        />
+        <CartesianGrid stroke="rgba(0,0,0,0.08)" horizontal vertical={false} />
 
         <XAxis
           dataKey="name"
           axisLine={false}
           tickLine={false}
-          tick={{
-            fontSize: 10,
-            fill: "#6a9cbf",
-            fontFamily: "Inter",
-          }}
+          tick={{ fontSize: 10, fill: "#6a9cbf", fontFamily: "Inter" }}
         />
 
         <YAxis
           axisLine={false}
           tickLine={false}
-          tick={{
-            fontSize: 10,
-            fill: "#6a9cbf",
-          }}
-          domain={["dataMin - 0.15", "dataMax + 0.15"]}
+          tick={{ fontSize: 10, fill: "#6a9cbf" }}
+          domain={["dataMin - 0.05", "dataMax + 0.05"]}
           tickFormatter={(v) => `${Number(v).toFixed(2)}%`}
           label={{
             value: "Avg EIR Rate (%)",
             angle: -90,
             position: "insideLeft",
-            style: {
-              fontSize: 9,
-              fill: "#6a9cbf",
-            },
+            style: { fontSize: 9, fill: "#6a9cbf" },
           }}
         />
 
@@ -1393,37 +1373,29 @@ export function EirMonthlyMovementChart({ data = [], height = 320 }) {
           })}
         />
 
-        {/* Area Shade */}
+        {/* ✅ Area shade — baseValue="dataMin" anchors the fill to the lowest data point */}
         <Area
           type="monotone"
           dataKey="value"
           fill="url(#eirAreaGrad)"
           stroke="none"
-          tooltipType="none"
           fillOpacity={1}
+          baseValue="dataMin"
           isAnimationActive={false}
         />
 
-        {/* Main Line */}
+        {/* Main Line drawn on top */}
         <Line
           type="monotone"
           dataKey="value"
           name="Avg EIR %"
           stroke="#00acc1"
           strokeWidth={2.5}
-          dot={{
-            r: 4,
-            stroke: "#fff",
-            strokeWidth: 2,
-            fill: "#00acc1",
-          }}
-          activeDot={{
-            r: 5,
-            fill: "#005ac1",
-          }}
+          dot={{ r: 4, stroke: "#fff", strokeWidth: 2, fill: "#00acc1" }}
+          activeDot={{ r: 5, fill: "#005ac1" }}
           isAnimationActive={false}
         />
-      </LineChart>
+      </ComposedChart>
     </ResponsiveContainer>
   );
 }
