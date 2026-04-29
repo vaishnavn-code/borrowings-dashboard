@@ -422,7 +422,7 @@ export function VerticalBarWithLineOverview({ data, height = 320, viewMode }) {
       <ComposedChart
         data={data}
         margin={{ top: 22, right: 16, left: 8, bottom: 2 }}
-        barCategoryGap="30%"
+        barCategoryGap="20%"
         barGap={2}
       >
         <defs>
@@ -522,7 +522,7 @@ export function VerticalBarWithLineOverview({ data, height = 320, viewMode }) {
           name="Opening Balance (₹ Cr)"
           fill="url(#openingGrad)"
           radius={[5, 5, 0, 0]}
-          maxBarSize={32}
+          // maxBarSize={36}
         />
 
         {/* CLOSING BALANCE BAR */}
@@ -532,7 +532,7 @@ export function VerticalBarWithLineOverview({ data, height = 320, viewMode }) {
           name="Closing Balance (₹ Cr)"
           fill="url(#closingGrad)"
           radius={[5, 5, 0, 0]}
-          maxBarSize={32}
+          // maxBarSize={36}
         />
 
         {/* <Area
