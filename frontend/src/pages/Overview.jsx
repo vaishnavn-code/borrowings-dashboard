@@ -280,7 +280,7 @@ export default function Overview({ data }) {
         />
 
         <KpiCard
-          label="Total Closing"
+          label="Total Weighted Avg Amt"
           value={formatDisplay(kpi.totalClosing?.Title)}
           sub={formatSubtitle(kpi.totalClosing?.Subtitle)}
           footer={kpi.totalClosing?.Footer}
