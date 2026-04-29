@@ -135,16 +135,7 @@ export const mapOverviewData = (apiData) => {
   =====================================================
   */
 
-  const rateMixRaw = charts?.["Rate & Mix Snapshot"] || {};
-
-  const rateMixSnapshot = {
-    fixedRate: toCr(rateMixRaw?.["Fixed Rate"]),
-    floatingRate: toCr(rateMixRaw?.["Floating Rate"]),
-    avgExitRate: Number(rateMixRaw?.["Avg Exit Rate"] || 0),
-    avgCouponYield: Number(rateMixRaw?.["Avg Coupon/Yield"] || 0),
-    maturities2026: Number(rateMixRaw?.["2026_Maturities"] || 0),
-    peakMaturity: Number(rateMixRaw?.["Peak_Maturity"] || 0),
-  };
+  const rateMixSnapshot = charts?.["Rate & Mix Snapshot"] || {};
 
   const portfolioSplitRaw =
     charts?.["Portfolio & Rate Type Split"]?.Portfolio || {};
@@ -154,16 +145,16 @@ export const mapOverviewData = (apiData) => {
     0,
   );
 
-  const portfolioSplitData = Object.entries(portfolioSplitRaw).map(
-    ([label, value]) => ({
+  const portfolioSplitData = Object.entries(portfolioSplitRaw)
+    .filter(([label]) => label && label.trim() !== "")
+    .map(([label, value]) => ({
       label,
       count: toCr(value),
       percent:
         totalPortfolioValue > 0
           ? +((Number(value || 0) / totalPortfolioValue) * 100).toFixed(1)
           : 0,
-    }),
-  );
+    }));
 
   const rateTypeRaw =
     charts?.["Portfolio & Rate Type Split"]?.["Rate Type"] || {};

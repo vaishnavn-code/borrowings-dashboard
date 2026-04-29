@@ -90,47 +90,53 @@ export default function Transactions({ data }) {
         );
       },
     },
+{
+  key: "portfolio",
+  label: "Portfolio",
+  render: (v) => {
+    const value = String(v || "").trim().toLowerCase();
 
-    {
-      key: "portfolio",
-      label: "Portfolio",
-      render: (v) => {
-        const value = String(v || "").toLowerCase();
+    const isSecured = value === "secured liability";
+    const isUnsecured = value === "unsecured liability";
+    const isDashOnly = value === "-";
 
-        const isSecured = value === "secured liability";
-        const isUnsecured = value === "unsecured liability  ";
-
-        return (
-          <span
-            className="pill"
-            style={{
-              background: isSecured
-                ? "#E8F1FF"
-                : isUnsecured
-                  ? "#E0F7FA"
-                  : "#F3F4F6",
-              color: isSecured
-                ? "#1565C0"
-                : isUnsecured
-                  ? "#00ACC1"
-                  : "#374151",
-            }}
-          >
-            <span
-              className="dot"
-              style={{
-                background: isSecured
-                  ? "#1565C0"
-                  : isUnsecured
-                    ? "#00ACC1"
-                    : "#6B7280",
-              }}
-            />
-            {v || "-"}
-          </span>
-        );
-      },
-    },
+    return (
+      <span
+        className="pill"
+        style={{
+          background: isSecured
+            ? "#E8F1FF"
+            : isUnsecured
+            ? "#E0F7FA"
+            : isDashOnly
+            ? "#FEF3C7"
+            : "#F3F4F6",
+          color: isSecured
+            ? "#1565C0"
+            : isUnsecured
+            ? "#00ACC1"
+            : isDashOnly
+            ? "#D97706"
+            : "#374151",
+        }}
+      >
+        <span
+          className="dot"
+          style={{
+            background: isSecured
+              ? "#1565C0"
+              : isUnsecured
+              ? "#00ACC1"
+              : isDashOnly
+              ? "#D97706"
+              : "#6B7280",
+          }}
+        />
+        {v || "-"}
+      </span>
+    );
+  },
+},
     {
       key: "txnType",
       label: "Txn Type",

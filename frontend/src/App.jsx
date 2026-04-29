@@ -16,13 +16,13 @@ import React from "react";
 const DASHBOARD_SUBTITLE = "COF Dashboard · v14 · All Amounts in INR Crores";
 
 const PAGE_TITLES = {
-  overview: "Cost of Funds — Overview",
-  portfolioMix: "Cost of Funds — Portfolio Mix",
-  costAnalysis: "Cost of Funds — Cost Analysis",
-  rateTrends: "Cost of Funds — Rate Trends",
-  maturityAnalysis: "Cost of Funds — Maturity Analysis",
-  counterparties: "Cost of Funds — Counterparties",
-  transactions: "Cost of Funds — Transactions",
+  overview: "ABHL — Overview",
+  portfolioMix: "ABHL — Portfolio Mix",
+  costAnalysis: "ABHL — Cost Analysis",
+  rateTrends: "ABHL — Rate Trends",
+  maturityAnalysis: "ABHL — Maturity Analysis",
+  counterparties: "ABHL — Counterparties",
+  transactions: "ABHL — Transactions",
 };
 
 export default function App() {

@@ -53,7 +53,7 @@ export default function Sidebar({ activePage, onNavigate }) {
       <div style={styles.logoWrap}>
         <img src={FSlogo} alt="FS Logo" style={{ width: 40, height: 40, borderRadius: 9 }} />
         <div>
-          <div style={styles.logoText}>Borrowings DASHBOARD</div>
+          <div style={styles.logoText}>Borrowings Dashboard</div>
           <div style={styles.logoSub}>A Product by Fourth Signal</div>
         </div>
       </div>

@@ -96,17 +96,17 @@ export default function Rates({ data }) {
     },
     {
       key: "fixedCr",
-      label: "Fixed ₹ Cr",
+      label: "Fixed (₹ Cr)",
       render: (v) => fmt.n_cr(v),
     },
     {
       key: "floatingCr",
-      label: "Floating ₹ Cr",
+      label: "Floating (₹ Cr)",
       render: (v) => fmt.n_cr(v),
     },
     {
       key: "closingCr",
-      label: "Closing ₹ Cr",
+      label: "Closing (₹ Cr)",
       render: (v) => fmt.n_cr(v),
     },
   ];
@@ -364,13 +364,13 @@ export default function Rates({ data }) {
       <div className="card" style={{ marginTop: "20px" }}>
         <div className="card-title">
           Monthly Rate Summary
-          <span className="card-badge">{tableData.length} RECORDS</span>
+          <span className="card-badge">12 RECORDS</span>
         </div>
 
         <DataTable
           columns={COLUMNS}
           rows={paginatedRows}
-          total={tableData.length}
+          total={12}
           page={page}
           totalPages={totalPages}
           onPage={(p) => setPage(Number(p))}

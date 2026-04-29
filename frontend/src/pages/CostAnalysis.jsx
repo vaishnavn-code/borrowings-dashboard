@@ -177,7 +177,7 @@ export default function CostAnalysis({ data }) {
 
       {/* MAIN TREND CHART */}
 
-      <div className="section-label">Cost Trends — 13 Months</div>
+      <div className="section-label">Cost Trends — 12 Months</div>
 
       <div className="chart-card">
         <div
@@ -203,7 +203,7 @@ export default function CostAnalysis({ data }) {
               letterSpacing: "0.06em",
             }}
           >
-            13 Months
+            12 Months
           </span>
         </div>
 

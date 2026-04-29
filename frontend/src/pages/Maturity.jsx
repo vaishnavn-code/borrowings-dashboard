@@ -539,7 +539,7 @@ FORMATTER
           </div>
 
           <RateTypeMaturityStackedBar
-            data={annualMaturityProfileData}
+            data={rateTypeByMaturityBucketData}
             height={420}
             formatter={(v) =>
               `₹${(Number(v || 0) / 10000000).toLocaleString("en-IN")} Cr`
