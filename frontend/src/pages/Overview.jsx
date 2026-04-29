@@ -23,6 +23,7 @@ export default function Overview({ data }) {
     loading: aiLoading,
     error: aiError,
     generate,
+    hasGenerated
   } = useInsights();
   const [topN, setTopN] = useState(15);
   const [viewMode, setViewMode] = useState("monthly");
@@ -265,7 +266,7 @@ export default function Overview({ data }) {
 
         <KpiCard
           label="Avg EIR Rate"
-          value={Number(kpi.avgEirRate?.Title || 0) +" %"}
+          value={Number(kpi.avgEirRate?.Title || 0) + " %"}
           sub={kpi.avgEirRate?.Subtitle}
           footer={kpi.avgEirRate?.Footer}
           sparkPct={80}
@@ -299,9 +300,9 @@ export default function Overview({ data }) {
           <div className="ai-panel-brand">
             <div className="ai-panel-icon">✦</div>
             <div className="ai-panel-title-block">
-              <div className="ai-panel-title">Exposure Insights</div>
+              <div className="ai-panel-title">Decision Intelligence</div>
               <div className="ai-panel-subtitle">
-                Powered by Treasury Intelligence
+                Powered by Generative AI Agents
               </div>
             </div>
           </div>
@@ -310,7 +311,11 @@ export default function Overview({ data }) {
             onClick={generate}
             disabled={aiLoading}
           >
-            {aiLoading ? "Analysing..." : "✦ Generate Insights"}
+            {aiLoading
+              ? "Analysing..."
+              : hasGenerated
+                ? "✦ Regenerate Insights"
+                : "✦ Generate Insights"}
           </button>
         </div>
         <div className="ai-panel-body">
@@ -409,8 +414,11 @@ export default function Overview({ data }) {
                           <div className="ai-detail-heading">
                             Recommended Action
                           </div>
+
                           <div className="ai-recommendation-text">
-                            {item.recommended_action}
+                            <div className="ai-recommendation-content">
+                              {item.recommended_action}
+                            </div>
                           </div>
                         </div>
                       )}

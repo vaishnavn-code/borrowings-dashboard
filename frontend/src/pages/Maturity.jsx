@@ -258,7 +258,7 @@ FORMATTER
           Closing Balance by Maturity Bucket — Monthly Trend
         </div>
         <div className="chart-subtitle">
-          STACKED BARS: &lt;1Y | 1–3Y | 3–5Y | &gt;5Y | MATURED · 13 MONTHS
+          STACKED BARS: &lt;1Y | 1–3Y | 3–5Y | &gt;5Y | MATURED · 12 MONTHS
         </div>
 
         {/* CUSTOM LEGEND */}

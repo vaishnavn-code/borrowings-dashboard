@@ -13,7 +13,7 @@ import { useDashboardData } from "./hooks/useDashboardData";
 // import mockData from "./data/mockOverview.json";
 import React from "react";
 
-const DASHBOARD_SUBTITLE = "COF Dashboard · v14 · All Amounts in INR Crores";
+const DASHBOARD_SUBTITLE = "SAP S/4HANA | COB Dashboard";
 
 const PAGE_TITLES = {
   overview: "Overview",

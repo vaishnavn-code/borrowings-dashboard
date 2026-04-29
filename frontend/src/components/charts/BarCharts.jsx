@@ -1417,7 +1417,7 @@ export function MaturityClosingTrendChart({ data = [], height = 360 }) {
           left: 10,
           bottom: 10,
         }}
-        barCategoryGap="10%" // reduced gap → thicker bars
+        barCategoryGap="22%" // reduced gap → thicker bars
         barGap={2}
       >
         <CartesianGrid
@@ -1506,15 +1506,14 @@ export function MaturityClosingTrendChart({ data = [], height = 360 }) {
           dataKey="lt1"
           stackId="a"
           name="< 1 Year"
-          fill="#1565C0"
-        />
+  fill="#42A5F5"        />
 
         <Bar
           yAxisId="left"
           dataKey="y1to3"
           stackId="a"
           name="1 - 3 Years"
-          fill="#1E88E5"
+          fill="#6bb4f4"
         />
 
         <Bar
@@ -1522,7 +1521,16 @@ export function MaturityClosingTrendChart({ data = [], height = 360 }) {
           dataKey="y3to5"
           stackId="a"
           name="3 - 5 Years"
-          fill="#42A5F5"
+          fill="#8ec9f9"
+        />
+
+        <Bar
+          yAxisId="left"
+          dataKey="gt5"
+          stackId="a"
+          name="> 5 Years"
+  fill="#42A5F5"
+            radius={[4, 4, 0, 0]}
         />
 
         <Bar

@@ -1882,7 +1882,7 @@ header {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
-  align-items: stretch;   /* IMPORTANT */
+  align-items: stretch; /* IMPORTANT */
 }
 .chart-card.equal-height-card {
   display: flex;
@@ -2631,17 +2631,17 @@ header {
 
 /* Month selector pills styling */
 .txn-month-pill {
-      font-family: var(--font);
-    font-size: .67rem;
-    font-weight: 700;
-    padding: 4px 11px;
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    background: transparent;
-    color: var(--text-muted);
-    cursor: pointer;
-    transition: all .15s;
-    white-space: nowrap;
+  font-family: var(--font);
+  font-size: 0.67rem;
+  font-weight: 700;
+  padding: 4px 11px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
 }
 .txn-month-pill:hover,
 .txn-month-pill:focus {
@@ -2651,8 +2651,8 @@ header {
 }
 .txn-month-pill.active {
   background: var(--blue-dark);
-    color: #fff;
-    border-color: var(--blue-dark);
+  color: #fff;
+  border-color: var(--blue-dark);
 }
 
 .ai-insight-tags-wrap {
@@ -2698,13 +2698,22 @@ header {
 
 .ai-recommendation-text {
   margin-top: 8px;
-  font-size: 14px;
   line-height: 1.6;
-  color: #334155;
-  background: #f8fafc;
+  background: linear-gradient(
+    180deg,
+    rgba(244, 248, 255, 0.96),
+    rgba(233, 241, 252, 0.96)
+  );
   border-left: 3px solid #1565c0;
-  padding: 12px 14px;
+  padding: 20px 26px;
   border-radius: 8px;
+}
+
+.ai-recommendation-content {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #1e293b;
+  font-weight: 700;
 }
 
 /* Period info styling */
@@ -2726,7 +2735,7 @@ header {
   gap: 6px;
   padding: 4px 10px;
   border-radius: 999px;
-  background: #E3F2FD;
+  background: #e3f2fd;
   color: #1d4ed8;
   font-size: 12px;
   font-weight: 600;

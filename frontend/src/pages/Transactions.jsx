@@ -90,53 +90,55 @@ export default function Transactions({ data }) {
         );
       },
     },
-{
-  key: "portfolio",
-  label: "Portfolio",
-  render: (v) => {
-    const value = String(v || "").trim().toLowerCase();
+    {
+      key: "portfolio",
+      label: "Portfolio",
+      render: (v) => {
+        const value = String(v || "")
+          .trim()
+          .toLowerCase();
 
-    const isSecured = value === "secured liability";
-    const isUnsecured = value === "unsecured liability";
-    const isDashOnly = value === "-";
+        const isSecured = value === "secured liability";
+        const isUnsecured = value === "unsecured liability";
+        const isDashOnly = value === "-";
 
-    return (
-      <span
-        className="pill"
-        style={{
-          background: isSecured
-            ? "#E8F1FF"
-            : isUnsecured
-            ? "#E0F7FA"
-            : isDashOnly
-            ? "#FEF3C7"
-            : "#F3F4F6",
-          color: isSecured
-            ? "#1565C0"
-            : isUnsecured
-            ? "#00ACC1"
-            : isDashOnly
-            ? "#D97706"
-            : "#374151",
-        }}
-      >
-        <span
-          className="dot"
-          style={{
-            background: isSecured
-              ? "#1565C0"
-              : isUnsecured
-              ? "#00ACC1"
-              : isDashOnly
-              ? "#D97706"
-              : "#6B7280",
-          }}
-        />
-        {v || "-"}
-      </span>
-    );
-  },
-},
+        return (
+          <span
+            className="pill"
+            style={{
+              background: isSecured
+                ? "#E8F1FF"
+                : isUnsecured
+                  ? "#E0F7FA"
+                  : isDashOnly
+                    ? "#FEF3C7"
+                    : "#F3F4F6",
+              color: isSecured
+                ? "#1565C0"
+                : isUnsecured
+                  ? "#00ACC1"
+                  : isDashOnly
+                    ? "#D97706"
+                    : "#374151",
+            }}
+          >
+            <span
+              className="dot"
+              style={{
+                background: isSecured
+                  ? "#1565C0"
+                  : isUnsecured
+                    ? "#00ACC1"
+                    : isDashOnly
+                      ? "#D97706"
+                      : "#6B7280",
+              }}
+            />
+            {v || "-"}
+          </span>
+        );
+      },
+    },
     {
       key: "txnType",
       label: "Txn Type",
@@ -201,6 +203,91 @@ export default function Transactions({ data }) {
     {
       key: "additionCr",
       label: "Addition",
+      render: (v) => fmt.n_cr(v),
+    },
+    {
+      key: "redemptionCr",
+      label: "Redemption",
+      render: (v) => fmt.n_cr(v),
+    },
+    {
+      key: "closingCr",
+      label: "Closing",
+      render: (v) => fmt.n_cr(v),
+    },
+    {
+      key: "accrualAmt",
+      label: "Accrual",
+      render: (v) => fmt.n_cr(v),
+    },
+    {
+      key: "wtAvgAmt",
+      label: "Wt Avg Amt",
+      render: (v) => fmt.n_cr(v),
+    },
+    {
+      key: "avgFunds",
+      label: "Avg Funds",
+      render: (v) => fmt.n_cr(v),
+    },
+    {
+      key: "openEir",
+      label: "Open EIR",
+      render: (v) => fmt.percent?.(v) || v,
+    },
+    {
+      key: "exitEir",
+      label: "Exit EIR",
+      render: (v) => fmt.percent?.(v) || v,
+    },
+    {
+      key: "avgRateEir",
+      label: "Avg Rate EIR",
+      render: (v) => fmt.percent?.(v) || v,
+    },
+    {
+      key: "avgRateEirPapm",
+      label: "Avg Rate EIR PAPM",
+      render: (v) => fmt.percent?.(v) || v,
+    },
+    {
+      key: "exitRate",
+      label: "Exit Rate",
+      render: (v) => fmt.percent?.(v) || v,
+    },
+    {
+      key: "exitSpread",
+      label: "Exit Spread",
+      render: (v) => fmt.percent?.(v) || v,
+    },
+    {
+      key: "exitFinalRate",
+      label: "Exit Final Rate",
+      render: (v) => fmt.percent?.(v) || v,
+    },
+    {
+      key: "exitFinalRatePapm",
+      label: "Exit Final Rate PAPM",
+      render: (v) => fmt.percent?.(v) || v,
+    },
+    {
+      key: "avgRateYield",
+      label: "Avg Rate Yield",
+      render: (v) => fmt.percent?.(v) || v,
+    },
+    {
+      key: "avgRateYieldPapm",
+      label: "Avg Rate Yield PAPM",
+      render: (v) => fmt.percent?.(v) || v,
+    },
+    {
+      key: "wtIntAmtCouponYield",
+      label: "Wt Int Amt Coupon Yield",
+      render: (v) => fmt.n_cr(v),
+    },
+    {
+      key: "wtAmtCouponYield",
+      label: "Wt Amt Coupon Yield",
       render: (v) => fmt.n_cr(v),
     },
   ];
