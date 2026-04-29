@@ -16,13 +16,13 @@ import React from "react";
 const DASHBOARD_SUBTITLE = "COF Dashboard · v14 · All Amounts in INR Crores";
 
 const PAGE_TITLES = {
-  overview: "ABHL — Overview",
-  portfolioMix: "ABHL — Portfolio Mix",
-  costAnalysis: "ABHL — Cost Analysis",
-  rateTrends: "ABHL — Rate Trends",
-  maturityAnalysis: "ABHL — Maturity Analysis",
-  counterparties: "ABHL — Counterparties",
-  transactions: "ABHL — Transactions",
+  overview: "Overview",
+  portfolioMix: "Portfolio Mix",
+  costAnalysis: "Cost Analysis",
+  rateTrends: "Rate Trends",
+  maturityAnalysis: "Maturity Analysis",
+  counterparties: "Counterparties",
+  transactions: "Transactions",
 };
 
 export default function App() {

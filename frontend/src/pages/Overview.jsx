@@ -265,7 +265,7 @@ export default function Overview({ data }) {
 
         <KpiCard
           label="Avg EIR Rate"
-          value={Number(kpi.avgEirRate?.Title || 0).toFixed(2)}
+          value={Number(kpi.avgEirRate?.Title || 0) +" %"}
           sub={kpi.avgEirRate?.Subtitle}
           footer={kpi.avgEirRate?.Footer}
           sparkPct={80}
