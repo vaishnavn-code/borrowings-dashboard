@@ -39,9 +39,9 @@ export default function MonthlySummaryTable({
             <tr>
               <th>Period</th>
               <th>Opening (₹Cr)</th>
-              <th>Closing (₹Cr)</th>
               <th>Addition (₹Cr)</th>
               <th>Redemption (₹Cr)</th>
+              <th>Closing (₹Cr)</th>
               <th>Accrual (₹Cr)</th>
               <th>EIR Int (₹Cr)</th>
               <th>Avg EIR%</th>
@@ -54,12 +54,90 @@ export default function MonthlySummaryTable({
               const isCurrent = highlightLastRow && index === rows.length - 1;
 
               return (
-                <tr key={`${row.period}-${index}`} className={isCurrent ? "is-current" : ""}>
+                <tr
+                  key={`${row.period}-${index}`}
+                  className={isCurrent ? "is-current" : ""}
+                >
                   <td>{row.period}</td>
-                  <td>{formatCr(row.openingCr)}</td>
-                  <td>{formatCr(row.closingCr)}</td>
+                  <td>
+                    <span
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "6px",
+                        padding: "4px 10px",
+                        borderRadius: "12px",
+                        background: "#E3F2FD", // light blue
+                        color: "#1565C0", // dark blue text
+                        fontWeight: 600,
+                        fontSize: "12px",
+                      }}
+                    >
+                      <span
+                        style={{
+                          width: "6px",
+                          height: "6px",
+                          borderRadius: "50%",
+                          background: "#1E88E5", // blue dot
+                          display: "inline-block",
+                        }}
+                      />
+                      {formatCr(row.openingCr)}
+                    </span>
+                  </td>
                   <td>{formatCr(row.additionCr)}</td>
-                  <td>{formatCr(row.redemptionCr)}</td>
+                  <td>
+                    <span
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "6px",
+                        padding: "4px 10px",
+                        borderRadius: "12px",
+                        background: "#FFEBEE", // light red
+                        color: "#C62828", // dark red text
+                        fontWeight: 600,
+                        fontSize: "12px",
+                      }}
+                    >
+                      <span
+                        style={{
+                          width: "6px",
+                          height: "6px",
+                          borderRadius: "50%",
+                          background: "#E53935", // red dot
+                          display: "inline-block",
+                        }}
+                      />
+                      {formatCr(row.redemptionCr)}
+                    </span>
+                  </td>
+                  <td>
+                    <span
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "6px",
+                        padding: "4px 10px",
+                        borderRadius: "12px",
+                        background: "#E8F5E9", // light green badge
+                        color: "#2E7D32", // dark green text
+                        fontWeight: 600,
+                        fontSize: "12px",
+                      }}
+                    >
+                      <span
+                        style={{
+                          width: "6px",
+                          height: "6px",
+                          borderRadius: "50%",
+                          background: "#43A047", // green dot
+                          display: "inline-block",
+                        }}
+                      />
+                      {formatCr(row.closingCr)}
+                    </span>
+                  </td>
                   <td>{formatCr(row.accrualCr)}</td>
                   <td>{formatCr(row.eirIntCr)}</td>
                   <td>{formatRate(row.avgEir)}</td>
