@@ -38,12 +38,12 @@ export default function MonthlySummaryTable({
           <thead>
             <tr>
               <th>Period</th>
-              <th>Opening (₹Cr)</th>
-              <th>Addition (₹Cr)</th>
-              <th>Redemption (₹Cr)</th>
-              <th>Closing (₹Cr)</th>
-              <th>Accrual (₹Cr)</th>
-              <th>EIR Int (₹Cr)</th>
+              <th>Opening (₹ Cr)</th>
+              <th>Addition (₹ Cr)</th>
+              <th>Redemption (₹ Cr)</th>
+              <th>Closing (₹ Cr)</th>
+              <th>Accrual (₹ Cr)</th>
+              <th>EIR Int (₹ Cr)</th>
               <th>Avg EIR%</th>
               <th>Avg Exit%</th>
               <th>Count</th>

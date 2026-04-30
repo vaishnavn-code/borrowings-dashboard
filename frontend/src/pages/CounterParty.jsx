@@ -26,7 +26,7 @@ const COLUMNS = [
   {
     key: "closingAmt",
     label: "Closing Amount (₹ Cr)",
-    render: (v) => fmt.n_cr(v),
+    render: (v) => fmt.n_cr(v).replace("₹", ""),
   },
 
   {
@@ -37,7 +37,7 @@ const COLUMNS = [
   {
     key: "accrualAmt",
     label: "Accrual Amount (₹ Cr)",
-    render: (v) => fmt.n_cr(v)
+    render: (v) => fmt.n_cr(v).replace("₹", ""),
   },
 
   {
@@ -114,38 +114,35 @@ export default function CounterParty({ data }) {
   const topConcentrationFooter = kpi?.Top_concentration?.Footer || "";
 
   const formatDisplay = (v) => {
-  if (v === null || v === undefined || v === "") return "-";
+    if (v === null || v === undefined || v === "") return "-";
 
-  const str = String(v);
+    const str = String(v);
 
-  // extract first numeric value from:
-  // 121491.57
-  // 187662500000
-  // "Top 5: ₹210086154133.32 Cr"
-  const match = str.match(/[\d,]+(\.\d+)?/);
+    // extract first numeric value from:
+    // 121491.57
+    // 187662500000
+    // "Top 5: ₹210086154133.32 Cr"
+    const match = str.match(/[\d,]+(\.\d+)?/);
 
-  if (!match) return v;
+    if (!match) return v;
 
-  const num = Number(match[0].replace(/,/g, ""));
+    const num = Number(match[0].replace(/,/g, ""));
 
-  if (isNaN(num)) return v;
+    if (isNaN(num)) return v;
 
-  // large values = raw rupees → convert to Cr
-  const valueInCr = num > 1000000 ? num / 10000000 : num;
+    // large values = raw rupees → convert to Cr
+    const valueInCr = num > 1000000 ? num / 10000000 : num;
 
-  const formattedValue = `₹${Math.round(valueInCr).toLocaleString("en-IN")} Cr`;
+    const formattedValue = `₹${Math.round(valueInCr).toLocaleString("en-IN")} Cr`;
 
-  // if full string is just number → return formatted directly
-  if (str === match[0]) {
-    return formattedValue;
-  }
+    // if full string is just number → return formatted directly
+    if (str === match[0]) {
+      return formattedValue;
+    }
 
-  // if text exists → replace only numeric part
-  return str.replace(
-    /₹?[\d,]+(\.\d+)?\s*Cr?/,
-    formattedValue
-  );
-};
+    // if text exists → replace only numeric part
+    return str.replace(/₹?[\d,]+(\.\d+)?\s*Cr?/, formattedValue);
+  };
 
   const hBarData = useMemo(() => {
     const rawChart = charts?.["Counterparties by Closing Balance"] || {};
@@ -244,7 +241,20 @@ export default function CounterParty({ data }) {
           label="Top Concentration"
           value={topConcentration || "-"}
           sub={topConcentrationSub}
-          footer={formatDisplay(topConcentrationFooter)}
+          footer={
+            topConcentrationFooter
+              ? (() => {
+                  const match =
+                    topConcentrationFooter.match(/₹([\d,]+(\.\d+)?)/);
+                  if (!match) return topConcentrationFooter;
+
+                  const num = Number(match[1].replace(/,/g, ""));
+                  const cr = num / 1e7;
+
+                  return `Top 5: ₹${Math.round(cr).toLocaleString("en-IN")} Cr`;
+                })()
+              : "-"
+          }
           sparkPct={60}
           accent="c3"
           iconName="trending"

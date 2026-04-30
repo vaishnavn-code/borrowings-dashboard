@@ -197,38 +197,38 @@ export default function Transactions({ data }) {
     { key: "days", label: "Days" },
     {
       key: "openingCr",
-      label: "Opening",
-      render: (v) => fmt.n_cr(v),
+      label: "Opening (₹ Cr)",
+      render: (v) => fmt.n_cr(v).replace("₹", ""),
     },
     {
       key: "additionCr",
-      label: "Addition",
-      render: (v) => fmt.n_cr(v),
+      label: "Addition (₹ Cr)",
+      render: (v) => fmt.n_cr(v).replace("₹", ""),
     },
     {
       key: "redemptionCr",
-      label: "Redemption",
-      render: (v) => fmt.n_cr(v),
+      label: "Redemption (₹ Cr)",
+      render: (v) => fmt.n_cr(v).replace("₹", ""),
     },
     {
       key: "closingCr",
-      label: "Closing",
-      render: (v) => fmt.n_cr(v),
+      label: "Closing (₹ Cr)",
+      render: (v) => fmt.n_cr(v).replace("₹", ""),
     },
     {
       key: "accrualAmt",
-      label: "Accrual",
-      render: (v) => fmt.n_cr(v),
+      label: "Accrual (₹ Cr)",
+      render: (v) => fmt.n_cr(v).replace("₹", ""),
     },
     {
       key: "wtAvgAmt",
-      label: "Wt Avg Amt",
-      render: (v) => fmt.n_cr(v),
+      label: "Wt Avg Amt (₹ Cr)",
+      render: (v) => fmt.n_cr(v).replace("₹", ""),
     },
     {
       key: "avgFunds",
-      label: "Avg Funds",
-      render: (v) => fmt.n_cr(v),
+      label: "Avg Funds (₹ Cr)",
+      render: (v) => fmt.n_cr(v).replace("₹", ""),
     },
     {
       key: "openEir",
@@ -282,13 +282,13 @@ export default function Transactions({ data }) {
     },
     {
       key: "wtIntAmtCouponYield",
-      label: "Wt Int Amt Coupon Yield",
-      render: (v) => fmt.n_cr(v),
+      label: "Wt Int Amt Coupon Yield (₹ Cr)",
+      render: (v) => fmt.n_cr(v).replace("₹", ""),
     },
     {
       key: "wtAmtCouponYield",
-      label: "Wt Amt Coupon Yield",
-      render: (v) => fmt.n_cr(v),
+      label: "Wt Amt Coupon Yield (₹ Cr)",
+      render: (v) => fmt.n_cr(v).replace("₹", ""),
     },
   ];
 
