@@ -10,8 +10,7 @@ import KpiCard from "../components/ui/KpiCard";
 import DataTable from "../components/ui/DataTable";
 import { fmt } from "../utils/formatters";
 import { mapRateTrends } from "../mappers/rateTrendMapper";
-import {formatMonth} from "../utils/formatters";
-
+import { formatMonth } from "../utils/formatters";
 
 export default function Rates({ data }) {
   /*
@@ -44,31 +43,31 @@ export default function Rates({ data }) {
   */
 
   const formatDisplay = (v) => {
-  if (v === null || v === undefined || v === "") return "-";
+    if (v === null || v === undefined || v === "") return "-";
 
-  const str = String(v);
-  const num = parseFloat(str.replace(/₹|,|Cr|%|Bn|Mn/gi, ""));
+    const str = String(v);
+    const num = parseFloat(str.replace(/₹|,|Cr|%|Bn|Mn/gi, ""));
 
-  if (isNaN(num)) return v;
+    if (isNaN(num)) return v;
 
-  // percentage values
-  if (str.includes("%")) {
-    return `${num.toFixed(2)} %`;
-  }
+    // percentage values
+    if (str.includes("%")) {
+      return `${num.toFixed(2)} %`;
+    }
 
-  // CR values
-  if (str.toLowerCase().includes("cr")) {
+    // CR values
+    if (str.toLowerCase().includes("cr")) {
+      return `₹${Math.round(num).toLocaleString("en-IN")} Cr`;
+    }
+
+    // BN values → convert to CR
+    if (str.toLowerCase().includes("bn")) {
+      return `₹${Math.round(num * 100).toLocaleString("en-IN")} Cr`;
+    }
+
+    // already in Cr from API
     return `₹${Math.round(num).toLocaleString("en-IN")} Cr`;
-  }
-
-  // BN values → convert to CR
-  if (str.toLowerCase().includes("bn")) {
-    return `₹${Math.round(num * 100).toLocaleString("en-IN")} Cr`;
-  }
-
-  // already in Cr from API
-  return `₹${Math.round(num).toLocaleString("en-IN")} Cr`;
-};
+  };
 
   /*
    ========================================
@@ -96,18 +95,18 @@ export default function Rates({ data }) {
     },
     {
       key: "fixedCr",
-      label: "Fixed ₹ Cr",
-      render: (v) => fmt.n_cr(v),
+      label: "Fixed (₹ Cr)",
+      render: (v) => fmt.n_cr(v).replace("₹", ""),
     },
     {
       key: "floatingCr",
-      label: "Floating ₹ Cr",
-      render: (v) => fmt.n_cr(v),
+      label: "Floating (₹ Cr)",
+      render: (v) => fmt.n_cr(v).replace("₹", ""),
     },
     {
       key: "closingCr",
-      label: "Closing ₹ Cr",
-      render: (v) => fmt.n_cr(v),
+      label: "Closing (₹ Cr)",
+      render: (v) => fmt.n_cr(v).replace("₹", ""),
     },
   ];
 
@@ -364,13 +363,13 @@ export default function Rates({ data }) {
       <div className="card" style={{ marginTop: "20px" }}>
         <div className="card-title">
           Monthly Rate Summary
-          <span className="card-badge">{tableData.length} RECORDS</span>
+          <span className="card-badge">12 RECORDS</span>
         </div>
 
         <DataTable
           columns={COLUMNS}
           rows={paginatedRows}
-          total={tableData.length}
+          total={12}
           page={page}
           totalPages={totalPages}
           onPage={(p) => setPage(Number(p))}

@@ -13,16 +13,16 @@ import { useDashboardData } from "./hooks/useDashboardData";
 // import mockData from "./data/mockOverview.json";
 import React from "react";
 
-const DASHBOARD_SUBTITLE = "COF Dashboard · v14 · All Amounts in INR Crores";
+const DASHBOARD_SUBTITLE = "SAP S/4HANA | COB Dashboard";
 
 const PAGE_TITLES = {
-  overview: "Cost of Funds — Overview",
-  portfolioMix: "Cost of Funds — Portfolio Mix",
-  costAnalysis: "Cost of Funds — Cost Analysis",
-  rateTrends: "Cost of Funds — Rate Trends",
-  maturityAnalysis: "Cost of Funds — Maturity Analysis",
-  counterparties: "Cost of Funds — Counterparties",
-  transactions: "Cost of Funds — Transactions",
+  overview: "Overview",
+  portfolioMix: "Portfolio Mix",
+  costAnalysis: "Cost Analysis",
+  rateTrends: "Rate Trends",
+  maturityAnalysis: "Maturity Analysis",
+  counterparties: "Counterparties",
+  transactions: "Transactions",
 };
 
 export default function App() {

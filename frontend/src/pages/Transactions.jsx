@@ -90,15 +90,17 @@ export default function Transactions({ data }) {
         );
       },
     },
-
     {
       key: "portfolio",
       label: "Portfolio",
       render: (v) => {
-        const value = String(v || "").toLowerCase();
+        const value = String(v || "")
+          .trim()
+          .toLowerCase();
 
         const isSecured = value === "secured liability";
-        const isUnsecured = value === "unsecured liability  ";
+        const isUnsecured = value === "unsecured liability";
+        const isDashOnly = value === "-";
 
         return (
           <span
@@ -108,12 +110,16 @@ export default function Transactions({ data }) {
                 ? "#E8F1FF"
                 : isUnsecured
                   ? "#E0F7FA"
-                  : "#F3F4F6",
+                  : isDashOnly
+                    ? "#FEF3C7"
+                    : "#F3F4F6",
               color: isSecured
                 ? "#1565C0"
                 : isUnsecured
                   ? "#00ACC1"
-                  : "#374151",
+                  : isDashOnly
+                    ? "#D97706"
+                    : "#374151",
             }}
           >
             <span
@@ -123,7 +129,9 @@ export default function Transactions({ data }) {
                   ? "#1565C0"
                   : isUnsecured
                     ? "#00ACC1"
-                    : "#6B7280",
+                    : isDashOnly
+                      ? "#D97706"
+                      : "#6B7280",
               }}
             />
             {v || "-"}
@@ -189,13 +197,98 @@ export default function Transactions({ data }) {
     { key: "days", label: "Days" },
     {
       key: "openingCr",
-      label: "Opening",
-      render: (v) => fmt.n_cr(v),
+      label: "Opening (₹ Cr)",
+      render: (v) => fmt.n_cr(v).replace("₹", ""),
     },
     {
       key: "additionCr",
-      label: "Addition",
-      render: (v) => fmt.n_cr(v),
+      label: "Addition (₹ Cr)",
+      render: (v) => fmt.n_cr(v).replace("₹", ""),
+    },
+    {
+      key: "redemptionCr",
+      label: "Redemption (₹ Cr)",
+      render: (v) => fmt.n_cr(v).replace("₹", ""),
+    },
+    {
+      key: "closingCr",
+      label: "Closing (₹ Cr)",
+      render: (v) => fmt.n_cr(v).replace("₹", ""),
+    },
+    {
+      key: "accrualAmt",
+      label: "Accrual (₹ Cr)",
+      render: (v) => fmt.n_cr(v).replace("₹", ""),
+    },
+    {
+      key: "wtAvgAmt",
+      label: "Wt Avg Amt (₹ Cr)",
+      render: (v) => fmt.n_cr(v).replace("₹", ""),
+    },
+    {
+      key: "avgFunds",
+      label: "Avg Funds (₹ Cr)",
+      render: (v) => fmt.n_cr(v).replace("₹", ""),
+    },
+    {
+      key: "openEir",
+      label: "Open EIR",
+      render: (v) => fmt.percent?.(v) || v,
+    },
+    {
+      key: "exitEir",
+      label: "Exit EIR",
+      render: (v) => fmt.percent?.(v) || v,
+    },
+    {
+      key: "avgRateEir",
+      label: "Avg Rate EIR",
+      render: (v) => fmt.percent?.(v) || v,
+    },
+    {
+      key: "avgRateEirPapm",
+      label: "Avg Rate EIR PAPM",
+      render: (v) => fmt.percent?.(v) || v,
+    },
+    {
+      key: "exitRate",
+      label: "Exit Rate",
+      render: (v) => fmt.percent?.(v) || v,
+    },
+    {
+      key: "exitSpread",
+      label: "Exit Spread",
+      render: (v) => fmt.percent?.(v) || v,
+    },
+    {
+      key: "exitFinalRate",
+      label: "Exit Final Rate",
+      render: (v) => fmt.percent?.(v) || v,
+    },
+    {
+      key: "exitFinalRatePapm",
+      label: "Exit Final Rate PAPM",
+      render: (v) => fmt.percent?.(v) || v,
+    },
+    {
+      key: "avgRateYield",
+      label: "Avg Rate Yield",
+      render: (v) => fmt.percent?.(v) || v,
+    },
+    {
+      key: "avgRateYieldPapm",
+      label: "Avg Rate Yield PAPM",
+      render: (v) => fmt.percent?.(v) || v,
+    },
+    {
+      key: "wtIntAmtCouponYield",
+      label: "Wt Int Amt Coupon Yield (₹ Cr)",
+      render: (v) => fmt.n_cr(v).replace("₹", ""),
+    },
+    {
+      key: "wtAmtCouponYield",
+      label: "Wt Amt Coupon Yield (₹ Cr)",
+      render: (v) => fmt.n_cr(v).replace("₹", ""),
     },
   ];
 

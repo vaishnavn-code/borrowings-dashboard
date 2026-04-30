@@ -12,7 +12,7 @@ import { useInsights } from "../hooks/useDashboardData";
 import DonutLegend from "../components/charts/DonutLegend";
 import React from "react";
 import MonthlySummaryTable from "../components/ui/MonthlySummaryTable";
-import { formatMonth } from "../utils/formatters";
+import { fmt, formatMonth } from "../utils/formatters";
 
 export default function Overview({ data }) {
   const mappedData = useMemo(() => mapOverviewData(data), [data]);
@@ -23,6 +23,7 @@ export default function Overview({ data }) {
     loading: aiLoading,
     error: aiError,
     generate,
+    hasGenerated
   } = useInsights();
   const [topN, setTopN] = useState(15);
   const [viewMode, setViewMode] = useState("monthly");
@@ -219,6 +220,9 @@ export default function Overview({ data }) {
   const disbursementTitle = `${formatViewMode(viewMode)} Closing Balance & Accrual Trend`;
 
   const disbursementSubtitle = `BARS = OPENING & CLOSING BALANCE (₹ CR) | LINE = AVG EIR RATE (%)`;
+  const rateMixData = data?.overview?.Charts?.["Rate & Mix Snapshot"] || {};
+
+  const selectedRateMixData = rateMixData[selectedSummaryMonth] || {};
 
   const monthlySummaryRows = mappedData.monthlySummaryTable;
 
@@ -262,7 +266,7 @@ export default function Overview({ data }) {
 
         <KpiCard
           label="Avg EIR Rate"
-          value={Number(kpi.avgEirRate?.Title || 0).toFixed(2)}
+          value={Number(kpi.avgEirRate?.Title || 0) + " %"}
           sub={kpi.avgEirRate?.Subtitle}
           footer={kpi.avgEirRate?.Footer}
           sparkPct={80}
@@ -276,7 +280,7 @@ export default function Overview({ data }) {
         />
 
         <KpiCard
-          label="Total Closing"
+          label="Total Weighted Avg Amt"
           value={formatDisplay(kpi.totalClosing?.Title)}
           sub={formatSubtitle(kpi.totalClosing?.Subtitle)}
           footer={kpi.totalClosing?.Footer}
@@ -296,9 +300,9 @@ export default function Overview({ data }) {
           <div className="ai-panel-brand">
             <div className="ai-panel-icon">✦</div>
             <div className="ai-panel-title-block">
-              <div className="ai-panel-title">Exposure Insights</div>
+              <div className="ai-panel-title">Decision Intelligence</div>
               <div className="ai-panel-subtitle">
-                Powered by Treasury Intelligence
+                Powered by Generative AI Agents
               </div>
             </div>
           </div>
@@ -307,7 +311,11 @@ export default function Overview({ data }) {
             onClick={generate}
             disabled={aiLoading}
           >
-            {aiLoading ? "Analysing..." : "✦ Generate Insights"}
+            {aiLoading
+              ? "Analysing..."
+              : hasGenerated
+                ? "✦ Regenerate Insights"
+                : "✦ Generate Insights"}
           </button>
         </div>
         <div className="ai-panel-body">
@@ -406,8 +414,11 @@ export default function Overview({ data }) {
                           <div className="ai-detail-heading">
                             Recommended Action
                           </div>
+
                           <div className="ai-recommendation-text">
-                            {item.recommended_action}
+                            <div className="ai-recommendation-content">
+                              {item.recommended_action}
+                            </div>
                           </div>
                         </div>
                       )}
@@ -850,7 +861,7 @@ export default function Overview({ data }) {
             <tbody>
               <tr>
                 <td>Total Book</td>
-                <td>{formatDisplay(selectedSummaryData["Total Book"])}</td>
+                <td>{fmt.cr(selectedSummaryData["Total Book"])}</td>
               </tr>
               <tr>
                 <td>Wtd Avg EIR</td>
@@ -860,7 +871,7 @@ export default function Overview({ data }) {
               </tr>
               <tr>
                 <td>Total Accrual</td>
-                <td>{formatDisplay(selectedSummaryData["Total Accrual"])}</td>
+                <td>{fmt.cr(selectedSummaryData["Total Accrual"])}</td>
               </tr>
               <tr>
                 <td>Active Lines</td>
@@ -891,19 +902,35 @@ export default function Overview({ data }) {
             <tbody>
               <tr>
                 <td>Fixed Rate</td>
-                <td>{mappedData.rateMixSnapshot.fixedRate} (88.8%)</td>
+                <td>{fmt.cr(selectedRateMixData["Fixed Rate"])}</td>
               </tr>
+
               <tr>
                 <td>Floating Rate</td>
-                <td>{mappedData.rateMixSnapshot.floatingRate} (11.2%)</td>
+                <td>{fmt.cr(selectedRateMixData["Floating Rate"])}</td>
               </tr>
+
               <tr>
                 <td>Avg Exit Rate</td>
-                <td>{mappedData.rateMixSnapshot.avgExitRate} %</td>
+                <td>
+                  {Number(selectedRateMixData["Avg Exit Rate"] || 0).toFixed(2)}{" "}
+                  %
+                </td>
               </tr>
+
               <tr>
                 <td>Avg Coupon/Yield</td>
-                <td>{mappedData.rateMixSnapshot.avgCouponYield} %</td>
+                <td>
+                  {Number(selectedRateMixData["Avg Coupon/Yield"] || 0).toFixed(
+                    2,
+                  )}{" "}
+                  %
+                </td>
+              </tr>
+
+              <tr>
+                <td>Peak Maturity</td>
+                <td>{selectedRateMixData["Peak_Maturity"] || 0}</td>
               </tr>
             </tbody>
           </table>

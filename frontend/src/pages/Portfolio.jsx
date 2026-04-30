@@ -11,7 +11,7 @@ import {
 } from "../components/charts/BarCharts";
 import DonutChart from "../components/charts/DonutChart";
 import DonutLegend from "../components/charts/DonutLegend";
-import {formatMonth} from "../utils/formatters";
+import { formatMonth } from "../utils/formatters";
 
 export default function Portfolio({ data }) {
   const COLUMNS = [
@@ -22,17 +22,17 @@ export default function Portfolio({ data }) {
     {
       key: "closingBalance",
       label: "Closing Balance (₹ Cr)",
-      render: (v) => fmt.n_cr(v),
+      render: (v) => fmt.n_cr(v).replace("₹", ""),
     },
     {
       key: "accrual",
       label: "Accrual (₹ Cr)",
-      render: (v) => fmt.n_cr(v),
+      render: (v) => fmt.n_cr(v).replace("₹", ""),
     },
     {
       key: "eirInterest",
       label: "EIR Interest (₹ Cr)",
-      render: (v) => fmt.n_cr(v),
+      render: (v) => fmt.n_cr(v).replace("₹", ""),
     },
     {
       key: "transactions",
@@ -70,7 +70,9 @@ export default function Portfolio({ data }) {
 
   return (
     <div>
-      <div className="section-label">Portfolio Mix — {formatMonth(data.curr_month)} Product Breakdown</div>
+      <div className="section-label">
+        Portfolio Mix — {formatMonth(data.curr_month)} Product Breakdown
+      </div>
 
       {/* KPI CARDS */}
 
@@ -242,9 +244,7 @@ export default function Portfolio({ data }) {
               <option value="wt_int_amt_coupon_yield">
                 WT INT AMT COUPON YIELD
               </option>
-              <option value="wt_amt_coupon_yield">
-                WT AMT COUPON YIELD
-              </option>
+              <option value="wt_amt_coupon_yield">WT AMT COUPON YIELD</option>
             </select>
           </div>
         </div>
@@ -265,7 +265,11 @@ export default function Portfolio({ data }) {
 
           <div className="chart-subtitle">MONTHLY FLOW ₹ CR</div>
 
-          <AdditionVsRedemptionChart data={additionData} height={360} barSize={36} />
+          <AdditionVsRedemptionChart
+            data={additionData}
+            height={360}
+            barSize={36}
+          />
         </div>
 
         <div className="chart-card" style={{ marginTop: "20px" }}>
